@@ -16,11 +16,7 @@
 //------------------------------------------------------------------------------
 #import "zxing-all-in-one.h"
 
-#ifdef CORDOVA_FRAMEWORK
 #import <CORDOVA/CDVPlugin.h>
-#else
-#import "CDVPlugin.h"
-#endif
 
 //------------------------------------------------------------------------------
 // Adds a shutter button to the UI, and changes the scan from continuous to
