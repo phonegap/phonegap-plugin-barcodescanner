@@ -10,7 +10,7 @@
 
     <!-- ios -->
     <platform name="ios">
-		<plugins-plist key="CDVBarcodeScanner" string="CDVBarcodeScanner" />
+		<plugins-plist key="BarcodeScanner" string="CDVBarcodeScanner" />
 		
 		<resource-file src="scannerOverlay.xib" />
 
@@ -27,6 +27,8 @@
 
     <!-- android -->
     <platform name="android">
+
+        <source-file src="com/phonegap/plugins/barcodescanner/BarcodeScanner.java" target-dir="src/com/phonegap/plugins/barcodescanner" />
 		
         <config-file target="res/xml/plugins.xml" parent="/plugins">
             <plugin name="BarcodeScanner"
@@ -37,8 +39,6 @@
             <plugin name="BarcodeScanner"
                 value="com.phonegap.plugins.barcodescanner.BarcodeScanner"/>
         </config-file>
-
-        <source-file src="com/phonegap/plugins/barcodescanner/BarcodeScanner.java" target-dir="src/com/phonegap/plugins/barcodescanner" />
 
         <config-file target="AndroidManifest.xml" parent="/manifest/application">
             <activity 
@@ -61,7 +61,12 @@
                     <category android:name="android.intent.category.DEFAULT"/> 
                 </intent-filter> 
             </activity>
-        </config>
+        </config-file>
+
+        <config-file target="AndroidManifest.xml" parent="/manifest">
+            <uses-permission android:name="android.permission.CAMERA" />
+            <uses-feature android:name="android.hardware.camera" />
+        </config-file>
 
     </platform>
 </plugin>
