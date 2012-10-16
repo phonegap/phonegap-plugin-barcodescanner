@@ -93,7 +93,7 @@ final class LoadPackagesAsyncTask extends AsyncTask<List<String[]>, Void, List<S
       labels.add(result[0]);
     }
     ListAdapter listAdapter = new ArrayAdapter<String>(activity,
-        android.R.layout.simple_list_item_1, labels);
+        activity.getApplicationContext().getResources().getIdentifier("simple_list_item_1", "layout", activity.getApplicationContext().getPackageName()), labels);
     activity.setListAdapter(listAdapter);
   }
 

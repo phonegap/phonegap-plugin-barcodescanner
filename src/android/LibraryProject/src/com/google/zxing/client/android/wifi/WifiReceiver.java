@@ -67,7 +67,7 @@ final class WifiReceiver extends BroadcastReceiver {
 
           if (state == NetworkInfo.State.CONNECTED && ssid != null){
             mWifiManager.saveConfiguration();
-            String label = parent.getString(R.string.wifi_connected);
+            String label = parent.getString(parent.getApplicationContext().getResources().getIdentifier("wifi_connected", "string", parent.getApplicationContext().getPackageName()));
             statusView.setText(label + '\n' + ssid);
             Runnable delayKill = new Killer(parent);
             delayKill.run();

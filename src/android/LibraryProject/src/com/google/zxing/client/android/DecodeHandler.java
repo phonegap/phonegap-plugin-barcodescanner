@@ -51,9 +51,9 @@ final class DecodeHandler extends Handler {
     if (!running) {
       return;
     }
-    if (message.what == R.id.decode) {
+    if (message.what == activity.getApplicationContext().getResources().getIdentifier("decode", "id", activity.getApplicationContext().getPackageName())) {
         decode((byte[]) message.obj, message.arg1, message.arg2);
-    } else if (message.what == R.id.quit) {
+    } else if (message.what == activity.getApplicationContext().getResources().getIdentifier("quit", "id", activity.getApplicationContext().getPackageName())) {
         running = false;
         Looper.myLooper().quit();
     }
@@ -84,13 +84,13 @@ final class DecodeHandler extends Handler {
       // Don't log the barcode contents for security.
       long end = System.currentTimeMillis();
       Log.d(TAG, "Found barcode in " + (end - start) + " ms");
-      Message message = Message.obtain(activity.getHandler(), R.id.decode_succeeded, rawResult);
+      Message message = Message.obtain(activity.getHandler(), activity.getApplicationContext().getResources().getIdentifier("decode_succeeded", "id", activity.getApplicationContext().getPackageName()), rawResult);
       Bundle bundle = new Bundle();
       bundle.putParcelable(DecodeThread.BARCODE_BITMAP, source.renderCroppedGreyscaleBitmap());
       message.setData(bundle);
       message.sendToTarget();
     } else {
-      Message message = Message.obtain(activity.getHandler(), R.id.decode_failed);
+      Message message = Message.obtain(activity.getHandler(), activity.getApplicationContext().getResources().getIdentifier("decode_failed", "id", activity.getApplicationContext().getPackageName()));
       message.sendToTarget();
     }
   }

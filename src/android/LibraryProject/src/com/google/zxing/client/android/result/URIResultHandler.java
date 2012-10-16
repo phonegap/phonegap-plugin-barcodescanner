@@ -35,15 +35,14 @@ public final class URIResultHandler extends ResultHandler {
     "otpauth:"
   };
 
-  private static final int[] buttons = {
-      R.string.button_open_browser,
-      R.string.button_share_by_email,
-      R.string.button_share_by_sms,
-      R.string.button_search_book_contents,
-  };
+  private static final int[] buttons = new int[4];
 
   public URIResultHandler(Activity activity, ParsedResult result) {
     super(activity, result);
+    buttons[0] = getIdentifier("string", "button_open_browser");
+    buttons[1] = getIdentifier("string", "button_share_by_email");
+    buttons[2] = getIdentifier("string", "button_share_by_sms");
+    buttons[3] = getIdentifier("string", "button_search_book_contents");
   }
 
   @Override
@@ -81,7 +80,7 @@ public final class URIResultHandler extends ResultHandler {
 
   @Override
   public int getDisplayTitle() {
-    return R.string.result_uri;
+    return getIdentifier("string", "result_uri");
   }
 
   @Override

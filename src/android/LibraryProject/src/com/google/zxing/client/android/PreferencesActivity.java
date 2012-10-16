@@ -58,7 +58,7 @@ public final class PreferencesActivity extends PreferenceActivity
   @Override
   protected void onCreate(Bundle icicle) {
     super.onCreate(icicle);
-    addPreferencesFromResource(R.xml.preferences);
+    addPreferencesFromResource(getApplicationContext().getResources().getIdentifier("preferences", "xml", getApplicationContext().getPackageName()));
 
     PreferenceScreen preferences = getPreferenceScreen();
     preferences.getSharedPreferences().registerOnSharedPreferenceChangeListener(this);

@@ -111,11 +111,11 @@ public final class HistoryManager {
     }
 
     Resources res = activity.getResources();
-    dialogItems.add(res.getString(R.string.history_send));
-    dialogItems.add(res.getString(R.string.history_clear_text));
+    dialogItems.add(res.getString(activity.getApplicationContext().getResources().getIdentifier("history_send", "string", activity.getApplicationContext().getPackageName())));
+    dialogItems.add(res.getString(activity.getApplicationContext().getResources().getIdentifier("history_clear_text", "string", activity.getApplicationContext().getPackageName())));
     DialogInterface.OnClickListener clickListener = new HistoryClickListener(this, activity, items);
     AlertDialog.Builder builder = new AlertDialog.Builder(activity);
-    builder.setTitle(R.string.history_title);
+    builder.setTitle(activity.getApplicationContext().getResources().getIdentifier("history_title", "string", activity.getApplicationContext().getPackageName()));
     builder.setItems(dialogItems.toArray(new String[dialogItems.size()]), clickListener);
     return builder.create();
   }

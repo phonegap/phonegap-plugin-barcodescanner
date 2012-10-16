@@ -117,7 +117,7 @@ final class QRCodeEncoder {
       if (data != null && data.length() > 0) {
         contents = data;
         displayContents = data;
-        title = activity.getString(R.string.contents_text);
+        title = activity.getString(activity.getApplicationContext().getResources().getIdentifier("contents_text", "string", activity.getApplicationContext().getPackageName()));
       }
     }
     return contents != null && contents.length() > 0;
@@ -154,7 +154,7 @@ final class QRCodeEncoder {
     } else {
       displayContents = contents;
     }
-    title = activity.getString(R.string.contents_text);
+    title = activity.getString(activity.getApplicationContext().getResources().getIdentifier("contents_text", "string", activity.getApplicationContext().getPackageName()));
     return true;
   }
 
@@ -206,28 +206,28 @@ final class QRCodeEncoder {
       if (data != null && data.length() > 0) {
         contents = data;
         displayContents = data;
-        title = activity.getString(R.string.contents_text);
+        title = activity.getString(activity.getApplicationContext().getResources().getIdentifier("contents_text", "string", activity.getApplicationContext().getPackageName()));
       }
     } else if (type.equals(Contents.Type.EMAIL)) {
       String data = trim(intent.getStringExtra(Intents.Encode.DATA));
       if (data != null) {
         contents = "mailto:" + data;
         displayContents = data;
-        title = activity.getString(R.string.contents_email);
+        title = activity.getString(activity.getApplicationContext().getResources().getIdentifier("contents_email", "string", activity.getApplicationContext().getPackageName()));
       }
     } else if (type.equals(Contents.Type.PHONE)) {
       String data = trim(intent.getStringExtra(Intents.Encode.DATA));
       if (data != null) {
         contents = "tel:" + data;
         displayContents = PhoneNumberUtils.formatNumber(data);
-        title = activity.getString(R.string.contents_phone);
+        title = activity.getString(activity.getApplicationContext().getResources().getIdentifier("contents_phone", "string", activity.getApplicationContext().getPackageName()));
       }
     } else if (type.equals(Contents.Type.SMS)) {
       String data = trim(intent.getStringExtra(Intents.Encode.DATA));
       if (data != null) {
         contents = "sms:" + data;
         displayContents = PhoneNumberUtils.formatNumber(data);
-        title = activity.getString(R.string.contents_sms);
+        title = activity.getString(activity.getApplicationContext().getResources().getIdentifier("contents_sms", "string", activity.getApplicationContext().getPackageName()));
       }
     } else if (type.equals(Contents.Type.CONTACT)) {
       Bundle bundle = intent.getBundleExtra(Intents.Encode.DATA);
@@ -264,7 +264,7 @@ final class QRCodeEncoder {
           newContents.append(';');
           contents = newContents.toString();
           displayContents = newDisplayContents.toString();
-          title = activity.getString(R.string.contents_contact);
+          title = activity.getString(activity.getApplicationContext().getResources().getIdentifier("contents_contact", "string", activity.getApplicationContext().getPackageName()));
         } else {
           contents = null;
           displayContents = null;
@@ -279,7 +279,7 @@ final class QRCodeEncoder {
         if (latitude != Float.MAX_VALUE && longitude != Float.MAX_VALUE) {
           contents = "geo:" + latitude + ',' + longitude;
           displayContents = latitude + "," + longitude;
-          title = activity.getString(R.string.contents_location);
+          title = activity.getString(activity.getApplicationContext().getResources().getIdentifier("contents_location", "string", activity.getApplicationContext().getPackageName()));
         }
       }
     }
@@ -337,7 +337,7 @@ final class QRCodeEncoder {
       newContents.append(';');
       contents = newContents.toString();
       displayContents = newDisplayContents.toString();
-      title = activity.getString(R.string.contents_contact);
+      title = activity.getString(activity.getApplicationContext().getResources().getIdentifier("contents_contact", "string", activity.getApplicationContext().getPackageName()));
       return true;
     } else {
       contents = null;

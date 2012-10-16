@@ -25,6 +25,7 @@ import com.google.zxing.client.android.R;
 
 import android.app.Activity;
 import android.app.AlertDialog;
+import android.content.Context;
 import android.content.Intent;
 import android.graphics.Bitmap;
 import android.net.Uri;
@@ -54,16 +55,18 @@ public final class EncodeActivity extends Activity {
   private static final int MAX_BARCODE_FILENAME_LENGTH = 24;
 
   private QRCodeEncoder qrCodeEncoder;
+  private Context context;
 
   @Override
   public void onCreate(Bundle icicle) {
     super.onCreate(icicle);
+    context = getApplicationContext();
 
     Intent intent = getIntent();
     if (intent != null) {
       String action = intent.getAction();
       if (action.equals(Intents.Encode.ACTION) || action.equals(Intent.ACTION_SEND)) {
-        setContentView(R.layout.encode);
+        setContentView(context.getResources().getIdentifier("encode", "layout", context.getPackageName()));
         return;
       }
     }
@@ -73,7 +76,7 @@ public final class EncodeActivity extends Activity {
   @Override
   public boolean onCreateOptionsMenu(Menu menu) {
     super.onCreateOptionsMenu(menu);
-    menu.add(0, Menu.FIRST, 0, R.string.menu_share).setIcon(android.R.drawable.ic_menu_share);
+    menu.add(0, Menu.FIRST, 0, context.getResources().getIdentifier("menu_share", "string", context.getPackageName())).setIcon(context.getResources().getIdentifier("ic_menu_share", "drawable", context.getPackageName()));
     return true;
   }
 
@@ -97,7 +100,7 @@ public final class EncodeActivity extends Activity {
     File barcodesRoot = new File(bsRoot, "Barcodes");
     if (!barcodesRoot.exists() && !barcodesRoot.mkdirs()) {
       Log.w(TAG, "Couldn't make dir " + barcodesRoot);
-      showErrorMessage(R.string.msg_unmount_usb);
+      showErrorMessage(context.getResources().getIdentifier("msg_unmount_usb", "string", context.getPackageName()));
       return true;
     }
     File barcodeFile = new File(barcodesRoot, makeBarcodeFileName(contents) + ".png");
@@ -108,7 +111,7 @@ public final class EncodeActivity extends Activity {
       bitmap.compress(Bitmap.CompressFormat.PNG, 0, fos);
     } catch (FileNotFoundException fnfe) {
       Log.w(TAG, "Couldn't access file " + barcodeFile + " due to " + fnfe);
-      showErrorMessage(R.string.msg_unmount_usb);
+      showErrorMessage(context.getResources().getIdentifier("msg_unmount_usb", "string", context.getPackageName()));
       return true;
     } finally {
       if (fos != null) {
@@ -121,7 +124,7 @@ public final class EncodeActivity extends Activity {
     }
 
     Intent intent = new Intent(Intent.ACTION_SEND, Uri.parse("mailto:"));
-    intent.putExtra(Intent.EXTRA_SUBJECT, getString(R.string.app_name) + " - " +
+    intent.putExtra(Intent.EXTRA_SUBJECT, getString(context.getResources().getIdentifier("app_name", "string", context.getPackageName())) + " - " +
         qrCodeEncoder.getTitle());
     intent.putExtra(Intent.EXTRA_TEXT, qrCodeEncoder.getContents());
     intent.putExtra(Intent.EXTRA_STREAM, Uri.parse("file://" + barcodeFile.getAbsolutePath()));
@@ -159,19 +162,19 @@ public final class EncodeActivity extends Activity {
     Intent intent = getIntent();
     try {
       qrCodeEncoder = new QRCodeEncoder(this, intent, smallerDimension);
-      setTitle(getString(R.string.app_name) + " - " + qrCodeEncoder.getTitle());
+      setTitle(getString(context.getResources().getIdentifier("app_name", "string", context.getPackageName())) + " - " + qrCodeEncoder.getTitle());
       Bitmap bitmap = qrCodeEncoder.encodeAsBitmap();
-      ImageView view = (ImageView) findViewById(R.id.image_view);
+      ImageView view = (ImageView) findViewById(context.getResources().getIdentifier("image_view", "id", context.getPackageName()));
       view.setImageBitmap(bitmap);
-      TextView contents = (TextView) findViewById(R.id.contents_text_view);
+      TextView contents = (TextView) findViewById(context.getResources().getIdentifier("contents_text_view", "id", context.getPackageName()));
       contents.setText(qrCodeEncoder.getDisplayContents());
     } catch (WriterException e) {
       Log.e(TAG, "Could not encode barcode", e);
-      showErrorMessage(R.string.msg_encode_contents_failed);
+      showErrorMessage(context.getResources().getIdentifier("msg_encode_contents_failed", "string", context.getPackageName()));
       qrCodeEncoder = null;
     } catch (IllegalArgumentException e) {
       Log.e(TAG, "Could not encode barcode", e);
-      showErrorMessage(R.string.msg_encode_contents_failed);
+      showErrorMessage(context.getResources().getIdentifier("msg_encode_contents_failed", "string", context.getPackageName()));
       qrCodeEncoder = null;
     }
   }
@@ -179,7 +182,7 @@ public final class EncodeActivity extends Activity {
   private void showErrorMessage(int message) {
     AlertDialog.Builder builder = new AlertDialog.Builder(this);
     builder.setMessage(message);
-    builder.setPositiveButton(R.string.button_ok, new FinishListener(this));
+    builder.setPositiveButton(context.getResources().getIdentifier("button_ok", "string", context.getPackageName()), new FinishListener(this));
     builder.setOnCancelListener(new FinishListener(this));
     builder.show();
   }

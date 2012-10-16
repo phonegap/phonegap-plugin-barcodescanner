@@ -62,11 +62,13 @@ public final class ViewfinderView extends View {
     // Initialize these once for performance rather than calling them every time in onDraw().
     paint = new Paint();
     Resources resources = getResources();
-    maskColor = resources.getColor(R.color.viewfinder_mask);
-    resultColor = resources.getColor(R.color.result_view);
-    frameColor = resources.getColor(R.color.viewfinder_frame);
-    laserColor = resources.getColor(R.color.viewfinder_laser);
-    resultPointColor = resources.getColor(R.color.possible_result_points);
+    Resources appRes = context.getResources();
+    String pkgName = context.getPackageName();
+    maskColor = resources.getColor(appRes.getIdentifier("viewfinder_mask", "color", pkgName));
+    resultColor = resources.getColor(appRes.getIdentifier("result_view", "color", pkgName));
+    frameColor = resources.getColor(appRes.getIdentifier("viewfinder_frame", "color", pkgName));
+    laserColor = resources.getColor(appRes.getIdentifier("viewfinder_laser", "color", pkgName));
+    resultPointColor = resources.getColor(appRes.getIdentifier("possible_result_points", "color", pkgName));
     scannerAlpha = 0;
     possibleResultPoints = new ArrayList<ResultPoint>(5);
     lastPossibleResultPoints = null;

@@ -86,9 +86,9 @@ public final class HelpActivity extends Activity {
   @Override
   protected void onCreate(Bundle icicle) {
     super.onCreate(icicle);
-    setContentView(R.layout.help);
+    setContentView(getApplicationContext().getResources().getIdentifier("help", "layout", getApplicationContext().getPackageName()));
 
-    webView = (WebView)findViewById(R.id.help_contents);
+    webView = (WebView)findViewById(getApplicationContext().getResources().getIdentifier("help_contents", "id", getApplicationContext().getPackageName()));
     webView.setWebViewClient(new HelpClient());
 
     // Froyo has a bug with calling onCreate() twice in a row, which causes the What's New page
@@ -108,9 +108,9 @@ public final class HelpActivity extends Activity {
       webView.loadUrl(BASE_URL + DEFAULT_PAGE);
     }
 
-    backButton = (Button) findViewById(R.id.back_button);
+    backButton = (Button) findViewById(getApplicationContext().getResources().getIdentifier("back_button", "id", getApplicationContext().getPackageName()));
     backButton.setOnClickListener(backListener);
-    View doneButton = findViewById(R.id.done_button);
+    View doneButton = findViewById(getApplicationContext().getResources().getIdentifier("done_button", "id", getApplicationContext().getPackageName()));
     doneButton.setOnClickListener(doneListener);
 
     if (!initialized) {
@@ -126,9 +126,9 @@ public final class HelpActivity extends Activity {
       for (String buggyModelSubstring : BUGGY_MODEL_SUBSTRINGS) {
         if (model.contains(buggyModelSubstring)) {
           AlertDialog.Builder builder = new AlertDialog.Builder(this);
-          builder.setMessage(R.string.msg_buggy);
-          builder.setPositiveButton(R.string.button_ok, groupsListener);
-          builder.setNegativeButton(R.string.button_cancel, null);
+          builder.setMessage(getApplicationContext().getResources().getIdentifier("msg_buggy", "string", getApplicationContext().getPackageName()));
+          builder.setPositiveButton(getApplicationContext().getResources().getIdentifier("button_ok", "string", getApplicationContext().getPackageName()), groupsListener);
+          builder.setNegativeButton(getApplicationContext().getResources().getIdentifier("button_cancel", "string", getApplicationContext().getPackageName()), null);
           builder.show();
           break;
         }

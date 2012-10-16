@@ -17,6 +17,7 @@
 package com.google.zxing.client.android.book;
 
 import android.app.Activity;
+import android.content.Context;
 import android.content.Intent;
 import android.os.Bundle;
 import android.os.Handler;
@@ -74,16 +75,18 @@ public final class SearchBookContentsActivity extends Activity {
   private Button queryButton;
   private ListView resultListView;
   private TextView headerView;
+  private static Context context;
+  private static String pkgName;
 
   private final Handler handler = new Handler() {
     @Override
     public void handleMessage(Message message) {
-      if (message.what == R.id.search_book_contents_succeeded) {
+      if (message.what == getIdentifier("id", "search_book_contents_succeeded")) {
           handleSearchResults((JSONObject) message.obj);
           resetForNewQuery();
-      } else if (message.what == R.id.search_book_contents_failed) {
+      } else if (message.what == getIdentifier("id", "search_book_contents_failed")) {
           resetForNewQuery();
-          headerView.setText(R.string.msg_sbc_failed);
+          headerView.setText(getIdentifier("string", "msg_sbc_failed"));
       }
     }
   };
@@ -108,9 +111,17 @@ public final class SearchBookContentsActivity extends Activity {
     return isbn;
   }
 
+  
+  private static int getIdentifier(String type, String name) {
+    return context.getResources().getIdentifier(name, type, pkgName);
+  }
+
   @Override
   public void onCreate(Bundle icicle) {
     super.onCreate(icicle);
+    
+    context = getApplicationContext();
+    pkgName = context.getPackageName();
 
     // Make sure that expired cookies are removed on launch.
     CookieSyncManager.createInstance(this);
@@ -124,13 +135,13 @@ public final class SearchBookContentsActivity extends Activity {
 
     isbn = intent.getStringExtra(Intents.SearchBookContents.ISBN);
     if (LocaleManager.isBookSearchUrl(isbn)) {
-      setTitle(getString(R.string.sbc_name));
+      setTitle(getString(getIdentifier("string", "sbc_name")));
     } else {
-      setTitle(getString(R.string.sbc_name) + ": ISBN " + isbn);
+      setTitle(getString(getIdentifier("string", "sbc_name")) + ": ISBN " + isbn);
     }
 
-    setContentView(R.layout.search_book_contents);
-    queryTextView = (EditText) findViewById(R.id.query_text_view);
+    setContentView(getIdentifier("layout", "search_book_contents"));
+    queryTextView = (EditText) findViewById(getIdentifier("id", "query_text_view"));
 
     String initialQuery = intent.getStringExtra(Intents.SearchBookContents.QUERY);
     if (initialQuery != null && initialQuery.length() > 0) {
@@ -139,12 +150,12 @@ public final class SearchBookContentsActivity extends Activity {
     }
     queryTextView.setOnKeyListener(keyListener);
 
-    queryButton = (Button) findViewById(R.id.query_button);
+    queryButton = (Button) findViewById(getIdentifier("id", "query_button"));
     queryButton.setOnClickListener(buttonListener);
 
-    resultListView = (ListView) findViewById(R.id.result_list_view);
+    resultListView = (ListView) findViewById(getIdentifier("id", "result_list_view"));
     LayoutInflater factory = LayoutInflater.from(this);
-    headerView = (TextView) factory.inflate(R.layout.search_book_contents_header,
+    headerView = (TextView) factory.inflate(getIdentifier("layout", "search_book_contents_header"),
         resultListView, false);
     resultListView.addHeaderView(headerView);
   }
@@ -168,7 +179,7 @@ public final class SearchBookContentsActivity extends Activity {
       if (query != null && query.length() > 0) {
         networkThread = new NetworkThread(isbn, query, handler);
         networkThread.start();
-        headerView.setText(R.string.msg_sbc_searching_book);
+        headerView.setText(getIdentifier("string", "msg_sbc_searching_book"));
         resultListView.setAdapter(null);
         queryTextView.setEnabled(false);
         queryButton.setEnabled(false);
@@ -194,14 +205,14 @@ public final class SearchBookContentsActivity extends Activity {
       } else {
         String searchable = json.optString("searchable");
         if ("false".equals(searchable)) {
-          headerView.setText(R.string.msg_sbc_book_not_searchable);
+          headerView.setText(getIdentifier("string", "msg_sbc_book_not_searchable"));
         }
         resultListView.setAdapter(null);
       }
     } catch (JSONException e) {
       Log.w(TAG, "Bad JSON from book search", e);
       resultListView.setAdapter(null);
-      headerView.setText(R.string.msg_sbc_failed);
+      headerView.setText(getIdentifier("string", "msg_sbc_failed"));
     }
   }
 
@@ -211,10 +222,10 @@ public final class SearchBookContentsActivity extends Activity {
       String pageId = json.getString("page_id");
       String pageNumber = json.getString("page_number");
       if (pageNumber.length() > 0) {
-        pageNumber = getString(R.string.msg_sbc_page) + ' ' + pageNumber;
+        pageNumber = getString(getIdentifier("string", "msg_sbc_page")) + ' ' + pageNumber;
       } else {
         // This can happen for text on the jacket, and possibly other reasons.
-        pageNumber = getString(R.string.msg_sbc_unknown_page);
+        pageNumber = getString(getIdentifier("string", "msg_sbc_unknown_page"));
       }
 
       // Remove all HTML tags and encoded characters. Ideally the server would do this.
@@ -227,13 +238,13 @@ public final class SearchBookContentsActivity extends Activity {
         snippet = QUOTE_ENTITY_PATTERN.matcher(snippet).replaceAll("'");
         snippet = QUOT_ENTITY_PATTERN.matcher(snippet).replaceAll("\"");
       } else {
-        snippet = '(' + getString(R.string.msg_sbc_snippet_unavailable) + ')';
+        snippet = '(' + getString(getIdentifier("string", "msg_sbc_snippet_unavailable")) + ')';
         valid = false;
       }
       return new SearchBookContentsResult(pageId, pageNumber, snippet, valid);
     } catch (JSONException e) {
       // Never seen in the wild, just being complete.
-      return new SearchBookContentsResult(getString(R.string.msg_sbc_no_page_returned), "", "", false);
+      return new SearchBookContentsResult(getString(getIdentifier("string", "msg_sbc_no_page_returned")), "", "", false);
     }
   }
 
@@ -277,17 +288,17 @@ public final class SearchBookContentsActivity extends Activity {
           JSONObject json = new JSONObject(jsonHolder.toString(getEncoding(entity)));
           jsonHolder.close();
 
-          Message message = Message.obtain(handler, R.id.search_book_contents_succeeded);
+          Message message = Message.obtain(handler, getIdentifier("id", "search_book_contents_succeeded"));
           message.obj = json;
           message.sendToTarget();
         } else {
           Log.w(TAG, "HTTP returned " + response.getStatusLine().getStatusCode() + " for " + uri);
-          Message message = Message.obtain(handler, R.id.search_book_contents_failed);
+          Message message = Message.obtain(handler, getIdentifier("id", "search_book_contents_failed"));
           message.sendToTarget();
         }
       } catch (Exception e) {
         Log.w(TAG, "Error accessing book search", e);
-        Message message = Message.obtain(handler, R.id.search_book_contents_failed);
+        Message message = Message.obtain(handler, getIdentifier("id", "search_book_contents_failed"));
         message.sendToTarget();
       } finally {
         if (client != null) {

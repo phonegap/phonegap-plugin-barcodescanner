@@ -29,13 +29,13 @@ import android.telephony.PhoneNumberUtils;
  * @author dswitkin@google.com (Daniel Switkin)
  */
 public final class TelResultHandler extends ResultHandler {
-  private static final int[] buttons = {
-      R.string.button_dial,
-      R.string.button_add_contact
-  };
+  private static final int[] buttons = new int[2];
 
   public TelResultHandler(Activity activity, ParsedResult result) {
     super(activity, result);
+    
+    buttons[0] = getIdentifier("string", "button_dial");
+    buttons[1] = getIdentifier("string", "button_add_contact");
   }
 
   @Override
@@ -73,6 +73,6 @@ public final class TelResultHandler extends ResultHandler {
 
   @Override
   public int getDisplayTitle() {
-    return R.string.result_tel;
+    return getIdentifier("string", "result_tel");
   }
 }

@@ -93,7 +93,7 @@ public final class BeepManager {
       }
     });
 
-    AssetFileDescriptor file = activity.getResources().openRawResourceFd(R.raw.beep);
+    AssetFileDescriptor file = activity.getResources().openRawResourceFd(activity.getApplicationContext().getResources().getIdentifier("beep", "raw", activity.getApplicationContext().getPackageName()));
     try {
       mediaPlayer.setDataSource(file.getFileDescriptor(), file.getStartOffset(), file.getLength());
       file.close();

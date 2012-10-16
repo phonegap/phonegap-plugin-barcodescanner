@@ -32,15 +32,16 @@ import android.view.View;
  * @author dswitkin@google.com (Daniel Switkin)
  */
 public final class ISBNResultHandler extends ResultHandler {
-  private static final int[] buttons = {
-      R.string.button_product_search,
-      R.string.button_book_search,
-      R.string.button_search_book_contents,
-      R.string.button_custom_product_search
-  };
+  private static final int[] buttons = new int[4];
 
   public ISBNResultHandler(Activity activity, ParsedResult result, Result rawResult) {
     super(activity, result, rawResult);
+    
+    buttons[0] = getIdentifier("string", "button_product_search");
+    buttons[1] = getIdentifier("string", "button_book_search");
+    buttons[2] = getIdentifier("string", "button_search_book_contents");
+    buttons[3] = getIdentifier("string", "button_custom_product_search");
+    
     showGoogleShopperButton(new View.OnClickListener() {
       public void onClick(View view) {
         ISBNParsedResult isbnResult = (ISBNParsedResult) getResult();
@@ -84,6 +85,6 @@ public final class ISBNResultHandler extends ResultHandler {
 
   @Override
   public int getDisplayTitle() {
-    return R.string.result_isbn;
+    return getIdentifier("string", "result_isbn");
   }
 }

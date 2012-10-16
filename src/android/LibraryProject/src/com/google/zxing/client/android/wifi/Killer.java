@@ -25,6 +25,7 @@ import android.app.Activity;
 import android.app.AlertDialog;
 import android.content.ActivityNotFoundException;
 import android.content.Intent;
+import android.content.res.Resources;
 import android.net.Uri;
 import android.os.Handler;
 
@@ -50,9 +51,11 @@ final class Killer implements Runnable {
         parent.startActivity(intent);
       } catch (ActivityNotFoundException e) {
         AlertDialog.Builder builder = new AlertDialog.Builder(parent);
-        builder.setTitle(R.string.app_name);
-        builder.setMessage(R.string.msg_intent_failed);
-        builder.setPositiveButton(R.string.button_ok, null);
+        Resources res = parent.getApplicationContext().getResources();
+        String pkgName = parent.getApplicationContext().getPackageName();
+        builder.setTitle(res.getIdentifier("app_name", "string", pkgName));
+        builder.setMessage(res.getIdentifier("msg_intent_failed", "string", pkgName));
+        builder.setPositiveButton(res.getIdentifier("button_ok", "string", pkgName), null);
         builder.show();
       }
     }

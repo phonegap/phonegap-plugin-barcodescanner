@@ -35,20 +35,23 @@ import android.widget.TextView;
 public final class SearchBookContentsListItem extends LinearLayout {
   private TextView pageNumberView;
   private TextView snippetView;
+  private Context context;
 
   SearchBookContentsListItem(Context context) {
     super(context);
+    this.context = context;
   }
 
   public SearchBookContentsListItem(Context context, AttributeSet attrs) {
     super(context, attrs);
+    this.context = context;
   }
 
   @Override
   protected void onFinishInflate() {
     super.onFinishInflate();
-    pageNumberView = (TextView) findViewById(R.id.page_number_view);
-    snippetView = (TextView) findViewById(R.id.snippet_view);
+    pageNumberView = (TextView) findViewById(context.getResources().getIdentifier("page_number_view", "id", context.getPackageName()));
+    snippetView = (TextView) findViewById(context.getResources().getIdentifier("snippet_view", "id", context.getPackageName()));
   }
 
   public void set(SearchBookContentsResult result) {

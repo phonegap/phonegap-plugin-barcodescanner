@@ -30,6 +30,7 @@ import com.google.zxing.client.android.share.ShareActivity;
 
 import android.app.Activity;
 import android.app.AlertDialog;
+import android.content.Context;
 import android.content.DialogInterface;
 import android.content.Intent;
 import android.content.SharedPreferences;
@@ -128,11 +129,13 @@ public final class CaptureActivity extends Activity implements SurfaceHolder.Cal
   private HistoryManager historyManager;
   private InactivityTimer inactivityTimer;
   private BeepManager beepManager;
+  private Context context;
+  private String pkgName;
 
   private final DialogInterface.OnClickListener aboutListener =
       new DialogInterface.OnClickListener() {
     public void onClick(DialogInterface dialogInterface, int i) {
-      Intent intent = new Intent(Intent.ACTION_VIEW, Uri.parse(getString(R.string.zxing_url)));
+      Intent intent = new Intent(Intent.ACTION_VIEW, Uri.parse(getString(getIdentifier("string", "zxing_url"))));
       intent.addFlags(Intent.FLAG_ACTIVITY_CLEAR_WHEN_TASK_RESET);
       startActivity(intent);
     }
@@ -149,15 +152,18 @@ public final class CaptureActivity extends Activity implements SurfaceHolder.Cal
   @Override
   public void onCreate(Bundle icicle) {
     super.onCreate(icicle);
-
+    
+    context = getApplicationContext();
+    pkgName = context.getPackageName();
+    
     Window window = getWindow();
     window.addFlags(WindowManager.LayoutParams.FLAG_KEEP_SCREEN_ON);
-    setContentView(R.layout.capture);
+    setContentView(getIdentifier("layout", "capture"));
 
     CameraManager.init(getApplication());
-    viewfinderView = (ViewfinderView) findViewById(R.id.viewfinder_view);
-    resultView = findViewById(R.id.result_view);
-    statusView = (TextView) findViewById(R.id.status_view);
+    viewfinderView = (ViewfinderView) findViewById(getIdentifier("id", "viewfinder_view"));
+    resultView = findViewById(getIdentifier("id", "result_view"));
+    statusView = (TextView) findViewById(getIdentifier("id", "status_view"));
     handler = null;
     lastResult = null;
     hasSurface = false;
@@ -168,13 +174,17 @@ public final class CaptureActivity extends Activity implements SurfaceHolder.Cal
 
     // showHelpOnFirstLaunch();
   }
+  
+  private int getIdentifier(String type, String name) {
+	  return context.getResources().getIdentifier(name, type, pkgName);
+  }
 
   @Override
   protected void onResume() {
     super.onResume();
     resetStatusView();
 
-    SurfaceView surfaceView = (SurfaceView) findViewById(R.id.preview_view);
+    SurfaceView surfaceView = (SurfaceView) findViewById(getIdentifier("id", "preview_view"));
     SurfaceHolder surfaceHolder = surfaceView.getHolder();
     if (hasSurface) {
       // The activity was paused but not stopped, so the surface still exists. Therefore
@@ -263,7 +273,7 @@ public final class CaptureActivity extends Activity implements SurfaceHolder.Cal
       } else if ((source == Source.NONE || source == Source.ZXING_LINK) && lastResult != null) {
         resetStatusView();
         if (handler != null) {
-          handler.sendEmptyMessage(R.id.restart_preview);
+          handler.sendEmptyMessage(getIdentifier("id", "restart_preview"));
         }
         return true;
       }
@@ -277,16 +287,16 @@ public final class CaptureActivity extends Activity implements SurfaceHolder.Cal
   @Override
   public boolean onCreateOptionsMenu(Menu menu) {
     super.onCreateOptionsMenu(menu);
-    menu.add(0, SHARE_ID, 0, R.string.menu_share)
-        .setIcon(android.R.drawable.ic_menu_share);
-    menu.add(0, HISTORY_ID, 0, R.string.menu_history)
-        .setIcon(android.R.drawable.ic_menu_recent_history);
-    menu.add(0, SETTINGS_ID, 0, R.string.menu_settings)
-        .setIcon(android.R.drawable.ic_menu_preferences);
-    menu.add(0, HELP_ID, 0, R.string.menu_help)
-        .setIcon(android.R.drawable.ic_menu_help);
-    menu.add(0, ABOUT_ID, 0, R.string.menu_about)
-        .setIcon(android.R.drawable.ic_menu_info_details);
+    menu.add(0, SHARE_ID, 0, getIdentifier("string", "menu_share"))
+        .setIcon(getIdentifier("drawable", "ic_menu_share"));
+    menu.add(0, HISTORY_ID, 0, getIdentifier("string", "menu_history"))
+        .setIcon(getIdentifier("drawable", "ic_menu_recent_history"));
+    menu.add(0, SETTINGS_ID, 0, getIdentifier("string", "menu_settings"))
+        .setIcon(getIdentifier("drawable", "ic_menu_preferences"));
+    menu.add(0, HELP_ID, 0, getIdentifier("string", "menu_help"))
+        .setIcon(getIdentifier("drawable", "ic_menu_help"));
+    menu.add(0, ABOUT_ID, 0, getIdentifier("string", "menu_about"))
+        .setIcon(getIdentifier("drawable", "ic_menu_info_details"));
     return true;
   }
 
@@ -329,11 +339,11 @@ public final class CaptureActivity extends Activity implements SurfaceHolder.Cal
       }
       case ABOUT_ID:
         AlertDialog.Builder builder = new AlertDialog.Builder(this);
-        builder.setTitle(getString(R.string.title_about) + versionName);
-        builder.setMessage(getString(R.string.msg_about) + "\n\n" + getString(R.string.zxing_url));
-        builder.setIcon(R.drawable.launcher_icon);
-        builder.setPositiveButton(R.string.button_open_browser, aboutListener);
-        builder.setNegativeButton(R.string.button_cancel, null);
+        builder.setTitle(getString(getIdentifier("string", "title_about")) + versionName);
+        builder.setMessage(getString(getIdentifier("string", "msg_about")) + "\n\n" + getString(getIdentifier("string", "zxing_url")));
+        builder.setIcon(getIdentifier("drawable", "launcher_icon"));
+        builder.setPositiveButton(getIdentifier("string", "button_open_browser"), aboutListener);
+        builder.setNegativeButton(getIdentifier("string", "button_cancel"), null);
         builder.show();
         break;
     }
@@ -388,10 +398,10 @@ public final class CaptureActivity extends Activity implements SurfaceHolder.Cal
         case NONE:
           SharedPreferences prefs = PreferenceManager.getDefaultSharedPreferences(this);
           if (prefs.getBoolean(PreferencesActivity.KEY_BULK_MODE, false)) {
-            Toast.makeText(this, R.string.msg_bulk_mode_scanned, Toast.LENGTH_SHORT).show();
+            Toast.makeText(this, getIdentifier("string", "msg_bulk_mode_scanned"), Toast.LENGTH_SHORT).show();
             // Wait a moment or else it will scan the same barcode continuously about 3 times
             if (handler != null) {
-              handler.sendEmptyMessageDelayed(R.id.restart_preview, BULK_MODE_SCAN_DELAY_MS);
+              handler.sendEmptyMessageDelayed(getIdentifier("id", "restart_preview"), BULK_MODE_SCAN_DELAY_MS);
             }
             resetStatusView();
           } else {
@@ -413,13 +423,13 @@ public final class CaptureActivity extends Activity implements SurfaceHolder.Cal
     if (points != null && points.length > 0) {
       Canvas canvas = new Canvas(barcode);
       Paint paint = new Paint();
-      paint.setColor(getResources().getColor(R.color.result_image_border));
+      paint.setColor(getResources().getColor(getIdentifier("color", "result_image_border")));
       paint.setStrokeWidth(3.0f);
       paint.setStyle(Paint.Style.STROKE);
       Rect border = new Rect(2, 2, barcode.getWidth() - 2, barcode.getHeight() - 2);
       canvas.drawRect(border, paint);
 
-      paint.setColor(getResources().getColor(R.color.result_points));
+      paint.setColor(getResources().getColor(getIdentifier("color", "result_points")));
       if (points.length == 2) {
         paint.setStrokeWidth(4.0f);
         drawLine(canvas, paint, points[0], points[1]);
@@ -448,28 +458,28 @@ public final class CaptureActivity extends Activity implements SurfaceHolder.Cal
     viewfinderView.setVisibility(View.GONE);
     resultView.setVisibility(View.VISIBLE);
 
-    ImageView barcodeImageView = (ImageView) findViewById(R.id.barcode_image_view);
+    ImageView barcodeImageView = (ImageView) findViewById(getIdentifier("id", "barcode_image_view"));
     if (barcode == null) {
       barcodeImageView.setImageBitmap(BitmapFactory.decodeResource(getResources(),
-          R.drawable.launcher_icon));
+          getIdentifier("drawable", "launcher_icon")));
     } else {
       barcodeImageView.setImageBitmap(barcode);
     }
 
-    TextView formatTextView = (TextView) findViewById(R.id.format_text_view);
+    TextView formatTextView = (TextView) findViewById(getIdentifier("id", "format_text_view"));
     formatTextView.setText(rawResult.getBarcodeFormat().toString());
 
-    TextView typeTextView = (TextView) findViewById(R.id.type_text_view);
+    TextView typeTextView = (TextView) findViewById(getIdentifier("id", "type_text_view"));
     typeTextView.setText(resultHandler.getType().toString());
 
     DateFormat formatter = DateFormat.getDateTimeInstance(DateFormat.SHORT, DateFormat.SHORT);
     String formattedTime = formatter.format(new Date(rawResult.getTimestamp()));
-    TextView timeTextView = (TextView) findViewById(R.id.time_text_view);
+    TextView timeTextView = (TextView) findViewById(getIdentifier("id", "time_text_view"));
     timeTextView.setText(formattedTime);
 
 
-    TextView metaTextView = (TextView) findViewById(R.id.meta_text_view);
-    View metaTextViewLabel = findViewById(R.id.meta_text_view_label);
+    TextView metaTextView = (TextView) findViewById(getIdentifier("id", "meta_text_view"));
+    View metaTextViewLabel = findViewById(getIdentifier("id", "meta_text_view_label"));
     metaTextView.setVisibility(View.GONE);
     metaTextViewLabel.setVisibility(View.GONE);
     Map<ResultMetadataType,Object> metadata =
@@ -489,14 +499,14 @@ public final class CaptureActivity extends Activity implements SurfaceHolder.Cal
       }
     }
 
-    TextView contentsTextView = (TextView) findViewById(R.id.contents_text_view);
+    TextView contentsTextView = (TextView) findViewById(getIdentifier("id", "contents_text_view"));
     CharSequence displayContents = resultHandler.getDisplayContents();
     contentsTextView.setText(displayContents);
     // Crudely scale betweeen 22 and 32 -- bigger font for shorter text
     int scaledSize = Math.max(22, 32 - displayContents.length() / 4);
     contentsTextView.setTextSize(TypedValue.COMPLEX_UNIT_SP, scaledSize);
 
-    TextView supplementTextView = (TextView) findViewById(R.id.contents_supplement_text_view);
+    TextView supplementTextView = (TextView) findViewById(getIdentifier("id", "contents_supplement_text_view"));
     supplementTextView.setText("");
     supplementTextView.setOnClickListener(null);
     if (PreferenceManager.getDefaultSharedPreferences(this).getBoolean(
@@ -506,7 +516,7 @@ public final class CaptureActivity extends Activity implements SurfaceHolder.Cal
     }
 
     int buttonCount = resultHandler.getButtonCount();
-    ViewGroup buttonView = (ViewGroup) findViewById(R.id.result_button_view);
+    ViewGroup buttonView = (ViewGroup) findViewById(getIdentifier("id", "result_button_view"));
     buttonView.requestFocus();
     for (int x = 0; x < ResultHandler.MAX_BUTTON_COUNT; x++) {
       TextView button = (TextView) buttonView.getChildAt(x);
@@ -550,13 +560,13 @@ public final class CaptureActivity extends Activity implements SurfaceHolder.Cal
       if (rawBytes != null && rawBytes.length > 0) {
         intent.putExtra(Intents.Scan.RESULT_BYTES, rawBytes);
       }
-      Message message = Message.obtain(handler, R.id.return_scan_result);
+      Message message = Message.obtain(handler, getIdentifier("id", "return_scan_result"));
       message.obj = intent;
       handler.sendMessageDelayed(message, INTENT_RESULT_DURATION);
     } else if (source == Source.PRODUCT_SEARCH_LINK) {
       // Reformulate the URL which triggered us into a query, so that the request goes to the same
       // TLD as the scan URL.
-      Message message = Message.obtain(handler, R.id.launch_product_query);
+      Message message = Message.obtain(handler, getIdentifier("id", "launch_product_query"));
       int end = sourceUrl.lastIndexOf("/scan");
       message.obj = sourceUrl.substring(0, end) + "?q=" +
           resultHandler.getDisplayContents().toString() + "&source=zxing";
@@ -564,7 +574,7 @@ public final class CaptureActivity extends Activity implements SurfaceHolder.Cal
     } else if (source == Source.ZXING_LINK) {
       // Replace each occurrence of RETURN_CODE_PLACEHOLDER in the returnUrlTemplate
       // with the scanned code. This allows both queries and REST-style URLs to work.
-      Message message = Message.obtain(handler, R.id.launch_product_query);
+      Message message = Message.obtain(handler, getIdentifier("id", "launch_product_query"));
       message.obj = returnUrlTemplate.replace(RETURN_CODE_PLACEHOLDER,
           resultHandler.getDisplayContents().toString());
       handler.sendMessageDelayed(message, INTENT_RESULT_DURATION);
@@ -621,16 +631,16 @@ public final class CaptureActivity extends Activity implements SurfaceHolder.Cal
 
   private void displayFrameworkBugMessageAndExit() {
     AlertDialog.Builder builder = new AlertDialog.Builder(this);
-    builder.setTitle(getString(R.string.app_name));
-    builder.setMessage(getString(R.string.msg_camera_framework_bug));
-    builder.setPositiveButton(R.string.button_ok, new FinishListener(this));
+    builder.setTitle(getString(getIdentifier("string", "app_name")));
+    builder.setMessage(getString(getIdentifier("string", "msg_camera_framework_bug")));
+    builder.setPositiveButton(getIdentifier("string", "button_ok"), new FinishListener(this));
     builder.setOnCancelListener(new FinishListener(this));
     builder.show();
   }
 
   private void resetStatusView() {
     resultView.setVisibility(View.GONE);
-    statusView.setText(R.string.msg_default_status);
+    statusView.setText(getIdentifier("string", "msg_default_status"));
     statusView.setVisibility(View.VISIBLE);
     viewfinderView.setVisibility(View.VISIBLE);
     lastResult = null;

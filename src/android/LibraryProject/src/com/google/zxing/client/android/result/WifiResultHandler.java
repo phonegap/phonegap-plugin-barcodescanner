@@ -44,7 +44,7 @@ public final class WifiResultHandler extends ResultHandler {
   @Override
   public int getButtonText(int index) {
     if (index == 0) {
-      return R.string.button_wifi;
+      return getIdentifier("string", "button_wifi");
     }
     throw new ArrayIndexOutOfBoundsException();
   }
@@ -63,15 +63,15 @@ public final class WifiResultHandler extends ResultHandler {
   public CharSequence getDisplayContents() {
     WifiParsedResult wifiResult = (WifiParsedResult) getResult();
     StringBuffer contents = new StringBuffer(50);
-    String wifiLabel = parent.getString(R.string.wifi_ssid_label);
+    String wifiLabel = parent.getString(getIdentifier("string", "wifi_ssid_label"));
     ParsedResult.maybeAppend(wifiLabel + '\n' + wifiResult.getSsid(), contents);
-    String typeLabel = parent.getString(R.string.wifi_type_label);
+    String typeLabel = parent.getString(getIdentifier("string", "wifi_type_label"));
     ParsedResult.maybeAppend(typeLabel + '\n' + wifiResult.getNetworkEncryption(), contents);
     return contents.toString();
   }
 
   @Override
   public int getDisplayTitle() {
-    return R.string.result_wifi;
+    return getIdentifier("string", "result_wifi");
   }
 }

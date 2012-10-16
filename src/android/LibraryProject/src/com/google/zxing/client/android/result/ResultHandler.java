@@ -33,6 +33,7 @@ import android.app.Activity;
 import android.app.AlertDialog;
 import android.app.SearchManager;
 import android.content.ActivityNotFoundException;
+import android.content.Context;
 import android.content.DialogInterface;
 import android.content.Intent;
 import android.content.SharedPreferences;
@@ -87,6 +88,8 @@ public abstract class ResultHandler {
   private final Activity activity;
   private final Result rawResult;
   private final String customProductSearch;
+  private static Context context;
+  private static String pkgName;
 
   private final DialogInterface.OnClickListener shopperMarketListener =
       new DialogInterface.OnClickListener() {
@@ -105,11 +108,17 @@ public abstract class ResultHandler {
     this.activity = activity;
     this.rawResult = rawResult;
     this.customProductSearch = parseCustomSearchURL();
+    ResultHandler.context = this.activity.getApplicationContext();
+    ResultHandler.pkgName = context.getPackageName();
 
     // Make sure the Shopper button is hidden by default. Without this, scanning a product followed
     // by a QR Code would leave the button on screen among the QR Code actions.
-    View shopperButton = activity.findViewById(R.id.shopper_button);
+    View shopperButton = activity.findViewById(getIdentifier("id", "shopper_button"));
     shopperButton.setVisibility(View.GONE);
+  }
+  
+  protected int getIdentifier(String type, String name) {
+	  return context.getResources().getIdentifier(name, type, pkgName);
   }
 
   public ParsedResult getResult() {
@@ -159,7 +168,7 @@ public abstract class ResultHandler {
    * @param listener The on click listener to install for this button.
    */
   protected void showGoogleShopperButton(View.OnClickListener listener) {
-    View shopperButton = activity.findViewById(R.id.shopper_button);
+    View shopperButton = activity.findViewById(getIdentifier("id", "shopper_button"));
     shopperButton.setVisibility(View.VISIBLE);
     shopperButton.setOnClickListener(listener);
   }
@@ -276,7 +285,7 @@ public abstract class ResultHandler {
   }
 
   final void shareByEmail(String contents) {
-    sendEmailFromUri("mailto:", null, activity.getString(R.string.msg_share_subject_line),
+    sendEmailFromUri("mailto:", null, activity.getString(getIdentifier("string", "msg_share_subject_line")),
         contents);
   }
 
@@ -297,7 +306,7 @@ public abstract class ResultHandler {
   }
 
   final void shareBySMS(String contents) {
-    sendSMSFromUri("smsto:", activity.getString(R.string.msg_share_subject_line) + ":\n" +
+    sendSMSFromUri("smsto:", activity.getString(getIdentifier("string", "msg_share_subject_line")) + ":\n" +
         contents);
   }
 
@@ -321,7 +330,7 @@ public abstract class ResultHandler {
     Intent intent = new Intent(Intent.ACTION_SENDTO, Uri.parse(uri));
     // The Messaging app needs to see a valid subject or else it will treat this an an SMS.
     if (subject == null || subject.length() == 0) {
-      putExtra(intent, "subject", activity.getString(R.string.msg_default_mms_subject));
+      putExtra(intent, "subject", activity.getString(getIdentifier("string", "msg_default_mms_subject")));
     } else {
       putExtra(intent, "subject", subject);
     }
@@ -411,11 +420,11 @@ public abstract class ResultHandler {
     } catch (PackageManager.NameNotFoundException e) {
       // Otherwise offer to install it from Market.
       AlertDialog.Builder builder = new AlertDialog.Builder(activity);
-      builder.setTitle(R.string.msg_google_shopper_missing);
-      builder.setMessage(R.string.msg_install_google_shopper);
-      builder.setIcon(R.drawable.shopper_icon);
-      builder.setPositiveButton(R.string.button_ok, shopperMarketListener);
-      builder.setNegativeButton(R.string.button_cancel, null);
+      builder.setTitle(getIdentifier("string", "msg_google_shopper_missing"));
+      builder.setMessage(getIdentifier("string", "msg_install_google_shopper"));
+      builder.setIcon(getIdentifier("drawable", "shopper_icon"));
+      builder.setPositiveButton(getIdentifier("string", "button_ok"), shopperMarketListener);
+      builder.setNegativeButton(getIdentifier("string", "button_cancel"), null);
       builder.show();
     }
   }
@@ -428,9 +437,9 @@ public abstract class ResultHandler {
         activity.startActivity(intent);
       } catch (ActivityNotFoundException e) {
         AlertDialog.Builder builder = new AlertDialog.Builder(activity);
-        builder.setTitle(R.string.app_name);
-        builder.setMessage(R.string.msg_intent_failed);
-        builder.setPositiveButton(R.string.button_ok, null);
+        builder.setTitle(getIdentifier("string", "app_name"));
+        builder.setMessage(getIdentifier("string", "msg_intent_failed"));
+        builder.setPositiveButton(getIdentifier("string", "button_ok"), null);
         builder.show();
       }
     }
@@ -451,8 +460,8 @@ public abstract class ResultHandler {
       // note the user has seen it
       prefs.edit().putBoolean(PreferencesActivity.KEY_NOT_OUR_RESULTS_SHOWN, true).commit();
       AlertDialog.Builder builder = new AlertDialog.Builder(activity);
-      builder.setMessage(R.string.msg_not_our_results);
-      builder.setPositiveButton(R.string.button_ok, proceedListener);
+      builder.setMessage(getIdentifier("string", "msg_not_our_results"));
+      builder.setPositiveButton(getIdentifier("string", "button_ok"), proceedListener);
       builder.show();
     }
   }

@@ -58,7 +58,7 @@ public final class WifiActivity extends Activity  {
     Log.d(TAG, "Encountered another error.  Errorcount = " + errorCount);
     if (errorCount > MAX_ERROR_COUNT){
       errorCount = 0;
-      doError(R.string.wifi_connect_failed);
+      doError(getIdentifier("string", "wifi_connect_failed"));
     }
   }
 
@@ -69,11 +69,11 @@ public final class WifiActivity extends Activity  {
   private int changeNetwork(NetworkSetting setting) {
     // If the SSID is empty, throw an error and return
     if (setting.getSsid() == null || setting.getSsid().length() == 0) {
-      return doError(R.string.wifi_ssid_missing);
+      return doError(getIdentifier("wifi_ssid_missing", "string"));
     }
     // If the network type is invalid
     if (setting.getNetworkType() == NetworkType.NETWORK_INVALID){
-      return doError(R.string.wifi_type_incorrect);
+      return doError(getIdentifier("wifi_type_incorrect", "string"));
     }
 
     // If the password is empty, this is an unencrypted network
@@ -105,7 +105,7 @@ public final class WifiActivity extends Activity  {
   }
 
   private WifiConfiguration changeNetworkCommon(NetworkSetting input){
-    statusView.setText(R.string.wifi_creating_network);
+    statusView.setText(getIdentifier("wifi_creating_network", "string"));
     Log.d(TAG, "Adding new configuration: \nSSID: " + input.getSsid() + "\nType: " +
         input.getNetworkType());
     WifiConfiguration config = new WifiConfiguration();
@@ -123,7 +123,7 @@ public final class WifiActivity extends Activity  {
   }
 
   private int requestNetworkChange(WifiConfiguration config){
-    statusView.setText(R.string.wifi_changing_network);
+    statusView.setText(getIdentifier("wifi_changing_network", "string"));
     return updateNetwork(config, false);
   }
 
@@ -207,8 +207,8 @@ public final class WifiActivity extends Activity  {
     String ssid = intent.getStringExtra(Intents.WifiConnect.SSID);
     String password = intent.getStringExtra(Intents.WifiConnect.PASSWORD);
     String networkType = intent.getStringExtra(Intents.WifiConnect.TYPE);
-    setContentView(R.layout.network);
-    statusView = (TextView) findViewById(R.id.networkStatus);
+    setContentView(getIdentifier("network", "layout"));
+    statusView = (TextView) findViewById(getIdentifier("id", "networkStatus"));
 
     NetworkType networkT;
     if ("WPA".equals(networkType)) {
@@ -285,9 +285,9 @@ public final class WifiActivity extends Activity  {
     WifiConfiguration found = findNetworkInExistingConfig(config.SSID);
     wifiManager.disconnect();
     if (found == null) {
-      statusView.setText(R.string.wifi_creating_network);
+      statusView.setText(getIdentifier("wifi_creating_network", "string"));
     } else {
-      statusView.setText(R.string.wifi_modifying_network);
+      statusView.setText(getIdentifier("wifi_modifying_network", "string"));
       Log.d(TAG, "Removing network " + found.networkId);
       wifiManager.removeNetwork(found.networkId);
       wifiManager.saveConfiguration();
@@ -306,6 +306,10 @@ public final class WifiActivity extends Activity  {
     errorCount = 0;
     wifiManager.reassociate();
     return networkId;
+  }
+  
+  private int getIdentifier(String type, String name) {
+	  return getApplicationContext().getResources().getIdentifier(name, type, getApplicationContext().getPackageName());
   }
 
 }

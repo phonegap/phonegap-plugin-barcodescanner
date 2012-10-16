@@ -99,13 +99,13 @@ public final class AddressBookResultHandler extends ResultHandler {
     int action = mapIndexToAction(index);
     switch (action) {
       case 0:
-        return R.string.button_add_contact;
+        return getIdentifier("string", "button_add_contact");
       case 1:
-        return R.string.button_show_map;
+        return getIdentifier("string", "button_show_map");
       case 2:
-        return R.string.button_dial;
+        return getIdentifier("string", "button_dial");
       case 3:
-        return R.string.button_email;
+        return getIdentifier("string", "button_email");
       default:
         throw new ArrayIndexOutOfBoundsException();
     }
@@ -201,6 +201,6 @@ public final class AddressBookResultHandler extends ResultHandler {
 
   @Override
   public int getDisplayTitle() {
-    return R.string.result_address_book;
+    return getIdentifier("string", "result_address_book");
   }
 }

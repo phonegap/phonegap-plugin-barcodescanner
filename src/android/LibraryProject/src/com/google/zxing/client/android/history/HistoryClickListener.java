@@ -53,14 +53,14 @@ final class HistoryClickListener implements DialogInterface.OnClickListener {
       Uri historyFile = HistoryManager.saveHistory(history.toString());
       if (historyFile == null) {
         AlertDialog.Builder builder = new AlertDialog.Builder(activity);
-        builder.setMessage(R.string.msg_unmount_usb);
-        builder.setPositiveButton(R.string.button_ok, null);
+        builder.setMessage(activity.getApplicationContext().getResources().getIdentifier("msg_unmount_usb", "string", activity.getApplicationContext().getPackageName()));
+        builder.setPositiveButton(activity.getApplicationContext().getResources().getIdentifier("button_ok", "string", activity.getApplicationContext().getPackageName()), null);
         builder.show();
         return;
       }
       Intent intent = new Intent(Intent.ACTION_SEND, Uri.parse("mailto:"));
       intent.addFlags(Intent.FLAG_ACTIVITY_CLEAR_WHEN_TASK_RESET);
-      String subject = activity.getResources().getString(R.string.history_email_title);
+      String subject = activity.getResources().getString(activity.getApplicationContext().getResources().getIdentifier("history_email_title", "string", activity.getApplicationContext().getPackageName()));
       intent.putExtra(Intent.EXTRA_SUBJECT, subject);
       intent.putExtra(Intent.EXTRA_TEXT, subject);
       intent.putExtra(Intent.EXTRA_STREAM, historyFile);
@@ -72,7 +72,7 @@ final class HistoryClickListener implements DialogInterface.OnClickListener {
     } else {
       // Display a single history entry.
       Result result = items.get(i);
-      Message message = Message.obtain(activity.getHandler(), R.id.decode_succeeded, result);
+      Message message = Message.obtain(activity.getHandler(), activity.getApplicationContext().getResources().getIdentifier("decode_succeeded", "id", activity.getApplicationContext().getPackageName()), result);
       message.sendToTarget();
     }
   }

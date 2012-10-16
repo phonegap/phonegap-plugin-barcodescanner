@@ -24,6 +24,7 @@ import com.google.zxing.client.android.R;
 import android.app.Activity;
 import android.content.ContentResolver;
 import android.content.Intent;
+import android.content.res.Resources;
 import android.database.Cursor;
 import android.net.Uri;
 import android.os.Bundle;
@@ -131,14 +132,16 @@ public final class ShareActivity extends Activity {
   @Override
   public void onCreate(Bundle icicle) {
     super.onCreate(icicle);
-    setContentView(R.layout.share);
+    Resources res = getApplicationContext().getResources();
+    String pkgName = getApplicationContext().getPackageName();
+    setContentView(res.getIdentifier("share", "layout", pkgName));
 
-    findViewById(R.id.share_contact_button).setOnClickListener(contactListener);
-    findViewById(R.id.share_bookmark_button).setOnClickListener(bookmarkListener);
-    findViewById(R.id.share_app_button).setOnClickListener(appListener);
-    clipboardButton = (Button) findViewById(R.id.share_clipboard_button);
+    findViewById(res.getIdentifier("share_contact_button", "id", pkgName)).setOnClickListener(contactListener);
+    findViewById(res.getIdentifier("share_bookmark_button", "id", pkgName)).setOnClickListener(bookmarkListener);
+    findViewById(res.getIdentifier("share_app_button", "id", pkgName)).setOnClickListener(appListener);
+    clipboardButton = (Button) findViewById(res.getIdentifier("share_clipboard_button", "id", pkgName));
     clipboardButton.setOnClickListener(clipboardListener);
-    findViewById(R.id.share_text_view).setOnKeyListener(textListener);
+    findViewById(res.getIdentifier("share_text_view", "id", pkgName)).setOnKeyListener(textListener);
   }
 
   @Override
@@ -148,10 +151,10 @@ public final class ShareActivity extends Activity {
     ClipboardManager clipboard = (ClipboardManager) getSystemService(CLIPBOARD_SERVICE);
     if (clipboard.hasText()) {
       clipboardButton.setEnabled(true);
-      clipboardButton.setText(R.string.button_share_clipboard);
+      clipboardButton.setText(getApplicationContext().getResources().getIdentifier("button_share_clipboard", "string", getApplicationContext().getPackageName()));
     } else {
       clipboardButton.setEnabled(false);
-      clipboardButton.setText(R.string.button_clipboard_empty);
+      clipboardButton.setText(getApplicationContext().getResources().getIdentifier("button_clipboard_empty", "string", getApplicationContext().getPackageName()));
     }
   }
 

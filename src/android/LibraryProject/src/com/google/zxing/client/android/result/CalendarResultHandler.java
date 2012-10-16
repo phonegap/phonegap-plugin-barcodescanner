@@ -39,12 +39,11 @@ public final class CalendarResultHandler extends ResultHandler {
   private static final DateFormat DATE_FORMAT = new SimpleDateFormat("yyyyMMdd");
   private static final DateFormat DATE_TIME_FORMAT = new SimpleDateFormat("yyyyMMdd'T'HHmmss");
 
-  private static final int[] buttons = {
-      R.string.button_add_calendar
-  };
+  private static final int[] buttons = new int[1];
 
   public CalendarResultHandler(Activity activity, ParsedResult result) {
     super(activity, result);
+    buttons[0] =  getIdentifier("string", "button_add_calendar");
   }
 
   @Override
@@ -115,6 +114,6 @@ public final class CalendarResultHandler extends ResultHandler {
 
   @Override
   public int getDisplayTitle() {
-    return R.string.result_calendar;
+    return getIdentifier("string", "result_calendar");
   }
 }
