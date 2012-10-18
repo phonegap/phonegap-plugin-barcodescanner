@@ -232,77 +232,29 @@
             <string name="zxing_url">http://code.google.com/p/zxing</string>
         </config-file>
 
-<!--
 
-./values-ar:
-strings.xml
+        <source-file src="LibraryProject/res/values-ar/strings.xml" target-dir="res/values-ar"/>
+        <source-file src="LibraryProject/res/values-bg/strings.xml" target-dir="res/values-bg"/>
+        <source-file src="LibraryProject/res/values-cs/strings.xml" target-dir="res/values-cs"/>
+        <source-file src="LibraryProject/res/values-da/strings.xml" target-dir="res/values-da"/>
+        <source-file src="LibraryProject/res/values-de/strings.xml" target-dir="res/values-de"/>
+        <source-file src="LibraryProject/res/values-es/strings.xml" target-dir="res/values-es"/>
+        <source-file src="LibraryProject/res/values-fi/strings.xml" target-dir="res/values-fi"/>
+        <source-file src="LibraryProject/res/values-fr/strings.xml" target-dir="res/values-fr"/>
+        <source-file src="LibraryProject/res/values-he/strings.xml" target-dir="res/values-he"/>
+        <source-file src="LibraryProject/res/values-hu/strings.xml" target-dir="res/values-hu"/>
+        <source-file src="LibraryProject/res/values-it/strings.xml" target-dir="res/values-it"/>
+        <source-file src="LibraryProject/res/values-ja-rJP/strings.xml" target-dir="res/values-ja-rJP"/>
+        <source-file src="LibraryProject/res/values-nl/strings.xml" target-dir="res/values-nl"/>
+        <source-file src="LibraryProject/res/values-pl/strings.xml" target-dir="res/values-pl"/>
+        <source-file src="LibraryProject/res/values-pt/strings.xml" target-dir="res/values-pt"/>
+        <source-file src="LibraryProject/res/values-ru/strings.xml" target-dir="res/values-ru"/>
+        <source-file src="LibraryProject/res/values-sk/strings.xml" target-dir="res/values-sk"/>
+        <source-file src="LibraryProject/res/values-sl/strings.xml" target-dir="res/values-sl"/>
+        <source-file src="LibraryProject/res/values-sv/strings.xml" target-dir="res/values-sv"/>
+        <source-file src="LibraryProject/res/values-tr/strings.xml" target-dir="res/values-tr"/>
+        <source-file src="LibraryProject/res/values-zh-rCN/strings.xml" target-dir="res/values-zh-rCN"/>
+        <source-file src="LibraryProject/res/values-zh-rTW/strings.xml" target-dir="res/values-zh-rTW"/>
 
-./values-bg:
-strings.xml
-
-./values-cs:
-strings.xml
-
-./values-da:
-strings.xml
-
-./values-de:
-strings.xml
-
-./values-es:
-strings.xml
-
-./values-fi:
-strings.xml
-
-./values-fr:
-strings.xml
-
-./values-he:
-strings.xml
-
-./values-hu:
-strings.xml
-
-./values-it:
-strings.xml
-
-./values-ja-rJP:
-strings.xml
-
-./values-kr:
-strings.xml
-
-./values-nl:
-strings.xml
-
-./values-pl:
-strings.xml
-
-./values-pt:
-strings.xml
-
-./values-ru:
-strings.xml
-
-./values-sk:
-strings.xml
-
-./values-sl:
-strings.xml
-
-./values-sv:
-strings.xml
-
-./values-tr:
-strings.xml
-
-./values-zh-rCN:
-strings.xml
-
-./values-zh-rTW:
-strings.xml
-
--->
     </platform>
 </plugin>
