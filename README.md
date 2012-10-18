@@ -7,6 +7,11 @@ follows the Cordova Plugin spec https://github.com/alunny/cordova-plugin-spec
 
 so that it works with Pluginstall https://github.com/alunny/pluginstall
 
+Note: the Android source for this project includes an Android Library Project.
+pluginstall currently doesn't support Library Project refs, so its been
+prebuilt as a jar library. Any updates to the Library Project should be
+committed with an updated jar.
+
 ## Licence ##
 
 The MIT License
