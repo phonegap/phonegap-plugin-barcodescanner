@@ -14,6 +14,8 @@ committed with an updated jar.
 The plugin creates the object `window.plugins.barcodeScanner` with the method `scan(success, fail)`. 
 The following barcode types are currently supported:
 
+### Android
+
 * QR_CODE
 * DATA_MATRIX
 * UPC_E
@@ -28,6 +30,17 @@ The following barcode types are currently supported:
 * RSS14
 * PDF417
 * RSS_EXPANDED
+
+### iOS
+
+* QR_CODE
+* DATA_MATRIX
+* UPC_E
+* UPC_A
+* EAN_8
+* EAN_13
+* CODE_128
+* CODE_3
 
 `success` and `fail` are callback functions. Success is passed an object with data, type and cancelled properties. Data is the text representation of the barcode data, type is the type of barcode detected and cancelled is whether or not the user cancelled the scan.
 
