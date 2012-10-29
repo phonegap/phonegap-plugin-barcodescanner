@@ -15,7 +15,7 @@
  limitations under the License.
  -->
 <resources>
-  <string name="app_name">סורק ברקודים</string>
+  <!-- string name="app_name">סורק ברקודים</string -->
   <string name="app_picker_name">יישומים</string>
   <string name="bookmark_picker_name">סימניות</string>
   <string name="button_add_calendar">הוסף ללוח שנה</string>
@@ -59,7 +59,7 @@
   <string name="menu_about">אודות</string>
   <string name="menu_help">עזרה</string>
   <string name="menu_history">היסטוריה</string>
-  <string name="menu_settings">הגדרות</string>
+  <!-- string name="menu_settings">הגדרות</string -->
   <string name="menu_share">שתף</string>
   <string name="msg_about">מבוסס עם ספריית הקוד הפתוח ZXing Barcode Library</string>
   <string name="msg_buggy">במכשיר זה יופיעו תקלות ידועות שיגרמו לבעיות בסריקת ברקודים. לקבלת מידע נוסף, בקר http://code.google.com/p/zxing/wiki/FrequentlyAskedQuestions</string>

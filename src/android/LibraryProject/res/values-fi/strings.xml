@@ -15,7 +15,7 @@
  limitations under the License.
  -->
 <resources>
-  <string name="app_name">Barcode Scanner</string>
+  <!-- string name="app_name">Barcode Scanner</string -->
   <string name="app_picker_name">Ohjelmat</string>
   <string name="bookmark_picker_name">Kirjanmerkit</string>
   <string name="button_add_calendar">Lisää kalenteriin</string>
@@ -59,7 +59,7 @@
   <string name="menu_about">Tietoja</string>
   <string name="menu_help">Apua</string>
   <string name="menu_history">Historia</string>
-  <string name="menu_settings">Asetukset</string>
+  <!-- string name="menu_settings">Asetukset</string -->
   <string name="menu_share">Jaa</string>
   <string name="msg_about">Perustuu avoimen koodin ZXing Barcode kirjastoon</string>
   <string name="msg_buggy">Tämä laite on tunnettuja vikoja, jotka aiheuttavat viivakoodi skannauksen ongelmia. Varten Lisätietoja http://code.google.com/p/zxing/wiki/FrequentlyAskedQuestions</string>

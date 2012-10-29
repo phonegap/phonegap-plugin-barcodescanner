@@ -15,7 +15,7 @@
  limitations under the License.
  -->
 <resources>
-  <string name="app_name">Barcode Scanner</string>
+  <!-- string name="app_name">Barcode Scanner</string -->
   <string name="app_picker_name">Applicaties</string>
   <string name="bookmark_picker_name">Bladwijzers</string>
   <string name="button_add_calendar">Voeg toe aan agenda</string>
@@ -59,7 +59,7 @@
   <string name="menu_about">Over</string>
   <string name="menu_help">Help</string>
   <string name="menu_history">Geschiedenis</string>
-  <string name="menu_settings">Instellingen</string>
+  <!-- string name="menu_settings">Instellingen</string -->
   <string name="menu_share">Deel</string>
   <string name="msg_about">Gebaseerd op de open source ZXing Barcodebibliotheek</string>
   <string name="msg_buggy">Dit apparaat heeft bekende bugs die ervoor zorgen dat er zich problemen voor kunnen doen bij het scannen. Voor meer informatie, bezoek http://code.google.com/p/zxing/wiki/FrequentlyAskedQuestions</string>

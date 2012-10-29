@@ -15,7 +15,7 @@
  limitations under the License.
  -->
 <resources>
-  <string name="app_name">Barcode Scanner</string>
+  <!-- string name="app_name">Barcode Scanner</string -->
   <string name="app_picker_name">Aplikacije</string>
   <string name="bookmark_picker_name">Zaznamki</string>
   <string name="button_add_calendar">Dodaj v koledar</string>
@@ -59,7 +59,7 @@
   <string name="menu_about">O programu</string>
   <string name="menu_help">Pomoč</string>
   <string name="menu_history">Zgodovina</string>
-  <string name="menu_settings">Nastavitve</string>
+  <!-- string name="menu_settings">Nastavitve</string -->
   <string name="menu_share">Deli</string>
   <string name="msg_about">Temelji na odprtokodni ZXing Barcode knjižnici</string>
   <string name="msg_buggy">Ta naprava ima znane hrošče, ki povzročajo težave z branjem črtih kod. Za več informacij obiščite http://code.google.com/p/zxing/wiki/FrequentlyAskedQuestions</string>

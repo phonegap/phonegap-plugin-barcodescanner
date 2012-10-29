@@ -15,7 +15,7 @@
  limitations under the License.
  -->
 <resources>
-  <string name="app_name">Barcode Scanner</string>
+  <!-- string name="app_name">Barcode Scanner</string -->
   <string name="app_picker_name">Applications</string>
   <string name="bookmark_picker_name">Marcadores</string>
   <string name="button_add_calendar">Adicionar ao calendário</string>
@@ -59,7 +59,7 @@
   <string name="menu_about">Acerca de</string>
   <string name="menu_help">Ajuda</string>
   <string name="menu_history">Histórico</string>
-  <string name="menu_settings">Definições</string>
+  <!-- string name="menu_settings">Definições</string -->
   <string name="menu_share">Partilhar</string>
   <string name="msg_about">Baseado na biblioteca de código de barras de código aberto ZXing</string>
   <string name="msg_buggy">Este dispositivo tem bugs conhecidos que causam problemas de varredura de código de barras. Para obter mais informações, visite http://code.google.com/p/zxing/wiki/FrequentlyAskedQuestions</string>

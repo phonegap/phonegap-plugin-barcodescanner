@@ -15,7 +15,7 @@
  limitations under the License.
  -->
 <resources>
-  <string name="app_name">条码扫描器</string>
+  <!-- string name="app_name">条码扫描器</string -->
   <string name="app_picker_name">应用</string>
   <string name="bookmark_picker_name">书签</string>
   <string name="button_add_calendar">添加事件至日历</string>
@@ -59,7 +59,7 @@
   <string name="menu_about">关于</string>
   <string name="menu_help">帮助</string>
   <string name="menu_history">历史</string>
-  <string name="menu_settings">设置</string>
+  <!-- string name="menu_settings">设置</string -->
   <string name="menu_share">分享</string>
   <string name="msg_about">基于ZXing开源条码引擎</string>
   <string name="msg_buggy">此设备存在已知问题，将导致条码扫描器出错。更多信息，请访问 http://code.google.com/p/zxing/wiki/FrequentlyAskedQuestions</string>

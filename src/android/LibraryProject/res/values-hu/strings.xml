@@ -15,7 +15,7 @@
  limitations under the License.
  -->
 <resources>
-  <string name="app_name">Barcode Scanner</string>
+  <!-- string name="app_name">Barcode Scanner</string -->
   <string name="app_picker_name">Alkalmazások</string>
   <string name="bookmark_picker_name">Könyvjelzők</string>
   <string name="button_add_calendar">Hozzáadás a naptárhoz</string>
@@ -59,7 +59,7 @@
   <string name="menu_about">Rólunk</string>
   <string name="menu_help">Segítség</string>
   <string name="menu_history">Előzmények</string>
-  <string name="menu_settings">Beállítások</string>
+  <!-- string name="menu_settings">Beállítások</string -->
   <string name="menu_share">Megosztás</string>
   <string name="msg_about">A nyílt forráskódú ZXing Barcode Library alapján.</string>
   <string name="msg_buggy">Ennek a készüléknek ismert hibái vannak, amik vonalkód olvasási problémákat okoznak. További információkért, látogassa meg a http://code.google.com/p/zxing/wiki/FrequentlyAskedQuestions weboldalt.</string>

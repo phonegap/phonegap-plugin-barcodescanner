@@ -15,7 +15,7 @@
  limitations under the License.
  -->
 <resources>
-  <string name="app_name">Сканер штрих-кодов</string>
+  <!-- string name="app_name">Сканер штрих-кодов</string -->
   <string name="app_picker_name">Программы</string>
   <string name="bookmark_picker_name">Закладки</string>
   <string name="button_add_calendar">Добавить в календарь</string>
@@ -59,7 +59,7 @@
   <string name="menu_about">О программе</string>
   <string name="menu_help">Помощь</string>
   <string name="menu_history">История</string>
-  <string name="menu_settings">Настройки</string>
+  <!-- string name="menu_settings">Настройки</string -->
   <string name="menu_share">Поделиться</string>
   <string name="msg_about">Основано на свободной библиотеке штрих-кодов ZXing</string>
   <string name="msg_buggy">Это устройство имеет известные ошибки при сканировании штрих-кода. Для получения более подробной информации, посетите http://code.google.com/p/zxing/wiki/FrequentlyAskedQuestions</string>

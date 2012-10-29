@@ -15,7 +15,7 @@
  limitations under the License.
  -->
 <resources>
-  <string name="app_name">Barcode Scanner</string>
+  <!-- string name="app_name">Barcode Scanner</string -->
   <string name="app_picker_name">Applikationer</string>
   <string name="bookmark_picker_name">Bogmærker</string>
   <string name="button_add_calendar">Tilføj til kalendar</string>
@@ -59,7 +59,7 @@
   <string name="menu_about">Om</string>
   <string name="menu_help">Hjælp</string>
   <string name="menu_history">Historik</string>
-  <string name="menu_settings">Indstillinger</string>
+  <!-- string name="menu_settings">Indstillinger</string -->
   <string name="menu_share">Del</string>
   <string name="msg_about">Baseret på open source ZXing Barcode Library</string>
   <string name="msg_buggy">Denne enhed har kendte fejl, der forårsager stregkodescanningsproblemer. For mere information, besøg http://code.google.com/p/zxing/wiki/FrequentlyAskedQuestions (på engelsk)</string>

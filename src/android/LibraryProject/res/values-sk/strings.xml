@@ -15,7 +15,7 @@
  limitations under the License.
  -->
 <resources>
-  <string name="app_name">Barcode Scanner</string>
+  <!-- string name="app_name">Barcode Scanner</string -->
   <string name="app_picker_name">Aplikácie</string>
   <string name="bookmark_picker_name">Záložky</string>
   <string name="button_add_calendar">Pridať do kalendára</string>
@@ -59,7 +59,7 @@
   <string name="menu_about">O programe</string>
   <string name="menu_help">Nápoveda</string>
   <string name="menu_history">História</string>
-  <string name="menu_settings">Nastavenia</string>
+  <!-- string name="menu_settings">Nastavenia</string -->
   <string name="menu_share">Zdieľať</string>
   <string name="msg_about">Založené na otvorených zdrojových kódoch knižnice čiarových kódov ZXing</string>
   <string name="msg_buggy">Toto zariadenie má známe chyby, ktoré spôsobujú problémy skenovania čiarových kódov. Pre viac informácií navštívte http://code.google.com/p/zxing/wiki/FrequentlyAskedQuestions</string>

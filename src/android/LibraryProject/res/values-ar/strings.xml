@@ -15,7 +15,7 @@
  limitations under the License.
  -->
 <resources>
-  <string name="app_name">ماسح الرمز الشريطي</string>
+  <!-- string name="app_name">ماسح الرمز الشريطي</string -->
   <string name="app_picker_name">تطبيقات</string>
   <string name="bookmark_picker_name">إشارات مرجعية</string>
   <string name="button_add_calendar">إضافة إلى التقويم</string>
@@ -59,7 +59,7 @@
   <string name="menu_about">حول</string>
   <string name="menu_help">تعليمات</string>
   <string name="menu_history">سجل</string>
-  <string name="menu_settings">إعدادات</string>
+  <!-- string name="menu_settings">إعدادات</string -->
   <string name="menu_share">مشاركة</string>
   <string name="msg_about">حسب مكتبة الرمز الشريطي ZXing مفتوحة المصادر</string>
   <string name="msg_buggy">يوجد بالهاتف أخطاء معروفة تتسبب في حدوث مشكلات في مسح الرمز الشريطي. لمزيد من المعلومات، قم بزيارة http://code.google.com/p/zxing/wiki/FrequentlyAskedQuestions</string>

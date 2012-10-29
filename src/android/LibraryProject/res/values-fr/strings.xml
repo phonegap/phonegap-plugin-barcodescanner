@@ -15,7 +15,7 @@
  limitations under the License.
  -->
 <resources>
-  <string name="app_name">Barcode Scanner</string>
+  <!-- string name="app_name">Barcode Scanner</string -->
   <string name="app_picker_name">Applications</string>
   <string name="bookmark_picker_name">Marques-pages</string>
   <string name="button_add_calendar">Ajouter à l\'agenda</string>
@@ -59,7 +59,7 @@
   <string name="menu_about">A propos</string>
   <string name="menu_help">Aide</string>
   <string name="menu_history">Historique</string>
-  <string name="menu_settings">Paramètres</string>
+  <!-- string name="menu_settings">Paramètres</string -->
   <string name="menu_share">Partager</string>
   <string name="msg_about">L\'application Android officielle du projet libre ZXing.</string>
   <string name="msg_buggy">Cet appareil a rencontré un bogue entraînant des problèmes de lecture de codes-barres. Pour plus d\'informations, rendez-vous sur http://code.google.com/p/zxing/wiki/FrequentlyAskedQuestions</string>

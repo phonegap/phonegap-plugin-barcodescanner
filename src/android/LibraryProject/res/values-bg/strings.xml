@@ -15,7 +15,7 @@
  limitations under the License.
  -->
 <resources>
-  <string name="app_name">Баркод Скенер</string>
+  <!-- string name="app_name">Баркод Скенер</string -->
   <string name="app_picker_name">Приложения</string>
   <string name="bookmark_picker_name">Отметки</string>
   <string name="button_add_calendar">Добави в календар</string>
@@ -59,7 +59,7 @@
   <string name="menu_about">Относно</string>
   <string name="menu_help">Помощ</string>
   <string name="menu_history">История</string>
-  <string name="menu_settings">Настройки</string>
+  <!-- string name="menu_settings">Настройки</string -->
   <string name="menu_share">Сподели</string>
   <string name="msg_about">Базирано на библиотеката с отворен код\nZXing Barcode</string>
   <string name="msg_buggy">Това устройство демонстрира проблеми при сканиране на баркодове. За повече информация посетете http://code.google.com/p/zxing/wiki/FrequentlyAskedQuestions</string>

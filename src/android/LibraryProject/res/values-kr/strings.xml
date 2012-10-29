@@ -15,7 +15,7 @@
  limitations under the License.
  -->
 <resources>
-  <string name="app_name">바코드 스캐너</string>
+  <!-- string name="app_name">바코드 스캐너</string -->
   <string name="app_picker_name">어플리케이션</string>
   <string name="bookmark_picker_name">즐겨찾기</string>
   <string name="button_add_calendar">일정에 추가하기</string>
@@ -59,7 +59,7 @@
   <string name="menu_about">정보</string>
   <string name="menu_help">도움말</string>
   <string name="menu_history">기록</string>
-  <string name="menu_settings">설정</string>
+  <!-- string name="menu_settings">설정</string -->
   <string name="menu_share">공유</string>
   <string name="msg_about">오픈소스 ZXing Barcode Library를 이용하여 제작된 어플</string>
   <string name="msg_buggy">해당 기기는 바코드 스캐닝시 알려진 버그가 있습니다. 더 많은 정보를 얻기 위해서는 다음 주소를 방문하세요.(영문)http://code.google.com/p/zxing/wiki/FrequentlyAskedQuestions</string>

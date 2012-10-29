@@ -15,7 +15,7 @@
  limitations under the License.
  -->
 <resources>
-  <string name="app_name">條碼掃描器</string>
+  <!-- string name="app_name">條碼掃描器</string -->
   <string name="app_picker_name">應用程式</string>
   <string name="bookmark_picker_name">書籤</string>
   <string name="button_add_calendar">加入事件至日曆</string>
@@ -59,7 +59,7 @@
   <string name="menu_about">關於</string>
   <string name="menu_help">幫助</string>
   <string name="menu_history">記錄</string>
-  <string name="menu_settings">設置</string>
+  <!-- string name="menu_settings">設置</string -->
   <string name="menu_share">分享</string>
   <string name="msg_about">使用ZXing開放原始碼的條碼資料庫</string>
   <string name="msg_buggy">該裝置有已知的錯誤導致條碼掃描有問題。如需更多資訊，請至 http://code.google.com/p/zxing/wiki/FrequentlyAskedQuestions</string>
