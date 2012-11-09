@@ -820,21 +820,18 @@ parentViewController:(UIViewController*)parentViewController
 #pragma mark CDVBarcodeScannerOrientationDelegate
 
 - (BOOL)shouldAutorotate
+{   
+    return NO;
+}
+
+- (UIInterfaceOrientation)preferredInterfaceOrientationForPresentation
 {
-    if ((self.orientationDelegate != nil) && [self.orientationDelegate respondsToSelector:@selector(shouldAutorotate)]) {
-        return [self.orientationDelegate shouldAutorotate];
-    }
-    
-    return YES;
+    return UIInterfaceOrientationLandscapeRight;
 }
 
 - (NSUInteger)supportedInterfaceOrientations
 {
-    if ((self.orientationDelegate != nil) && [self.orientationDelegate respondsToSelector:@selector(supportedInterfaceOrientations)]) {
-        return [self.orientationDelegate supportedInterfaceOrientations];
-    }
-    
-    return UIInterfaceOrientationMaskPortrait;
+    return UIInterfaceOrientationMaskLandscape;
 }
 
 - (BOOL)shouldAutorotateToInterfaceOrientation:(UIInterfaceOrientation)interfaceOrientation
