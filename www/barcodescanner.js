@@ -6,58 +6,68 @@
  * Copyright (c) 2011, IBM Corporation
  */
 
-var BarcodeScanner = function() {
-};
 
-//-------------------------------------------------------------------
-BarcodeScanner.Encode = {
-        TEXT_TYPE: "TEXT_TYPE",
-        EMAIL_TYPE: "EMAIL_TYPE",
-        PHONE_TYPE: "PHONE_TYPE",
-        SMS_TYPE: "SMS_TYPE",
-        //  CONTACT_TYPE: "CONTACT_TYPE",  // TODO:  not implemented, requires passing a Bundle class from Javascriopt to Java
-        //  LOCATION_TYPE: "LOCATION_TYPE" // TODO:  not implemented, requires passing a Bundle class from Javascriopt to Java
-};
+PhoneGap.define("cordova/plugin/BarcodeScanner",
+    
+    function (require, exports, module) {
 
-//-------------------------------------------------------------------
-BarcodeScanner.prototype.scan = function(successCallback, errorCallback) {
-    if (errorCallback == null) { errorCallback = function() {}}
+        var exec = require("cordova/exec");
 
-    if (typeof errorCallback != "function")  {
-        console.log("BarcodeScanner.scan failure: failure parameter not a function");
-        return
-    }
+        var BarcodeScanner = function () {
+        };
 
-    if (typeof successCallback != "function") {
-        console.log("BarcodeScanner.scan failure: success callback parameter must be a function");
-        return
-    }
+        //-------------------------------------------------------------------
+        BarcodeScanner.Encode = {
+            TEXT_TYPE: "TEXT_TYPE",
+            EMAIL_TYPE: "EMAIL_TYPE",
+            PHONE_TYPE: "PHONE_TYPE",
+            SMS_TYPE: "SMS_TYPE",
+            //  CONTACT_TYPE: "CONTACT_TYPE",  // TODO:  not implemented, requires passing a Bundle class from Javascript to Java
+            //  LOCATION_TYPE: "LOCATION_TYPE" // TODO:  not implemented, requires passing a Bundle class from Javascript to Java
+        };
 
-    cordova.exec(successCallback, errorCallback, 'BarcodeScanner', 'scan', []);
-};
+        //-------------------------------------------------------------------
+        BarcodeScanner.prototype.scan = function (successCallback, errorCallback) {
+            if (errorCallback == null) {
+                errorCallback = function () {
+                }
+            }
 
-//-------------------------------------------------------------------
-BarcodeScanner.prototype.encode = function(type, data, successCallback, errorCallback, options) {
-    if (errorCallback == null) { errorCallback = function() {}}
+            if (typeof errorCallback != "function") {
+                console.log("BarcodeScanner.scan failure: failure parameter not a function");
+                return
+            }
 
-    if (typeof errorCallback != "function")  {
-        console.log("BarcodeScanner.scan failure: failure parameter not a function");
-        return
-    }
+            if (typeof successCallback != "function") {
+                console.log("BarcodeScanner.scan failure: success callback parameter must be a function");
+                return
+            }
 
-    if (typeof successCallback != "function") {
-        console.log("BarcodeScanner.scan failure: success callback parameter must be a function");
-        return
-    }
+            exec(successCallback, errorCallback, 'BarcodeScanner', 'scan', []);
+        };
 
-    cordova.exec(successCallback, errorCallback, 'BarcodeScanner', 'encode', [{"type": type, "data": data, "options": options}]);
-};
+        //-------------------------------------------------------------------
+        BarcodeScanner.prototype.encode = function (type, data, successCallback, errorCallback, options) {
+            if (errorCallback == null) {
+                errorCallback = function () {
+                }
+            }
 
-//-------------------------------------------------------------------
+            if (typeof errorCallback != "function") {
+                console.log("BarcodeScanner.scan failure: failure parameter not a function");
+                return
+            }
 
-if(!window.plugins) {
-    window.plugins = {};
-}
-if (!window.plugins.barcodeScanner) {
-    window.plugins.barcodeScanner = new BarcodeScanner();
-}
+            if (typeof successCallback != "function") {
+                console.log("BarcodeScanner.scan failure: success callback parameter must be a function");
+                return
+            }
+
+            exec(successCallback, errorCallback, 'BarcodeScanner', 'encode', [
+                {"type": type, "data": data, "options": options}
+            ]);
+        };
+
+        var barcodeScanner = new BarcodeScanner();
+        module.exports = barcodeScanner;
+    });
