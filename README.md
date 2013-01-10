@@ -48,7 +48,7 @@ The following barcode types are currently supported:
 
 A full example could be:
 
-   var scanner = $wnd.PhoneGap.require("cordova/plugin/BarcodeScanner");
+   var scanner = window.PhoneGap.require("cordova/plugin/BarcodeScanner");
 
    scanner.scan(
       function (result) {
@@ -74,7 +74,7 @@ Supported encoding types:
 
 A full example could be:
 
-   var scanner = $wnd.PhoneGap.require("cordova/plugin/BarcodeScanner");
+   var scanner = window.PhoneGap.require("cordova/plugin/BarcodeScanner");
 
    scanner.encode(BarcodeScanner.Encode.TEXT_TYPE, "http://www.nytimes.com", function(success) {
   	        alert("encode success: " + success);
