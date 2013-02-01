@@ -2,7 +2,7 @@
 <plugin xmlns="http://www.phonegap.com/ns/plugins/1.0"
     xmlns:android="http://schemas.android.com/apk/res/android"
     id="com.phonegap.plugins.barcodescanner"
-    version="0.2.2">
+    version="0.3.0">
 
     <name>BarcodeScanner</name>
 
@@ -12,6 +12,11 @@
     <platform name="ios">
 		<plugins-plist key="BarcodeScanner" string="CDVBarcodeScanner" />
 		
+        <!-- Cordova >= 2.3 -->
+        <config-file target="config.xml" parent="/cordova/plugins">
+            <plugin name="BarcodeScanner" value="CDVBarcodeScanner"/>
+        </config-file>
+
 		<resource-file src="scannerOverlay.xib" />
 
         <header-file src="zxing-all-in-one.h" />
