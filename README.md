@@ -5,15 +5,17 @@ Cross-platform BarcodeScanner for Cordova / PhoneGap.
 
 Follows the [Cordova Plugin spec](https://github.com/alunny/cordova-plugin-spec), so that it works with [Pluginstall](https://github.com/alunny/pluginstall).
 
+This plugin leverages Cordova/PhoneGap's [require/define functionality used for plugins](http://simonmacdonald.blogspot.ca/2012/08/so-you-wanna-write-phonegap-200-android.html). 
+
 Note: the Android source for this project includes an Android Library Project.
 pluginstall currently doesn't support Library Project refs, so its been
 prebuilt as a jar library. Any updates to the Library Project should be
 committed with an updated jar.
 
 ## Using the plugin ##
-The plugin creates the object `window.plugins.barcodeScanner` with the method `scan(success, fail)`. 
-The following barcode types are currently supported:
+The plugin creates the object `cordova/plugin/BarcodeScanner` with the method `scan(success, fail)`. 
 
+The following barcode types are currently supported:
 ### Android
 
 * QR_CODE
@@ -46,15 +48,20 @@ The following barcode types are currently supported:
 
 A full example could be:
 
-    window.plugins.barcodeScanner.scan( function(result) {
-            alert("We got a barcode\n" +
-                      "Result: " + result.text + "\n" +
-                      "Format: " + result.format + "\n" +
-                      "Cancelled: " + result.cancelled);
-        }, function(error) {
-		    alert("Scanning failed: " + error);
-	    }
-	);
+   var scanner = window.PhoneGap.require("cordova/plugin/BarcodeScanner");
+
+   scanner.scan(
+      function (result) {
+          alert("We got a barcode\n" +
+                "Result: " + result.text + "\n" +
+                "Format: " + result.format + "\n" +
+                "Cancelled: " + result.cancelled);
+      }, 
+      function (error) {
+          alert("Scanning failed: " + error);
+      }
+   );
+
 
 ## Encoding a Barcode ##
 The plugin creates the object `window.plugins.barcodeScanner` with the method `encode(type, data, success, fail)`. 
@@ -67,7 +74,9 @@ Supported encoding types:
 
 A full example could be:
 
-        window.plugins.barcodeScanner.encode(BarcodeScanner.Encode.TEXT_TYPE, "http://www.nytimes.com", function(success) {
+   var scanner = window.PhoneGap.require("cordova/plugin/BarcodeScanner");
+
+   scanner.encode(BarcodeScanner.Encode.TEXT_TYPE, "http://www.nytimes.com", function(success) {
   	        alert("encode success: " + success);
   	      }, function(fail) {
   	        alert("encoding failed: " + fail);
