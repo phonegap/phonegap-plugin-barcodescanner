@@ -40,7 +40,7 @@
         android:title="@string/preferences_vibrate_title"/>
     <CheckBoxPreference
         android:key="preferences_copy_to_clipboard"
-        android:defaultValue="true"
+        android:defaultValue="false"
         android:title="@string/preferences_copy_to_clipboard_title"/>
     <CheckBoxPreference
         android:key="preferences_remember_duplicates"
