@@ -2,7 +2,7 @@
 <plugin xmlns="http://www.phonegap.com/ns/plugins/1.0"
     xmlns:android="http://schemas.android.com/apk/res/android"
     id="com.phonegap.plugins.barcodescanner"
-    version="0.3.0">
+    version="0.3.1">
 
     <name>BarcodeScanner</name>
 
@@ -13,7 +13,7 @@
 		<plugins-plist key="BarcodeScanner" string="CDVBarcodeScanner" />
 		
         <!-- Cordova >= 2.3 -->
-        <config-file target="config.xml" parent="/cordova/plugins">
+        <config-file target="config.xml" parent="plugins">
             <plugin name="BarcodeScanner" value="CDVBarcodeScanner"/>
         </config-file>
 
@@ -43,7 +43,7 @@
                 value="com.phonegap.plugins.barcodescanner.BarcodeScanner"/>
         </config-file>
 
-        <config-file target="res/xml/config.xml" parent="/cordova/plugins">
+        <config-file target="res/xml/config.xml" parent="plugins">
             <plugin name="BarcodeScanner"
                 value="com.phonegap.plugins.barcodescanner.BarcodeScanner"/>
         </config-file>
