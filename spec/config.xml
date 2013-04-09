@@ -13,6 +13,8 @@
         Ryan Willoughby - PhoneGap Team
     </author>
 
+    <gap:preference name="phonegap-version" value="2.5.0" />
+
     <gap:plugin name="BarcodeScanner"/>
 
 </widget>
