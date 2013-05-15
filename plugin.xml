@@ -17,12 +17,12 @@
             <plugin name="BarcodeScanner" value="CDVBarcodeScanner"/>
         </config-file>
 
-		<resource-file src="scannerOverlay.xib" />
+		<resource-file src="src/ios/scannerOverlay.xib" />
 
-        <header-file src="zxing-all-in-one.h" />
+        <header-file src="src/ios/zxing-all-in-one.h" />
 
-        <source-file src="CDVBarcodeScanner.mm"  />
-        <source-file src="zxing-all-in-one.cpp" />
+        <source-file src="src/ios/CDVBarcodeScanner.mm"  />
+        <source-file src="src/ios/zxing-all-in-one.cpp" />
 
         <framework src="libiconv.dylib" />
         <framework src="AVFoundation.framework" />
