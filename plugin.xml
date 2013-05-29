@@ -17,12 +17,12 @@
             <plugin name="BarcodeScanner" value="CDVBarcodeScanner"/>
         </config-file>
 
-		<resource-file src="scannerOverlay.xib" />
+		<resource-file src="src/ios/scannerOverlay.xib" />
 
-        <header-file src="zxing-all-in-one.h" />
+        <header-file src="src/ios/zxing-all-in-one.h" />
 
-        <source-file src="CDVBarcodeScanner.mm"  />
-        <source-file src="zxing-all-in-one.cpp" />
+        <source-file src="src/ios/CDVBarcodeScanner.mm"  />
+        <source-file src="src/ios/zxing-all-in-one.cpp" />
 
         <framework src="libiconv.dylib" />
         <framework src="AVFoundation.framework" />
@@ -33,7 +33,7 @@
     <!-- android -->
     <platform name="android">
 
-        <source-file src="com/phonegap/plugins/barcodescanner/BarcodeScanner.java" target-dir="src/com/phonegap/plugins/barcodescanner" />
+        <source-file src="src/android/com/phonegap/plugins/barcodescanner/BarcodeScanner.java" target-dir="src/com/phonegap/plugins/barcodescanner" />
         <!--
         <source-file src="R.java" target-dir="src/com/google/zxing/client/android" />
         -->
@@ -76,39 +76,39 @@
             <uses-feature android:name="android.hardware.camera" />
         </config-file>
 
-        <source-file src="com.google.zxing.client.android.captureactivity.jar" target-dir="libs"/>
+        <source-file src="src/android/com.google.zxing.client.android.captureactivity.jar" target-dir="libs"/>
 
         
-        <source-file src="LibraryProject/res/drawable/launcher_icon.png" target-dir="res/drawable"/>
-        <source-file src="LibraryProject/res/drawable/share_via_barcode.png" target-dir="res/drawable"/>
-        <source-file src="LibraryProject/res/drawable/shopper_icon.png" target-dir="res/drawable"/>
+        <source-file src="src/android/LibraryProject/res/drawable/launcher_icon.png" target-dir="res/drawable"/>
+        <source-file src="src/android/LibraryProject/res/drawable/share_via_barcode.png" target-dir="res/drawable"/>
+        <source-file src="src/android/LibraryProject/res/drawable/shopper_icon.png" target-dir="res/drawable"/>
         
 
-        <source-file src="LibraryProject/res/drawable-hdpi/launcher_icon.png" target-dir="res/drawable-hdpi"/>
-        <source-file src="LibraryProject/res/drawable-hdpi/shopper_icon.png" target-dir="res/drawable-hdpi"/>
+        <source-file src="src/android/LibraryProject/res/drawable-hdpi/launcher_icon.png" target-dir="res/drawable-hdpi"/>
+        <source-file src="src/android/LibraryProject/res/drawable-hdpi/shopper_icon.png" target-dir="res/drawable-hdpi"/>
 
-        <source-file src="LibraryProject/res/raw/beep.ogg" target-dir="res/raw"/>
+        <source-file src="src/android/LibraryProject/res/raw/beep.ogg" target-dir="res/raw"/>
 
-        <source-file src="LibraryProject/res/layout/bookmark_picker_list_item.xml" target-dir="res/layout"/>
-        <source-file src="LibraryProject/res/layout/capture.xml" target-dir="res/layout"/>
-        <source-file src="LibraryProject/res/layout/encode.xml" target-dir="res/layout"/>
-        <source-file src="LibraryProject/res/layout/help.xml" target-dir="res/layout"/>
-        <source-file src="LibraryProject/res/layout/network.xml" target-dir="res/layout"/>
-        <source-file src="LibraryProject/res/layout/search_book_contents.xml" target-dir="res/layout"/>
-        <source-file src="LibraryProject/res/layout/search_book_contents_header.xml" target-dir="res/layout"/>
-        <source-file src="LibraryProject/res/layout/search_book_contents_list_item.xml" target-dir="res/layout"/>
-        <source-file src="LibraryProject/res/layout/share.xml" target-dir="res/layout"/>
+        <source-file src="src/android/LibraryProject/res/layout/bookmark_picker_list_item.xml" target-dir="res/layout"/>
+        <source-file src="src/android/LibraryProject/res/layout/capture.xml" target-dir="res/layout"/>
+        <source-file src="src/android/LibraryProject/res/layout/encode.xml" target-dir="res/layout"/>
+        <source-file src="src/android/LibraryProject/res/layout/help.xml" target-dir="res/layout"/>
+        <source-file src="src/android/LibraryProject/res/layout/network.xml" target-dir="res/layout"/>
+        <source-file src="src/android/LibraryProject/res/layout/search_book_contents.xml" target-dir="res/layout"/>
+        <source-file src="src/android/LibraryProject/res/layout/search_book_contents_header.xml" target-dir="res/layout"/>
+        <source-file src="src/android/LibraryProject/res/layout/search_book_contents_list_item.xml" target-dir="res/layout"/>
+        <source-file src="src/android/LibraryProject/res/layout/share.xml" target-dir="res/layout"/>
 
-        <source-file src="LibraryProject/res/layout-land/encode.xml" target-dir="res/layout-land"/>
-        <source-file src="LibraryProject/res/layout-land/share.xml" target-dir="res/layout-land"/>
+        <source-file src="src/android/LibraryProject/res/layout-land/encode.xml" target-dir="res/layout-land"/>
+        <source-file src="src/android/LibraryProject/res/layout-land/share.xml" target-dir="res/layout-land"/>
 
-        <source-file src="LibraryProject/res/layout-ldpi/capture.xml" target-dir="res/layout-ldpi"/>
+        <source-file src="src/android/LibraryProject/res/layout-ldpi/capture.xml" target-dir="res/layout-ldpi"/>
 
-        <source-file src="LibraryProject/res/xml/preferences.xml" target-dir="res/xml"/>
+        <source-file src="src/android/LibraryProject/res/xml/preferences.xml" target-dir="res/xml"/>
 
-        <source-file src="LibraryProject/res/values/attrs.xml" target-dir="res/values"/>
-        <source-file src="LibraryProject/res/values/colors.xml" target-dir="res/values"/>
-        <source-file src="LibraryProject/res/values/ids.xml" target-dir="res/values"/>
+        <source-file src="src/android/LibraryProject/res/values/attrs.xml" target-dir="res/values"/>
+        <source-file src="src/android/LibraryProject/res/values/colors.xml" target-dir="res/values"/>
+        <source-file src="src/android/LibraryProject/res/values/ids.xml" target-dir="res/values"/>
 
         <config-file target="res/values/strings.xml" parent="/resources">
             <!-- string name="app_name">Barcode Scanner</string -->
@@ -238,28 +238,28 @@
         </config-file>
 
 
-        <source-file src="LibraryProject/res/values-ar/strings.xml" target-dir="res/values-ar"/>
-        <source-file src="LibraryProject/res/values-bg/strings.xml" target-dir="res/values-bg"/>
-        <source-file src="LibraryProject/res/values-cs/strings.xml" target-dir="res/values-cs"/>
-        <source-file src="LibraryProject/res/values-da/strings.xml" target-dir="res/values-da"/>
-        <source-file src="LibraryProject/res/values-de/strings.xml" target-dir="res/values-de"/>
-        <source-file src="LibraryProject/res/values-es/strings.xml" target-dir="res/values-es"/>
-        <source-file src="LibraryProject/res/values-fi/strings.xml" target-dir="res/values-fi"/>
-        <source-file src="LibraryProject/res/values-fr/strings.xml" target-dir="res/values-fr"/>
-        <source-file src="LibraryProject/res/values-he/strings.xml" target-dir="res/values-he"/>
-        <source-file src="LibraryProject/res/values-hu/strings.xml" target-dir="res/values-hu"/>
-        <source-file src="LibraryProject/res/values-it/strings.xml" target-dir="res/values-it"/>
-        <source-file src="LibraryProject/res/values-ja-rJP/strings.xml" target-dir="res/values-ja-rJP"/>
-        <source-file src="LibraryProject/res/values-nl/strings.xml" target-dir="res/values-nl"/>
-        <source-file src="LibraryProject/res/values-pl/strings.xml" target-dir="res/values-pl"/>
-        <source-file src="LibraryProject/res/values-pt/strings.xml" target-dir="res/values-pt"/>
-        <source-file src="LibraryProject/res/values-ru/strings.xml" target-dir="res/values-ru"/>
-        <source-file src="LibraryProject/res/values-sk/strings.xml" target-dir="res/values-sk"/>
-        <source-file src="LibraryProject/res/values-sl/strings.xml" target-dir="res/values-sl"/>
-        <source-file src="LibraryProject/res/values-sv/strings.xml" target-dir="res/values-sv"/>
-        <source-file src="LibraryProject/res/values-tr/strings.xml" target-dir="res/values-tr"/>
-        <source-file src="LibraryProject/res/values-zh-rCN/strings.xml" target-dir="res/values-zh-rCN"/>
-        <source-file src="LibraryProject/res/values-zh-rTW/strings.xml" target-dir="res/values-zh-rTW"/>
+        <source-file src="src/android/LibraryProject/res/values-ar/strings.xml" target-dir="res/values-ar"/>
+        <source-file src="src/android/LibraryProject/res/values-bg/strings.xml" target-dir="res/values-bg"/>
+        <source-file src="src/android/LibraryProject/res/values-cs/strings.xml" target-dir="res/values-cs"/>
+        <source-file src="src/android/LibraryProject/res/values-da/strings.xml" target-dir="res/values-da"/>
+        <source-file src="src/android/LibraryProject/res/values-de/strings.xml" target-dir="res/values-de"/>
+        <source-file src="src/android/LibraryProject/res/values-es/strings.xml" target-dir="res/values-es"/>
+        <source-file src="src/android/LibraryProject/res/values-fi/strings.xml" target-dir="res/values-fi"/>
+        <source-file src="src/android/LibraryProject/res/values-fr/strings.xml" target-dir="res/values-fr"/>
+        <source-file src="src/android/LibraryProject/res/values-he/strings.xml" target-dir="res/values-he"/>
+        <source-file src="src/android/LibraryProject/res/values-hu/strings.xml" target-dir="res/values-hu"/>
+        <source-file src="src/android/LibraryProject/res/values-it/strings.xml" target-dir="res/values-it"/>
+        <source-file src="src/android/LibraryProject/res/values-ja-rJP/strings.xml" target-dir="res/values-ja-rJP"/>
+        <source-file src="src/android/LibraryProject/res/values-nl/strings.xml" target-dir="res/values-nl"/>
+        <source-file src="src/android/LibraryProject/res/values-pl/strings.xml" target-dir="res/values-pl"/>
+        <source-file src="src/android/LibraryProject/res/values-pt/strings.xml" target-dir="res/values-pt"/>
+        <source-file src="src/android/LibraryProject/res/values-ru/strings.xml" target-dir="res/values-ru"/>
+        <source-file src="src/android/LibraryProject/res/values-sk/strings.xml" target-dir="res/values-sk"/>
+        <source-file src="src/android/LibraryProject/res/values-sl/strings.xml" target-dir="res/values-sl"/>
+        <source-file src="src/android/LibraryProject/res/values-sv/strings.xml" target-dir="res/values-sv"/>
+        <source-file src="src/android/LibraryProject/res/values-tr/strings.xml" target-dir="res/values-tr"/>
+        <source-file src="src/android/LibraryProject/res/values-zh-rCN/strings.xml" target-dir="res/values-zh-rCN"/>
+        <source-file src="src/android/LibraryProject/res/values-zh-rTW/strings.xml" target-dir="res/values-zh-rTW"/>
 
     </platform>
 </plugin>
