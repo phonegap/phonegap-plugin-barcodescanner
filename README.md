@@ -47,7 +47,7 @@ The following barcode types are currently supported:
 `success` and `fail` are callback functions. Success is passed an object with data, type and cancelled properties. Data is the text representation of the barcode data, type is the type of barcode detected and cancelled is whether or not the user cancelled the scan.
 
 A full example could be:
-
+```
    var scanner = window.PhoneGap.require("cordova/plugin/BarcodeScanner");
 
    scanner.scan(
@@ -61,7 +61,7 @@ A full example could be:
           alert("Scanning failed: " + error);
       }
    );
-
+```
 
 ## Encoding a Barcode ##
 The plugin creates the object `window.plugins.barcodeScanner` with the method `encode(type, data, success, fail)`. 
@@ -72,6 +72,7 @@ Supported encoding types:
 * PHONE_TYPE
 * SMS_TYPE
 
+```
 A full example could be:
 
    var scanner = window.PhoneGap.require("cordova/plugin/BarcodeScanner");
@@ -82,6 +83,7 @@ A full example could be:
   	        alert("encoding failed: " + fail);
   	      }
   	    );
+```
 
 ## Thanks on Github ##
 
