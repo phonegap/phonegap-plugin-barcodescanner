@@ -7,7 +7,7 @@
  */
 
 
-PhoneGap.define("cordova/plugin/BarcodeScanner",
+cordova.define("cordova/plugin/BarcodeScanner",
     
     function (require, exports, module) {
 
