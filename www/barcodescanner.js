@@ -54,12 +54,12 @@ cordova.define("cordova/plugin/BarcodeScanner",
             }
 
             if (typeof errorCallback != "function") {
-                console.log("BarcodeScanner.scan failure: failure parameter not a function");
+                console.log("BarcodeScanner.encode failure: failure parameter not a function");
                 return
             }
 
             if (typeof successCallback != "function") {
-                console.log("BarcodeScanner.scan failure: success callback parameter must be a function");
+                console.log("BarcodeScanner.encode failure: success callback parameter must be a function");
                 return
             }
 

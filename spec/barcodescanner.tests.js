@@ -19,35 +19,39 @@
  *
 */
 
-describe('Plugin object (window.plugins)', function () {
+var scanner;
+
+describe('cordova.require object should exist', function () {
 	it("should exist", function() {
-        expect(window.plugins).toBeDefined();
+        expect(window.cordova).toBeDefined();
+        expect(typeof cordova.require == 'function').toBe(true);
 	});
 
-	it("should contain a barcodeScanner object", function() {
-        expect(window.plugins.barcodeScanner).toBeDefined();
-		expect(typeof window.plugins.barcodeScanner == 'object').toBe(true);
+	it("BarcodeScanner plugin should exist", function() {
+        scanner = cordova.require("cordova/plugin/BarcodeScanner")
+        expect(scanner).toBeDefined();
+		expect(typeof scanner == 'object').toBe(true);
 	});
 
     it("should contain a scan function", function() {
-        expect(window.plugins.barcodeScanner.scan).toBeDefined();
-        expect(typeof window.plugins.barcodeScanner.scan == 'function').toBe(true);
+        expect(scanner.scan).toBeDefined();
+        expect(typeof scanner.scan == 'function').toBe(true);
     });
 
     it("should contain an encode function", function() {
-        expect(window.plugins.barcodeScanner.encode).toBeDefined();
-        expect(typeof window.plugins.barcodeScanner.encode == 'function').toBe(true);
+        expect(scanner.encode).toBeDefined();
+        expect(typeof scanner.encode == 'function').toBe(true);
     });
 
     it("should contain three DestinationType constants", function() {
-        expect(BarcodeScanner.Encode.TEXT_TYPE).toBe("TEXT_TYPE");
-        expect(BarcodeScanner.Encode.EMAIL_TYPE).toBe("EMAIL_TYPE");
-        expect(BarcodeScanner.Encode.PHONE_TYPE).toBe("PHONE_TYPE");
-        expect(BarcodeScanner.Encode.SMS_TYPE).toBe("SMS_TYPE");
+        expect(scanner.Encode.TEXT_TYPE).toBe("TEXT_TYPE");
+        expect(scanner.Encode.EMAIL_TYPE).toBe("EMAIL_TYPE");
+        expect(scanner.Encode.PHONE_TYPE).toBe("PHONE_TYPE");
+        expect(scanner.Encode.SMS_TYPE).toBe("SMS_TYPE");
     });
     /*
     it("should call scan successfully", function() {
-        window.plugins.barcodeScanner.scan(function() {}, function() {});
+        scanner.scan(function() {}, function() {});
     });
     */
 });
