@@ -5,6 +5,8 @@
     version="0.5.1">
 
     <name>BarcodeScanner</name>
+    
+    <description>Scans Barcodes.</description>
 
     <asset src="www/barcodescanner.js" target="barcodescanner.js" />
 
