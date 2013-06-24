@@ -8,6 +8,10 @@
     
     <description>Scans Barcodes.</description>
 
+    <engines>
+        <engine name="cordova" version=">=2.0.0" />
+    </engines>    
+
     <asset src="www/barcodescanner.js" target="barcodescanner.js" />
 
     <!-- ios -->
