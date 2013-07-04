@@ -37,17 +37,18 @@ public abstract class ParsedResult {
     this.type = type;
   }
 
-  public ParsedResultType getType() {
+  public final ParsedResultType getType() {
     return type;
   }
 
   public abstract String getDisplayResult();
 
-  public String toString() {
+  @Override
+  public final String toString() {
     return getDisplayResult();
   }
 
-  public static void maybeAppend(String value, StringBuffer result) {
+  public static void maybeAppend(String value, StringBuilder result) {
     if (value != null && value.length() > 0) {
       // Don't add a newline before the first value
       if (result.length() > 0) {
@@ -57,14 +58,14 @@ public abstract class ParsedResult {
     }
   }
 
-  public static void maybeAppend(String[] value, StringBuffer result) {
+  public static void maybeAppend(String[] value, StringBuilder result) {
     if (value != null) {
-      for (int i = 0; i < value.length; i++) {
-        if (value[i] != null && value[i].length() > 0) {
+      for (String s : value) {
+        if (s != null && s.length() > 0) {
           if (result.length() > 0) {
             result.append('\n');
           }
-          result.append(value[i]);
+          result.append(s);
         }
       }
     }

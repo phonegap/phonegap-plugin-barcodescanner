@@ -31,7 +31,7 @@ import java.io.IOException;
 /**
  * Manages beeps and vibrations for {@link CaptureActivity}.
  */
-public final class BeepManager {
+final class BeepManager {
 
   private static final String TAG = BeepManager.class.getSimpleName();
 
@@ -88,12 +88,13 @@ public final class BeepManager {
     mediaPlayer.setAudioStreamType(AudioManager.STREAM_MUSIC);
     // When the beep has finished playing, rewind to queue up another one.
     mediaPlayer.setOnCompletionListener(new MediaPlayer.OnCompletionListener() {
+      @Override
       public void onCompletion(MediaPlayer player) {
         player.seekTo(0);
       }
     });
 
-    AssetFileDescriptor file = activity.getResources().openRawResourceFd(activity.getApplicationContext().getResources().getIdentifier("beep", "raw", activity.getApplicationContext().getPackageName()));
+    AssetFileDescriptor file = activity.getResources().openRawResourceFd(R.raw.beep);
     try {
       mediaPlayer.setDataSource(file.getFileDescriptor(), file.getStartOffset(), file.getLength());
       file.close();

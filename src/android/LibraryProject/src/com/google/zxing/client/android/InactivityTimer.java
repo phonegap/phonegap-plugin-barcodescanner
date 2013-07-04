@@ -16,77 +16,65 @@
 
 package com.google.zxing.client.android;
 
-import java.util.concurrent.Executors;
-import java.util.concurrent.RejectedExecutionException;
-import java.util.concurrent.ScheduledExecutorService;
-import java.util.concurrent.ScheduledFuture;
-import java.util.concurrent.ThreadFactory;
-import java.util.concurrent.TimeUnit;
-
 import android.app.Activity;
 import android.content.BroadcastReceiver;
 import android.content.Context;
 import android.content.Intent;
 import android.content.IntentFilter;
+import android.os.AsyncTask;
+import android.os.BatteryManager;
+import android.util.Log;
+
+import com.google.zxing.client.android.common.executor.AsyncTaskExecInterface;
+import com.google.zxing.client.android.common.executor.AsyncTaskExecManager;
 
 /**
  * Finishes an activity after a period of inactivity if the device is on battery power.
  */
 final class InactivityTimer {
 
-  private static final int INACTIVITY_DELAY_SECONDS = 5 * 60;
+  private static final String TAG = InactivityTimer.class.getSimpleName();
 
-  private final ScheduledExecutorService inactivityTimer =
-      Executors.newSingleThreadScheduledExecutor(new DaemonThreadFactory());
+  private static final long INACTIVITY_DELAY_MS = 5 * 60 * 1000L;
+
   private final Activity activity;
-  private ScheduledFuture<?> inactivityFuture = null;
-  private final PowerStatusReceiver powerStatusReceiver = new PowerStatusReceiver();
+  private final AsyncTaskExecInterface taskExec;
+  private final BroadcastReceiver powerStatusReceiver;
+  private InactivityAsyncTask inactivityTask;
 
   InactivityTimer(Activity activity) {
     this.activity = activity;
+    taskExec = new AsyncTaskExecManager().build();
+    powerStatusReceiver = new PowerStatusReceiver();
     onActivity();
   }
 
-  void onActivity() {
+  synchronized void onActivity() {
     cancel();
-    if (!inactivityTimer.isShutdown()) {
-      try {
-        inactivityFuture = inactivityTimer.schedule(new FinishListener(activity),
-            INACTIVITY_DELAY_SECONDS,
-            TimeUnit.SECONDS);
-      } catch (RejectedExecutionException ree) {
-        // surprising, but could be normal if for some reason the implementation just doesn't
-        // think it can shcedule again. Since this time-out is non-essential, just forget it
-      }
-    }
+    inactivityTask = new InactivityAsyncTask();
+    taskExec.execute(inactivityTask);
   }
 
-  public void onPause(){
+  public void onPause() {
+    cancel();
     activity.unregisterReceiver(powerStatusReceiver);
   }
 
   public void onResume(){
     activity.registerReceiver(powerStatusReceiver, new IntentFilter(Intent.ACTION_BATTERY_CHANGED));
+    onActivity();
   }
 
-  private void cancel() {
-    if (inactivityFuture != null) {
-      inactivityFuture.cancel(true);
-      inactivityFuture = null;
+  private synchronized  void cancel() {
+    AsyncTask<?,?,?> task = inactivityTask;
+    if (task != null) {
+      task.cancel(true);
+      inactivityTask = null;
     }
   }
 
   void shutdown() {
     cancel();
-    inactivityTimer.shutdown();
-  }
-
-  private static final class DaemonThreadFactory implements ThreadFactory {
-    public Thread newThread(Runnable runnable) {
-      Thread thread = new Thread(runnable);
-      thread.setDaemon(true);
-      return thread;
-    }
   }
 
   private final class PowerStatusReceiver extends BroadcastReceiver {
@@ -94,13 +82,27 @@ final class InactivityTimer {
     public void onReceive(Context context, Intent intent){
       if (Intent.ACTION_BATTERY_CHANGED.equals(intent.getAction())) {
         // 0 indicates that we're on battery
-        // In Android 2.0+, use BatteryManager.EXTRA_PLUGGED
-        if (intent.getIntExtra("plugged", -1) == 0) {
+        boolean onBatteryNow = intent.getIntExtra(BatteryManager.EXTRA_PLUGGED, -1) <= 0;
+        if (onBatteryNow) {
           InactivityTimer.this.onActivity();
         } else {
           InactivityTimer.this.cancel();
         }
       }
+    }
+  }
+
+  private final class InactivityAsyncTask extends AsyncTask<Object,Object,Object> {
+    @Override
+    protected Object doInBackground(Object... objects) {
+      try {
+        Thread.sleep(INACTIVITY_DELAY_MS);
+        Log.i(TAG, "Finishing activity due to inactivity");
+        activity.finish();
+      } catch (InterruptedException e) {
+        // continue without killing
+      }
+      return null;
     }
   }
 

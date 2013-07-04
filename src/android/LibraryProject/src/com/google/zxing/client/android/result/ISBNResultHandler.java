@@ -22,8 +22,6 @@ import com.google.zxing.client.result.ISBNParsedResult;
 import com.google.zxing.client.result.ParsedResult;
 
 import android.app.Activity;
-import android.app.AlertDialog;
-import android.content.DialogInterface;
 import android.view.View;
 
 /**
@@ -32,17 +30,17 @@ import android.view.View;
  * @author dswitkin@google.com (Daniel Switkin)
  */
 public final class ISBNResultHandler extends ResultHandler {
-  private static final int[] buttons = new int[4];
+  private static final int[] buttons = {
+      R.string.button_product_search,
+      R.string.button_book_search,
+      R.string.button_search_book_contents,
+      R.string.button_custom_product_search
+  };
 
   public ISBNResultHandler(Activity activity, ParsedResult result, Result rawResult) {
     super(activity, result, rawResult);
-    
-    buttons[0] = getIdentifier("string", "button_product_search");
-    buttons[1] = getIdentifier("string", "button_book_search");
-    buttons[2] = getIdentifier("string", "button_search_book_contents");
-    buttons[3] = getIdentifier("string", "button_custom_product_search");
-    
     showGoogleShopperButton(new View.OnClickListener() {
+      @Override
       public void onClick(View view) {
         ISBNParsedResult isbnResult = (ISBNParsedResult) getResult();
         openGoogleShopper(isbnResult.getISBN());
@@ -61,30 +59,26 @@ public final class ISBNResultHandler extends ResultHandler {
   }
 
   @Override
-  public void handleButtonPress(final int index) {
-    showNotOurResults(index, new AlertDialog.OnClickListener() {
-      public void onClick(DialogInterface dialogInterface, int i) {
-        ISBNParsedResult isbnResult = (ISBNParsedResult) getResult();
-        switch (index) {
-          case 0:
-            openProductSearch(isbnResult.getISBN());
-            break;
-          case 1:
-            openBookSearch(isbnResult.getISBN());
-            break;
-          case 2:
-            searchBookContents(isbnResult.getISBN());
-            break;
-          case 3:
-            openURL(fillInCustomSearchURL(isbnResult.getISBN()));
-            break;
-        }
-      }
-    });
+  public void handleButtonPress(int index) {
+    ISBNParsedResult isbnResult = (ISBNParsedResult) getResult();
+    switch (index) {
+      case 0:
+        openProductSearch(isbnResult.getISBN());
+        break;
+      case 1:
+        openBookSearch(isbnResult.getISBN());
+        break;
+      case 2:
+        searchBookContents(isbnResult.getISBN());
+        break;
+      case 3:
+        openURL(fillInCustomSearchURL(isbnResult.getISBN()));
+        break;
+    }
   }
 
   @Override
   public int getDisplayTitle() {
-    return getIdentifier("string", "result_isbn");
+    return R.string.result_isbn;
   }
 }

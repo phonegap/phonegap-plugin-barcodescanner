@@ -39,38 +39,44 @@ final class BookmarkAdapter extends BaseAdapter {
   private final Context context;
   private final Cursor cursor;
 
-  public BookmarkAdapter(Context context, Cursor cursor) {
+  BookmarkAdapter(Context context, Cursor cursor) {
     this.context = context;
     this.cursor = cursor;
   }
 
+  @Override
   public int getCount() {
     return cursor.getCount();
   }
 
+  @Override
   public Object getItem(int index) {
     // Not used, so no point in retrieving it.
     return null;
   }
 
+  @Override
   public long getItemId(int index) {
     return index;
   }
 
+  @Override
   public View getView(int index, View view, ViewGroup viewGroup) {
     LinearLayout layout;
-    if (view == null || !(view instanceof LinearLayout)) {
-      LayoutInflater factory = LayoutInflater.from(context);
-      layout = (LinearLayout) factory.inflate(context.getResources().getIdentifier("bookmark_picker_list_item", "layout", context.getPackageName()), viewGroup, false);
-    } else {
+    if (view instanceof LinearLayout) {
       layout = (LinearLayout) view;
+    } else {
+      LayoutInflater factory = LayoutInflater.from(context);
+      layout = (LinearLayout) factory.inflate(R.layout.bookmark_picker_list_item, viewGroup, false);
     }
 
-    cursor.moveToPosition(index);
-    String title = cursor.getString(BookmarkPickerActivity.TITLE_COLUMN);
-    ((TextView) layout.findViewById(context.getResources().getIdentifier("bookmark_title", "id", context.getPackageName()))).setText(title);
-    String url = cursor.getString(BookmarkPickerActivity.URL_COLUMN);
-    ((TextView) layout.findViewById(context.getResources().getIdentifier("bookmark_url", "id", context.getPackageName()))).setText(url);
+    if (!cursor.isClosed()) {
+      cursor.moveToPosition(index);
+      String title = cursor.getString(BookmarkPickerActivity.TITLE_COLUMN);
+      ((TextView) layout.findViewById(R.id.bookmark_title)).setText(title);
+      String url = cursor.getString(BookmarkPickerActivity.URL_COLUMN);
+      ((TextView) layout.findViewById(R.id.bookmark_url)).setText(url);
+    } // Otherwise... just don't update as the object is shutting down
     return layout;
   }
 }

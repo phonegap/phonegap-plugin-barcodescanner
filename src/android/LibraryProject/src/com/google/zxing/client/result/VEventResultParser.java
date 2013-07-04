@@ -18,34 +18,42 @@ package com.google.zxing.client.result;
 
 import com.google.zxing.Result;
 
+import java.util.List;
+
 /**
  * Partially implements the iCalendar format's "VEVENT" format for specifying a
  * calendar event. See RFC 2445. This supports SUMMARY, LOCATION, GEO, DTSTART and DTEND fields.
  *
  * @author Sean Owen
  */
-final class VEventResultParser extends ResultParser {
+public final class VEventResultParser extends ResultParser {
 
-  private VEventResultParser() {
-  }
-
-  public static CalendarParsedResult parse(Result result) {
-    String rawText = result.getText();
-    if (rawText == null) {
-      return null;
-    }
+  @Override
+  public CalendarParsedResult parse(Result result) {
+    String rawText = getMassagedText(result);
     int vEventStart = rawText.indexOf("BEGIN:VEVENT");
     if (vEventStart < 0) {
       return null;
     }
 
-    String summary = VCardResultParser.matchSingleVCardPrefixedField("SUMMARY", rawText, true);
-    String start = VCardResultParser.matchSingleVCardPrefixedField("DTSTART", rawText, true);
-    String end = VCardResultParser.matchSingleVCardPrefixedField("DTEND", rawText, true);
-    String location = VCardResultParser.matchSingleVCardPrefixedField("LOCATION", rawText, true);
-    String description = VCardResultParser.matchSingleVCardPrefixedField("DESCRIPTION", rawText, true);
+    String summary = matchSingleVCardPrefixedField("SUMMARY", rawText, true);
+    String start = matchSingleVCardPrefixedField("DTSTART", rawText, true);
+    if (start == null) {
+      return null;
+    }
+    String end = matchSingleVCardPrefixedField("DTEND", rawText, true);
+    String location = matchSingleVCardPrefixedField("LOCATION", rawText, true);
+    String organizer = stripMailto(matchSingleVCardPrefixedField("ORGANIZER", rawText, true));
 
-    String geoString = VCardResultParser.matchSingleVCardPrefixedField("GEO", rawText, true);
+    String[] attendees = matchVCardPrefixedField("ATTENDEE", rawText, true);
+    if (attendees != null) {
+      for (int i = 0; i < attendees.length; i++) {
+        attendees[i] = stripMailto(attendees[i]);
+      }
+    }
+    String description = matchSingleVCardPrefixedField("DESCRIPTION", rawText, true);
+
+    String geoString = matchSingleVCardPrefixedField("GEO", rawText, true);
     double latitude;
     double longitude;
     if (geoString == null) {
@@ -62,10 +70,45 @@ final class VEventResultParser extends ResultParser {
     }
 
     try {
-      return new CalendarParsedResult(summary, start, end, location, null, description, latitude, longitude);
+      return new CalendarParsedResult(summary,
+                                      start,
+                                      end,
+                                      location,
+                                      organizer,
+                                      attendees,
+                                      description,
+                                      latitude,
+                                      longitude);
     } catch (IllegalArgumentException iae) {
       return null;
     }
+  }
+
+  private static String matchSingleVCardPrefixedField(CharSequence prefix,
+                                                      String rawText,
+                                                      boolean trim) {
+    List<String> values = VCardResultParser.matchSingleVCardPrefixedField(prefix, rawText, trim, false);
+    return values == null || values.isEmpty() ? null : values.get(0);
+  }
+
+  private static String[] matchVCardPrefixedField(CharSequence prefix, String rawText, boolean trim) {
+    List<List<String>> values = VCardResultParser.matchVCardPrefixedField(prefix, rawText, trim, false);
+    if (values == null || values.isEmpty()) {
+      return null;
+    }
+    int size = values.size();
+    String[] result = new String[size];
+    for (int i = 0; i < size; i++) {
+      result[i] = values.get(i).get(0);
+    }
+    return result;
+  }
+
+  private static String stripMailto(String s) {
+    if (s != null && (s.startsWith("mailto:") || s.startsWith("MAILTO:"))) {
+      s = s.substring(7);
+    }
+    return s;
   }
 
 }
