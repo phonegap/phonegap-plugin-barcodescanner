@@ -16,23 +16,29 @@
 
 package com.google.zxing.oned;
 
-import java.util.Hashtable;
 import com.google.zxing.BarcodeFormat;
+import com.google.zxing.EncodeHintType;
 import com.google.zxing.WriterException;
 import com.google.zxing.common.BitMatrix;
+
+import java.util.Map;
 
 /**
  * This object renders a ITF code as a {@link BitMatrix}.
  * 
  * @author erik.barbara@gmail.com (Erik Barbara)
  */
-public final class ITFWriter extends UPCEANWriter {
+public final class ITFWriter extends OneDimensionalCodeWriter {
 
+  private static final int[] START_PATTERN = {1, 1, 1, 1};
+  private static final int[] END_PATTERN = {3, 1, 1};
+
+  @Override
   public BitMatrix encode(String contents,
                           BarcodeFormat format,
                           int width,
                           int height,
-                          Hashtable hints) throws WriterException {
+                          Map<EncodeHintType,?> hints) throws WriterException {
     if (format != BarcodeFormat.ITF) {
       throw new IllegalArgumentException("Can only encode ITF, but got " + format);
     }
@@ -40,15 +46,18 @@ public final class ITFWriter extends UPCEANWriter {
     return super.encode(contents, format, width, height, hints);
   }
 
-  public byte[] encode(String contents) {
+  @Override
+  public boolean[] encode(String contents) {
     int length = contents.length();
+    if (length % 2 != 0) {
+      throw new IllegalArgumentException("The lenght of the input should be even");
+    }
     if (length > 80) {
       throw new IllegalArgumentException(
           "Requested contents should be less than 80 digits long, but got " + length);
     }
-    byte[] result = new byte[9 + 9 * length];
-    int[] start = {1, 1, 1, 1};
-    int pos = appendPattern(result, 0, start, 1);
+    boolean[] result = new boolean[9 + 9 * length];
+    int pos = appendPattern(result, 0, START_PATTERN, true);
     for (int i = 0; i < length; i += 2) {
       int one = Character.digit(contents.charAt(i), 10);
       int two = Character.digit(contents.charAt(i+1), 10);
@@ -57,10 +66,9 @@ public final class ITFWriter extends UPCEANWriter {
         encoding[(j << 1)] = ITFReader.PATTERNS[one][j];
         encoding[(j << 1) + 1] = ITFReader.PATTERNS[two][j];
       }
-      pos += appendPattern(result, pos, encoding, 1);
+      pos += appendPattern(result, pos, encoding, true);
     }
-    int[] end = {3, 1, 1};
-    pos += appendPattern(result, pos, end, 1);
+    appendPattern(result, pos, END_PATTERN, true);
 
     return result;
   }

@@ -23,6 +23,8 @@ import com.google.zxing.client.result.URIParsedResult;
 
 import android.app.Activity;
 
+import java.util.Locale;
+
 /**
  * Offers appropriate actions for URLS.
  *
@@ -31,18 +33,19 @@ import android.app.Activity;
 public final class URIResultHandler extends ResultHandler {
   // URIs beginning with entries in this array will not be saved to history or copied to the
   // clipboard for security.
-  private static final String[] SECURE_PROTOCOLS = new String[] {
+  private static final String[] SECURE_PROTOCOLS = {
     "otpauth:"
   };
 
-  private static final int[] buttons = new int[4];
+  private static final int[] buttons = {
+      R.string.button_open_browser,
+      R.string.button_share_by_email,
+      R.string.button_share_by_sms,
+      R.string.button_search_book_contents,
+  };
 
   public URIResultHandler(Activity activity, ParsedResult result) {
     super(activity, result);
-    buttons[0] = getIdentifier("string", "button_open_browser");
-    buttons[1] = getIdentifier("string", "button_share_by_email");
-    buttons[2] = getIdentifier("string", "button_share_by_sms");
-    buttons[3] = getIdentifier("string", "button_search_book_contents");
   }
 
   @Override
@@ -80,13 +83,13 @@ public final class URIResultHandler extends ResultHandler {
 
   @Override
   public int getDisplayTitle() {
-    return getIdentifier("string", "result_uri");
+    return R.string.result_uri;
   }
 
   @Override
   public boolean areContentsSecure() {
     URIParsedResult uriResult = (URIParsedResult) getResult();
-    String uri = uriResult.getURI().toLowerCase();
+    String uri = uriResult.getURI().toLowerCase(Locale.ENGLISH);
     for (String secure : SECURE_PROTOCOLS) {
       if (uri.startsWith(secure)) {
         return true;

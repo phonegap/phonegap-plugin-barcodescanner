@@ -15,8 +15,6 @@
  limitations under the License.
  -->
 <resources>
-  <!-- Messages IDs -->
-  <item type="id" name="auto_focus"/>
   <item type="id" name="decode"/>
   <item type="id" name="decode_failed"/>
   <item type="id" name="decode_succeeded"/>
@@ -24,6 +22,4 @@
   <item type="id" name="quit"/>
   <item type="id" name="restart_preview"/>
   <item type="id" name="return_scan_result"/>
-  <item type="id" name="search_book_contents_failed"/>
-  <item type="id" name="search_book_contents_succeeded"/>
 </resources>

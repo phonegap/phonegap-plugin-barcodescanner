@@ -19,32 +19,33 @@ package com.google.zxing.client.result;
 import com.google.zxing.Result;
 
 /**
- * Parses a WIFI configuration string.  Strings will be of the form:
- * WIFI:T:WPA;S:mynetwork;P:mypass;;
+ * <p>Parses a WIFI configuration string. Strings will be of the form:</p>
  *
- * The fields can come in any order, and there should be tests to see
- * if we can parse them all correctly.
+ * <p>{@code WIFI:T:[network type];S:[network SSID];P:[network password];H:[hidden?];;}</p>
+ *
+ * <p>The fields can appear in any order. Only "S:" is required.</p>
  *
  * @author Vikram Aggarwal
+ * @author Sean Owen
  */
-final class WifiResultParser extends ResultParser {
+public final class WifiResultParser extends ResultParser {
 
-  private WifiResultParser() {
-  }
-
-  public static WifiParsedResult parse(Result result) {
-    String rawText = result.getText();
-
-    if (rawText == null || !rawText.startsWith("WIFI:")) {
+  @Override
+  public WifiParsedResult parse(Result result) {
+    String rawText = getMassagedText(result);
+    if (!rawText.startsWith("WIFI:")) {
       return null;
     }
-
-    // Don't remove leading or trailing whitespace
-    boolean trim = false;
-    String ssid = matchSinglePrefixedField("S:", rawText, ';', trim);
-    String pass = matchSinglePrefixedField("P:", rawText, ';', trim);
-    String type = matchSinglePrefixedField("T:", rawText, ';', trim);
-
-    return new WifiParsedResult(type, ssid, pass);
+    String ssid = matchSinglePrefixedField("S:", rawText, ';', false);
+    if (ssid == null || ssid.length() == 0) {
+      return null;
+    }
+    String pass = matchSinglePrefixedField("P:", rawText, ';', false);
+    String type = matchSinglePrefixedField("T:", rawText, ';', false);
+    if (type == null) {
+      type = "nopass";
+    }
+    boolean hidden = Boolean.parseBoolean(matchSinglePrefixedField("B:", rawText, ';', false));
+    return new WifiParsedResult(type, ssid, pass, hidden);
   }
 }

@@ -17,13 +17,9 @@
 package com.google.zxing.client.android;
 
 import android.app.Activity;
-import android.app.AlertDialog;
-import android.content.DialogInterface;
 import android.content.Intent;
 import android.net.Uri;
-import android.os.Build;
 import android.os.Bundle;
-import android.util.Log;
 import android.view.View;
 import android.view.KeyEvent;
 import android.webkit.WebView;
@@ -37,58 +33,39 @@ import android.widget.Button;
  */
 public final class HelpActivity extends Activity {
 
-  private static final String TAG = HelpActivity.class.getSimpleName();
-
-  // Actually guessing at the Desire's MODEL for now:
-  private static final String[] BUGGY_MODEL_SUBSTRINGS = {
-      "Desire",
-      "Pulse", // Camera doesn't come on
-      "Geeksphone", // Doesn't support YUV?
-      "supersonic", // aka Evo
-  };
-  private static final Uri BUGGY_URI =
-      Uri.parse("http://code.google.com/p/zxing/wiki/FrequentlyAskedQuestions");
-
   // Use this key and one of the values below when launching this activity via intent. If not
   // present, the default page will be loaded.
   public static final String REQUESTED_PAGE_KEY = "requested_page_key";
   public static final String DEFAULT_PAGE = "index.html";
   public static final String WHATS_NEW_PAGE = "whatsnew.html";
 
-  private static final String BASE_URL = "file:///android_asset/html/";
+  private static final String BASE_URL =
+      "file:///android_asset/html-" + LocaleManager.getTranslatedAssetLanguage() + '/';
   private static final String WEBVIEW_STATE_PRESENT = "webview_state_present";
 
-  private static boolean initialized = false;
   private WebView webView;
   private Button backButton;
 
   private final Button.OnClickListener backListener = new Button.OnClickListener() {
+    @Override
     public void onClick(View view) {
       webView.goBack();
     }
   };
 
   private final Button.OnClickListener doneListener = new Button.OnClickListener() {
+    @Override
     public void onClick(View view) {
       finish();
-    }
-  };
-
-  private final DialogInterface.OnClickListener groupsListener =
-      new DialogInterface.OnClickListener() {
-    public void onClick(DialogInterface dialogInterface, int i) {
-      Intent intent = new Intent(Intent.ACTION_VIEW, BUGGY_URI);
-      intent.addFlags(Intent.FLAG_ACTIVITY_CLEAR_WHEN_TASK_RESET);
-      HelpActivity.this.startActivity(intent);
     }
   };
 
   @Override
   protected void onCreate(Bundle icicle) {
     super.onCreate(icicle);
-    setContentView(getApplicationContext().getResources().getIdentifier("help", "layout", getApplicationContext().getPackageName()));
+    setContentView(R.layout.help);
 
-    webView = (WebView)findViewById(getApplicationContext().getResources().getIdentifier("help_contents", "id", getApplicationContext().getPackageName()));
+    webView = (WebView)findViewById(R.id.help_contents);
     webView.setWebViewClient(new HelpClient());
 
     // Froyo has a bug with calling onCreate() twice in a row, which causes the What's New page
@@ -108,32 +85,10 @@ public final class HelpActivity extends Activity {
       webView.loadUrl(BASE_URL + DEFAULT_PAGE);
     }
 
-    backButton = (Button) findViewById(getApplicationContext().getResources().getIdentifier("back_button", "id", getApplicationContext().getPackageName()));
+    backButton = (Button) findViewById(R.id.back_button);
     backButton.setOnClickListener(backListener);
-    View doneButton = findViewById(getApplicationContext().getResources().getIdentifier("done_button", "id", getApplicationContext().getPackageName()));
+    View doneButton = findViewById(R.id.done_button);
     doneButton.setOnClickListener(doneListener);
-
-    if (!initialized) {
-      initialized = true;
-      checkBuggyDevice();
-    }
-  }
-
-  private void checkBuggyDevice() {
-    String model = Build.MODEL;
-    Log.i(TAG, "Build model is " + model);
-    if (model != null) {
-      for (String buggyModelSubstring : BUGGY_MODEL_SUBSTRINGS) {
-        if (model.contains(buggyModelSubstring)) {
-          AlertDialog.Builder builder = new AlertDialog.Builder(this);
-          builder.setMessage(getApplicationContext().getResources().getIdentifier("msg_buggy", "string", getApplicationContext().getPackageName()));
-          builder.setPositiveButton(getApplicationContext().getResources().getIdentifier("button_ok", "string", getApplicationContext().getPackageName()), groupsListener);
-          builder.setNegativeButton(getApplicationContext().getResources().getIdentifier("button_cancel", "string", getApplicationContext().getPackageName()), null);
-          builder.show();
-          break;
-        }
-      }
-    }
   }
 
   @Override

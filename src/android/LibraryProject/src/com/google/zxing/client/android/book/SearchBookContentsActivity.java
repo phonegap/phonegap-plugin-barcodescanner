@@ -17,11 +17,9 @@
 package com.google.zxing.client.android.book;
 
 import android.app.Activity;
-import android.content.Context;
 import android.content.Intent;
+import android.os.AsyncTask;
 import android.os.Bundle;
-import android.os.Handler;
-import android.os.Message;
 import android.util.Log;
 import android.view.KeyEvent;
 import android.view.LayoutInflater;
@@ -32,27 +30,22 @@ import android.widget.Button;
 import android.widget.EditText;
 import android.widget.ListView;
 import android.widget.TextView;
-import org.apache.http.Header;
-import org.apache.http.HttpEntity;
-import org.apache.http.HttpResponse;
-import org.apache.http.client.methods.HttpGet;
-import org.apache.http.client.methods.HttpHead;
-import org.apache.http.client.methods.HttpUriRequest;
+
 import org.json.JSONArray;
 import org.json.JSONException;
 import org.json.JSONObject;
 
-import java.io.ByteArrayOutputStream;
 import java.io.IOException;
-import java.net.URI;
 import java.util.ArrayList;
 import java.util.List;
 import java.util.regex.Pattern;
 
+import com.google.zxing.client.android.Intents;
+import com.google.zxing.client.android.HttpHelper;
 import com.google.zxing.client.android.LocaleManager;
 import com.google.zxing.client.android.R;
-import com.google.zxing.client.android.Intents;
-import com.google.zxing.client.android.AndroidHttpClient;
+import com.google.zxing.client.android.common.executor.AsyncTaskExecInterface;
+import com.google.zxing.client.android.common.executor.AsyncTaskExecManager;
 
 /**
  * Uses Google Book Search to find a word or phrase in the requested book.
@@ -60,44 +53,36 @@ import com.google.zxing.client.android.AndroidHttpClient;
  * @author dswitkin@google.com (Daniel Switkin)
  */
 public final class SearchBookContentsActivity extends Activity {
+
   private static final String TAG = SearchBookContentsActivity.class.getSimpleName();
 
-  private static final String USER_AGENT = "ZXing (Android)";
   private static final Pattern TAG_PATTERN = Pattern.compile("\\<.*?\\>");
   private static final Pattern LT_ENTITY_PATTERN = Pattern.compile("&lt;");
   private static final Pattern GT_ENTITY_PATTERN = Pattern.compile("&gt;");
   private static final Pattern QUOTE_ENTITY_PATTERN = Pattern.compile("&#39;");
   private static final Pattern QUOT_ENTITY_PATTERN = Pattern.compile("&quot;");
 
-  private NetworkThread networkThread;
   private String isbn;
   private EditText queryTextView;
   private Button queryButton;
   private ListView resultListView;
   private TextView headerView;
-  private static Context context;
-  private static String pkgName;
+  private NetworkTask networkTask;
+  private final AsyncTaskExecInterface taskExec;
 
-  private final Handler handler = new Handler() {
-    @Override
-    public void handleMessage(Message message) {
-      if (message.what == getIdentifier("id", "search_book_contents_succeeded")) {
-          handleSearchResults((JSONObject) message.obj);
-          resetForNewQuery();
-      } else if (message.what == getIdentifier("id", "search_book_contents_failed")) {
-          resetForNewQuery();
-          headerView.setText(getIdentifier("string", "msg_sbc_failed"));
-      }
-    }
-  };
+  public SearchBookContentsActivity() {
+    taskExec = new AsyncTaskExecManager().build();
+  }
 
   private final Button.OnClickListener buttonListener = new Button.OnClickListener() {
+    @Override
     public void onClick(View view) {
       launchSearch();
     }
   };
 
   private final View.OnKeyListener keyListener = new View.OnKeyListener() {
+    @Override
     public boolean onKey(View view, int keyCode, KeyEvent event) {
       if (keyCode == KeyEvent.KEYCODE_ENTER && event.getAction() == KeyEvent.ACTION_DOWN) {
         launchSearch();
@@ -111,17 +96,9 @@ public final class SearchBookContentsActivity extends Activity {
     return isbn;
   }
 
-  
-  private static int getIdentifier(String type, String name) {
-    return context.getResources().getIdentifier(name, type, pkgName);
-  }
-
   @Override
   public void onCreate(Bundle icicle) {
     super.onCreate(icicle);
-    
-    context = getApplicationContext();
-    pkgName = context.getPackageName();
 
     // Make sure that expired cookies are removed on launch.
     CookieSyncManager.createInstance(this);
@@ -135,13 +112,13 @@ public final class SearchBookContentsActivity extends Activity {
 
     isbn = intent.getStringExtra(Intents.SearchBookContents.ISBN);
     if (LocaleManager.isBookSearchUrl(isbn)) {
-      setTitle(getString(getIdentifier("string", "sbc_name")));
+      setTitle(getString(R.string.sbc_name));
     } else {
-      setTitle(getString(getIdentifier("string", "sbc_name")) + ": ISBN " + isbn);
+      setTitle(getString(R.string.sbc_name) + ": ISBN " + isbn);
     }
 
-    setContentView(getIdentifier("layout", "search_book_contents"));
-    queryTextView = (EditText) findViewById(getIdentifier("id", "query_text_view"));
+    setContentView(R.layout.search_book_contents);
+    queryTextView = (EditText) findViewById(R.id.query_text_view);
 
     String initialQuery = intent.getStringExtra(Intents.SearchBookContents.QUERY);
     if (initialQuery != null && initialQuery.length() > 0) {
@@ -150,12 +127,12 @@ public final class SearchBookContentsActivity extends Activity {
     }
     queryTextView.setOnKeyListener(keyListener);
 
-    queryButton = (Button) findViewById(getIdentifier("id", "query_button"));
+    queryButton = (Button) findViewById(R.id.query_button);
     queryButton.setOnClickListener(buttonListener);
 
-    resultListView = (ListView) findViewById(getIdentifier("id", "result_list_view"));
+    resultListView = (ListView) findViewById(R.id.result_list_view);
     LayoutInflater factory = LayoutInflater.from(this);
-    headerView = (TextView) factory.inflate(getIdentifier("layout", "search_book_contents_header"),
+    headerView = (TextView) factory.inflate(R.layout.search_book_contents_header,
         resultListView, false);
     resultListView.addHeaderView(headerView);
   }
@@ -166,187 +143,135 @@ public final class SearchBookContentsActivity extends Activity {
     queryTextView.selectAll();
   }
 
-  private void resetForNewQuery() {
-    networkThread = null;
-    queryTextView.setEnabled(true);
-    queryTextView.selectAll();
-    queryButton.setEnabled(true);
+  @Override
+  protected void onPause() {
+    NetworkTask oldTask = networkTask;
+    if (oldTask != null) {
+      oldTask.cancel(true);
+      networkTask = null;
+    }
+    super.onPause();
   }
 
   private void launchSearch() {
-    if (networkThread == null) {
-      String query = queryTextView.getText().toString();
-      if (query != null && query.length() > 0) {
-        networkThread = new NetworkThread(isbn, query, handler);
-        networkThread.start();
-        headerView.setText(getIdentifier("string", "msg_sbc_searching_book"));
-        resultListView.setAdapter(null);
-        queryTextView.setEnabled(false);
-        queryButton.setEnabled(false);
+    String query = queryTextView.getText().toString();
+    if (query != null && query.length() > 0) {
+      NetworkTask oldTask = networkTask;
+      if (oldTask != null) {
+        oldTask.cancel(true);
       }
-    }
-  }
-
-  // Currently there is no way to distinguish between a query which had no results and a book
-  // which is not searchable - both return zero results.
-  private void handleSearchResults(JSONObject json) {
-    try {
-      int count = json.getInt("number_of_results");
-      headerView.setText("Found " + (count == 1 ? "1 result" : count + " results"));
-      if (count > 0) {
-        JSONArray results = json.getJSONArray("search_results");
-        SearchBookContentsResult.setQuery(queryTextView.getText().toString());
-        List<SearchBookContentsResult> items = new ArrayList<SearchBookContentsResult>(count);
-        for (int x = 0; x < count; x++) {
-          items.add(parseResult(results.getJSONObject(x)));
-        }
-        resultListView.setOnItemClickListener(new BrowseBookListener(this, items));
-        resultListView.setAdapter(new SearchBookContentsAdapter(this, items));
-      } else {
-        String searchable = json.optString("searchable");
-        if ("false".equals(searchable)) {
-          headerView.setText(getIdentifier("string", "msg_sbc_book_not_searchable"));
-        }
-        resultListView.setAdapter(null);
-      }
-    } catch (JSONException e) {
-      Log.w(TAG, "Bad JSON from book search", e);
+      networkTask = new NetworkTask();
+      taskExec.execute(networkTask, query, isbn);
+      headerView.setText(R.string.msg_sbc_searching_book);
       resultListView.setAdapter(null);
-      headerView.setText(getIdentifier("string", "msg_sbc_failed"));
+      queryTextView.setEnabled(false);
+      queryButton.setEnabled(false);
     }
   }
 
-  // Available fields: page_id, page_number, page_url, snippet_text
-  private SearchBookContentsResult parseResult(JSONObject json) {
-    try {
-      String pageId = json.getString("page_id");
-      String pageNumber = json.getString("page_number");
-      if (pageNumber.length() > 0) {
-        pageNumber = getString(getIdentifier("string", "msg_sbc_page")) + ' ' + pageNumber;
-      } else {
-        // This can happen for text on the jacket, and possibly other reasons.
-        pageNumber = getString(getIdentifier("string", "msg_sbc_unknown_page"));
-      }
-
-      // Remove all HTML tags and encoded characters. Ideally the server would do this.
-      String snippet = json.optString("snippet_text");
-      boolean valid = true;
-      if (snippet.length() > 0) {
-        snippet = TAG_PATTERN.matcher(snippet).replaceAll("");
-        snippet = LT_ENTITY_PATTERN.matcher(snippet).replaceAll("<");
-        snippet = GT_ENTITY_PATTERN.matcher(snippet).replaceAll(">");
-        snippet = QUOTE_ENTITY_PATTERN.matcher(snippet).replaceAll("'");
-        snippet = QUOT_ENTITY_PATTERN.matcher(snippet).replaceAll("\"");
-      } else {
-        snippet = '(' + getString(getIdentifier("string", "msg_sbc_snippet_unavailable")) + ')';
-        valid = false;
-      }
-      return new SearchBookContentsResult(pageId, pageNumber, snippet, valid);
-    } catch (JSONException e) {
-      // Never seen in the wild, just being complete.
-      return new SearchBookContentsResult(getString(getIdentifier("string", "msg_sbc_no_page_returned")), "", "", false);
-    }
-  }
-
-  private static final class NetworkThread extends Thread {
-    private final String isbn;
-    private final String query;
-    private final Handler handler;
-
-    NetworkThread(String isbn, String query, Handler handler) {
-      this.isbn = isbn;
-      this.query = query;
-      this.handler = handler;
-    }
+  private final class NetworkTask extends AsyncTask<String,Object,JSONObject> {
 
     @Override
-    public void run() {
-      AndroidHttpClient client = null;
+    protected JSONObject doInBackground(String... args) {
       try {
         // These return a JSON result which describes if and where the query was found. This API may
         // break or disappear at any time in the future. Since this is an API call rather than a
         // website, we don't use LocaleManager to change the TLD.
-        URI uri;
-        if (isbn.startsWith("http://google.com/books?id=")) {
-          int equals = isbn.indexOf('=');
-          String volumeId = isbn.substring(equals + 1);
-          uri = new URI("http", null, "www.google.com", -1, "/books", "id=" + volumeId +
-                        "&jscmd=SearchWithinVolume2&q=" + query, null);
+        String theQuery = args[0];
+        String theIsbn = args[1];
+        String uri;
+        if (LocaleManager.isBookSearchUrl(theIsbn)) {
+          int equals = theIsbn.indexOf('=');
+          String volumeId = theIsbn.substring(equals + 1);
+          uri = "http://www.google.com/books?id=" + volumeId + "&jscmd=SearchWithinVolume2&q=" + theQuery;
         } else {
-          uri = new URI("http", null, "www.google.com", -1, "/books", "vid=isbn" + isbn +
-                        "&jscmd=SearchWithinVolume2&q=" + query, null);
+          uri = "http://www.google.com/books?vid=isbn" + theIsbn + "&jscmd=SearchWithinVolume2&q=" + theQuery;
         }
-        HttpUriRequest get = new HttpGet(uri);
-        get.setHeader("cookie", getCookie(uri.toString()));
-        client = AndroidHttpClient.newInstance(USER_AGENT);
-        HttpResponse response = client.execute(get);
-        if (response.getStatusLine().getStatusCode() == 200) {
-          HttpEntity entity = response.getEntity();
-          ByteArrayOutputStream jsonHolder = new ByteArrayOutputStream();
-          entity.writeTo(jsonHolder);
-          jsonHolder.flush();
-          JSONObject json = new JSONObject(jsonHolder.toString(getEncoding(entity)));
-          jsonHolder.close();
-
-          Message message = Message.obtain(handler, getIdentifier("id", "search_book_contents_succeeded"));
-          message.obj = json;
-          message.sendToTarget();
-        } else {
-          Log.w(TAG, "HTTP returned " + response.getStatusLine().getStatusCode() + " for " + uri);
-          Message message = Message.obtain(handler, getIdentifier("id", "search_book_contents_failed"));
-          message.sendToTarget();
-        }
-      } catch (Exception e) {
-        Log.w(TAG, "Error accessing book search", e);
-        Message message = Message.obtain(handler, getIdentifier("id", "search_book_contents_failed"));
-        message.sendToTarget();
-      } finally {
-        if (client != null) {
-          client.close();
-        }
+        CharSequence content = HttpHelper.downloadViaHttp(uri, HttpHelper.ContentType.JSON);
+        return new JSONObject(content.toString());
+      } catch (IOException ioe) {
+        Log.w(TAG, "Error accessing book search", ioe);
+        return null;
+      } catch (JSONException je) {
+        Log.w(TAG, "Error accessing book search", je);
+        return null;
       }
     }
 
-    // Book Search requires a cookie to work, which we store persistently. If the cookie does
-    // not exist, this could be the first search or it has expired. Either way, do a quick HEAD
-    // request to fetch it, save it via the CookieSyncManager to flash, then return it.
-    private static String getCookie(String url) {
-      String cookie = CookieManager.getInstance().getCookie(url);
-      if (cookie == null || cookie.length() == 0) {
-        Log.d(TAG, "Book Search cookie was missing or expired");
-        HttpUriRequest head = new HttpHead(url);
-        AndroidHttpClient client = AndroidHttpClient.newInstance(USER_AGENT);
-        try {
-          HttpResponse response = client.execute(head);
-          if (response.getStatusLine().getStatusCode() == 200) {
-            Header[] cookies = response.getHeaders("set-cookie");
-            for (Header theCookie : cookies) {
-              CookieManager.getInstance().setCookie(url, theCookie.getValue());
-            }
-            CookieSyncManager.getInstance().sync();
-            cookie = CookieManager.getInstance().getCookie(url);
+    @Override
+    protected void onPostExecute(JSONObject result) {
+      if (result == null) {
+        headerView.setText(R.string.msg_sbc_failed);
+      } else {
+        handleSearchResults(result);
+      }
+      queryTextView.setEnabled(true);
+      queryTextView.selectAll();
+      queryButton.setEnabled(true);
+    }
+
+    // Currently there is no way to distinguish between a query which had no results and a book
+    // which is not searchable - both return zero results.
+    private void handleSearchResults(JSONObject json) {
+      try {
+        int count = json.getInt("number_of_results");
+        headerView.setText(getString(R.string.msg_sbc_results) + " : " + count);
+        if (count > 0) {
+          JSONArray results = json.getJSONArray("search_results");
+          SearchBookContentsResult.setQuery(queryTextView.getText().toString());
+          List<SearchBookContentsResult> items = new ArrayList<SearchBookContentsResult>(count);
+          for (int x = 0; x < count; x++) {
+            items.add(parseResult(results.getJSONObject(x)));
           }
-        } catch (IOException e) {
-          Log.w(TAG, "Error setting book search cookie", e);
+          resultListView.setOnItemClickListener(new BrowseBookListener(SearchBookContentsActivity.this, items));
+          resultListView.setAdapter(new SearchBookContentsAdapter(SearchBookContentsActivity.this, items));
+        } else {
+          String searchable = json.optString("searchable");
+          if ("false".equals(searchable)) {
+            headerView.setText(R.string.msg_sbc_book_not_searchable);
+          }
+          resultListView.setAdapter(null);
         }
-        client.close();
+      } catch (JSONException e) {
+        Log.w(TAG, "Bad JSON from book search", e);
+        resultListView.setAdapter(null);
+        headerView.setText(R.string.msg_sbc_failed);
       }
-      return cookie;
     }
 
-    private static String getEncoding(HttpEntity entity) {
-      // FIXME: The server is returning ISO-8859-1 but the content is actually windows-1252.
-      // Once Jeff fixes the HTTP response, remove this hardcoded value and go back to getting
-      // the encoding dynamically.
-      return "windows-1252";
-//            HeaderElement[] elements = entity.getContentType().getElements();
-//            if (elements != null && elements.length > 0) {
-//                String encoding = elements[0].getParameterByName("charset").getValue();
-//                if (encoding != null && encoding.length() > 0) {
-//                    return encoding;
-//                }
-//            }
-//            return "UTF-8";
+    // Available fields: page_id, page_number, page_url, snippet_text
+    private SearchBookContentsResult parseResult(JSONObject json) {
+      try {
+        String pageId = json.getString("page_id");
+        String pageNumber = json.getString("page_number");
+        if (pageNumber.length() > 0) {
+          pageNumber = getString(R.string.msg_sbc_page) + ' ' + pageNumber;
+        } else {
+          // This can happen for text on the jacket, and possibly other reasons.
+          pageNumber = getString(R.string.msg_sbc_unknown_page);
+        }
+
+        // Remove all HTML tags and encoded characters. Ideally the server would do this.
+        String snippet = json.optString("snippet_text");
+        boolean valid = true;
+        if (snippet.length() > 0) {
+          snippet = TAG_PATTERN.matcher(snippet).replaceAll("");
+          snippet = LT_ENTITY_PATTERN.matcher(snippet).replaceAll("<");
+          snippet = GT_ENTITY_PATTERN.matcher(snippet).replaceAll(">");
+          snippet = QUOTE_ENTITY_PATTERN.matcher(snippet).replaceAll("'");
+          snippet = QUOT_ENTITY_PATTERN.matcher(snippet).replaceAll("\"");
+        } else {
+          snippet = '(' + getString(R.string.msg_sbc_snippet_unavailable) + ')';
+          valid = false;
+        }
+        return new SearchBookContentsResult(pageId, pageNumber, snippet, valid);
+      } catch (JSONException e) {
+        // Never seen in the wild, just being complete.
+        return new SearchBookContentsResult(getString(R.string.msg_sbc_no_page_returned), "", "", false);
+      }
     }
+
+
   }
+
 }

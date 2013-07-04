@@ -22,8 +22,6 @@ import com.google.zxing.client.result.ParsedResult;
 import com.google.zxing.client.result.ProductParsedResult;
 
 import android.app.Activity;
-import android.app.AlertDialog;
-import android.content.DialogInterface;
 import android.view.View;
 
 /**
@@ -32,16 +30,16 @@ import android.view.View;
  * @author dswitkin@google.com (Daniel Switkin)
  */
 public final class ProductResultHandler extends ResultHandler {
-  private static final int[] buttons = new int[3];
+  private static final int[] buttons = {
+      R.string.button_product_search,
+      R.string.button_web_search,
+      R.string.button_custom_product_search
+  };
 
   public ProductResultHandler(Activity activity, ParsedResult result, Result rawResult) {
     super(activity, result, rawResult);
-    
-    buttons[0] = getIdentifier("string", "button_product_search");
-    buttons[1] = getIdentifier("string", "button_web_search");
-    buttons[2] = getIdentifier("string", "button_custom_product_search");
-    
     showGoogleShopperButton(new View.OnClickListener() {
+      @Override
       public void onClick(View view) {
         ProductParsedResult productResult = (ProductParsedResult) getResult();
         openGoogleShopper(productResult.getNormalizedProductID());
@@ -60,27 +58,23 @@ public final class ProductResultHandler extends ResultHandler {
   }
 
   @Override
-  public void handleButtonPress(final int index) {
-    showNotOurResults(index, new AlertDialog.OnClickListener() {
-      public void onClick(DialogInterface dialogInterface, int i) {
-        ProductParsedResult productResult = (ProductParsedResult) getResult();
-        switch (index) {
-          case 0:
-            openProductSearch(productResult.getNormalizedProductID());
-            break;
-          case 1:
-            webSearch(productResult.getNormalizedProductID());
-            break;
-          case 2:
-            openURL(fillInCustomSearchURL(productResult.getNormalizedProductID()));
-            break;
-        }
-      }
-    });
+  public void handleButtonPress(int index) {
+    ProductParsedResult productResult = (ProductParsedResult) getResult();
+    switch (index) {
+      case 0:
+        openProductSearch(productResult.getNormalizedProductID());
+        break;
+      case 1:
+        webSearch(productResult.getNormalizedProductID());
+        break;
+      case 2:
+        openURL(fillInCustomSearchURL(productResult.getNormalizedProductID()));
+        break;
+    }
   }
 
   @Override
   public int getDisplayTitle() {
-    return getIdentifier("string", "result_product");
+    return R.string.result_product;
   }
 }
