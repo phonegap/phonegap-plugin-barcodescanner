@@ -52,6 +52,7 @@ The process may vary depending on version of Zxing project, but base steps shoul
 	1. Commented out call to showHelpOnFirstLaunch (it will probably not work anyway).
 	2. Replace R class with FakeR class calls (this is needed beacuse R class will be in a different namespace).
 	3. Add FakeR initialization in each class it was added (note that if some classes extened other then you might want to add a protected fakeR variable to their parent - see e.g. ResultHandler class and it's children).
+	4. Comment out ```(<string name="app_name">[^<>]+</string>)``` from strings.xml (to avoid replacing original application name).
 4. Build LibraryProject, rename and copy it.
 
 ## Building with plugman ##

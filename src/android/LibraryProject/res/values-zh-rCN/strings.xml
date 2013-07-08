@@ -15,7 +15,7 @@
  limitations under the License.
  -->
 <resources>
-  <string name="app_name">条码扫描器</string>
+  <!-- <string name="app_name">条码扫描器</string> -->
   <string name="app_picker_name">应用</string>
   <string name="bookmark_picker_name">书签</string>
   <string name="button_add_calendar">添加事件至日历</string>

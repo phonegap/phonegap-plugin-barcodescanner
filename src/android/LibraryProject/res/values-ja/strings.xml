@@ -15,7 +15,7 @@
  limitations under the License.
  -->
 <resources>
-  <string name="app_name">QRコードスキャナー</string>
+  <!-- <string name="app_name">QRコードスキャナー</string> -->
   <string name="app_picker_name">アプリケーション</string>
   <string name="bookmark_picker_name">ブックマーク</string>
   <string name="button_add_calendar">カレンダーに追加</string>

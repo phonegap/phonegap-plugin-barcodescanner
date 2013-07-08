@@ -15,7 +15,7 @@
  limitations under the License.
  -->
 <resources>
-  <string name="app_name">ماسح الرمز الشريطي</string>
+  <!-- <string name="app_name">ماسح الرمز الشريطي</string> -->
   <string name="app_picker_name">تطبيقات</string>
   <string name="bookmark_picker_name">إشارات مرجعية</string>
   <string name="button_add_calendar">إضافة إلى التقويم</string>
