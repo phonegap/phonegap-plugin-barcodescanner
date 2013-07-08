@@ -28,13 +28,14 @@ import android.app.Activity;
  * @author dswitkin@google.com (Daniel Switkin)
  */
 public final class GeoResultHandler extends ResultHandler {
-  private static final int[] buttons = {
-      R.string.button_show_map,
-      R.string.button_get_directions
-  };
+  private static int[] buttons;
 
   public GeoResultHandler(Activity activity, ParsedResult result) {
     super(activity, result);
+	buttons = new int[]{
+		fakeR.getId("string", "button_show_map"),
+		fakeR.getId("string", "button_get_directions")
+	};
   }
 
   @Override
@@ -62,6 +63,6 @@ public final class GeoResultHandler extends ResultHandler {
 
   @Override
   public int getDisplayTitle() {
-    return R.string.result_geo;
+    return fakeR.getId("string", "result_geo");
   }
 }

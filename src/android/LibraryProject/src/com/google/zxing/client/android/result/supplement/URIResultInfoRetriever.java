@@ -18,6 +18,7 @@ package com.google.zxing.client.android.result.supplement;
 
 import android.content.Context;
 import android.widget.TextView;
+import com.google.zxing.FakeR;
 import com.google.zxing.client.android.HttpHelper;
 import com.google.zxing.client.android.history.HistoryManager;
 import com.google.zxing.client.android.R;
@@ -36,7 +37,7 @@ final class URIResultInfoRetriever extends SupplementalInfoRetriever {
 
   URIResultInfoRetriever(TextView textView, URIParsedResult result, HistoryManager historyManager, Context context) {
     super(textView, historyManager);
-    redirectString = context.getString(R.string.msg_redirect);
+    redirectString = context.getString(FakeR.getId(context, "string", "msg_redirect"));
     this.result = result;
   }
 

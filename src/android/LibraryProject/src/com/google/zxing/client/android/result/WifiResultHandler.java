@@ -53,7 +53,7 @@ public final class WifiResultHandler extends ResultHandler {
 
   @Override
   public int getButtonText(int index) {
-    return R.string.button_wifi;
+    return fakeR.getId("string", "button_wifi");
   }
 
   @Override
@@ -61,7 +61,7 @@ public final class WifiResultHandler extends ResultHandler {
     if (index == 0) {
       WifiParsedResult wifiResult = (WifiParsedResult) getResult();
       WifiManager wifiManager = (WifiManager) getActivity().getSystemService(Context.WIFI_SERVICE);
-      Toast.makeText(getActivity(), R.string.wifi_changing_network, Toast.LENGTH_LONG).show();
+      Toast.makeText(getActivity(), fakeR.getId("string", "wifi_changing_network"), Toast.LENGTH_LONG).show();
       taskExec.execute(new WifiConfigManager(wifiManager), wifiResult);
       parent.restartPreviewAfterDelay(0L);
     }
@@ -72,15 +72,15 @@ public final class WifiResultHandler extends ResultHandler {
   public CharSequence getDisplayContents() {
     WifiParsedResult wifiResult = (WifiParsedResult) getResult();
     StringBuilder contents = new StringBuilder(50);
-    String wifiLabel = parent.getString(R.string.wifi_ssid_label);
+    String wifiLabel = parent.getString(fakeR.getId("string", "wifi_ssid_label"));
     ParsedResult.maybeAppend(wifiLabel + '\n' + wifiResult.getSsid(), contents);
-    String typeLabel = parent.getString(R.string.wifi_type_label);
+    String typeLabel = parent.getString(fakeR.getId("string", "wifi_type_label"));
     ParsedResult.maybeAppend(typeLabel + '\n' + wifiResult.getNetworkEncryption(), contents);
     return contents.toString();
   }
 
   @Override
   public int getDisplayTitle() {
-    return R.string.result_wifi;
+    return fakeR.getId("string", "result_wifi");
   }
 }

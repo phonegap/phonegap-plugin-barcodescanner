@@ -25,6 +25,7 @@ import android.media.MediaPlayer;
 import android.os.Vibrator;
 import android.preference.PreferenceManager;
 import android.util.Log;
+import com.google.zxing.FakeR;
 
 import java.io.IOException;
 
@@ -43,7 +44,9 @@ final class BeepManager {
   private boolean playBeep;
   private boolean vibrate;
 
+  private static FakeR fakeR;
   BeepManager(Activity activity) {
+	fakeR = new FakeR(activity);
     this.activity = activity;
     this.mediaPlayer = null;
     updatePrefs();
@@ -94,7 +97,7 @@ final class BeepManager {
       }
     });
 
-    AssetFileDescriptor file = activity.getResources().openRawResourceFd(R.raw.beep);
+    AssetFileDescriptor file = activity.getResources().openRawResourceFd(fakeR.getId("raw", "beep"));
     try {
       mediaPlayer.setDataSource(file.getFileDescriptor(), file.getStartOffset(), file.getLength());
       file.close();

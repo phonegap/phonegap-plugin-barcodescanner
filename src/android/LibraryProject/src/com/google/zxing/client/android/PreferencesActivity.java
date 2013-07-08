@@ -22,6 +22,7 @@ import android.os.Bundle;
 import android.preference.CheckBoxPreference;
 import android.preference.PreferenceActivity;
 import android.preference.PreferenceScreen;
+import com.google.zxing.FakeR;
 
 import java.util.ArrayList;
 import java.util.Collection;
@@ -58,10 +59,13 @@ public final class PreferencesActivity extends PreferenceActivity
   private CheckBoxPreference decodeQR;
   private CheckBoxPreference decodeDataMatrix;
 
+  private static FakeR fakeR;
+
   @Override
   protected void onCreate(Bundle icicle) {
     super.onCreate(icicle);
-    addPreferencesFromResource(R.xml.preferences);
+	fakeR = new FakeR(this);
+    addPreferencesFromResource(fakeR.getId("xml", "preferences"));
 
     PreferenceScreen preferences = getPreferenceScreen();
     preferences.getSharedPreferences().registerOnSharedPreferenceChangeListener(this);

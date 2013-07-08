@@ -31,6 +31,7 @@ import android.os.Handler;
 import android.os.Looper;
 import android.os.Message;
 import android.util.Log;
+import com.google.zxing.FakeR;
 
 import java.util.Map;
 
@@ -42,7 +43,9 @@ final class DecodeHandler extends Handler {
   private final MultiFormatReader multiFormatReader;
   private boolean running = true;
 
+  private static FakeR fakeR;
   DecodeHandler(CaptureActivity activity, Map<DecodeHintType,Object> hints) {
+	fakeR = new FakeR(activity);
     multiFormatReader = new MultiFormatReader();
     multiFormatReader.setHints(hints);
     this.activity = activity;
@@ -53,9 +56,9 @@ final class DecodeHandler extends Handler {
     if (!running) {
       return;
     }
-    if (message.what == R.id.decode) {
+    if (message.what == fakeR.getId("id", "decode")) {
         decode((byte[]) message.obj, message.arg1, message.arg2);
-    } else if (message.what == R.id.quit) {
+    } else if (message.what == fakeR.getId("id", "quit")) {
         running = false;
         Looper.myLooper().quit();
     }
@@ -90,7 +93,7 @@ final class DecodeHandler extends Handler {
       long end = System.currentTimeMillis();
       Log.d(TAG, "Found barcode in " + (end - start) + " ms");
       if (handler != null) {
-        Message message = Message.obtain(handler, R.id.decode_succeeded, rawResult);
+        Message message = Message.obtain(handler, fakeR.getId("id", "decode_succeeded"), rawResult);
         Bundle bundle = new Bundle();
         Bitmap grayscaleBitmap = toBitmap(source, source.renderCroppedGreyscaleBitmap());
         bundle.putParcelable(DecodeThread.BARCODE_BITMAP, grayscaleBitmap);
@@ -99,7 +102,7 @@ final class DecodeHandler extends Handler {
       }
     } else {
       if (handler != null) {
-        Message message = Message.obtain(handler, R.id.decode_failed);
+        Message message = Message.obtain(handler, fakeR.getId("id", "decode_failed"));
         message.sendToTarget();
       }
     }

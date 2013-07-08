@@ -29,13 +29,14 @@ import android.telephony.PhoneNumberUtils;
  * @author dswitkin@google.com (Daniel Switkin)
  */
 public final class SMSResultHandler extends ResultHandler {
-  private static final int[] buttons = {
-      R.string.button_sms,
-      R.string.button_mms
-  };
+  private static int[] buttons;
 
   public SMSResultHandler(Activity activity, ParsedResult result) {
     super(activity, result);
+	buttons = new int[]{
+		fakeR.getId("string", "button_sms"),
+		fakeR.getId("string", "button_mms")
+	};
   }
 
   @Override
@@ -79,6 +80,6 @@ public final class SMSResultHandler extends ResultHandler {
 
   @Override
   public int getDisplayTitle() {
-    return R.string.result_sms;
+    return fakeR.getId("string", "result_sms");
   }
 }

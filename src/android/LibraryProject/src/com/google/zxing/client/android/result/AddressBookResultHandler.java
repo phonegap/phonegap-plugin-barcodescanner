@@ -51,12 +51,7 @@ public final class AddressBookResultHandler extends ResultHandler {
     }
   }
 
-  private static final int[] BUTTON_TEXTS = {
-    R.string.button_add_contact,
-    R.string.button_show_map,
-    R.string.button_dial,
-    R.string.button_email,
-  };
+  private static int[] BUTTON_TEXTS;
 
   private final boolean[] fields;
   private int buttonCount;
@@ -80,6 +75,12 @@ public final class AddressBookResultHandler extends ResultHandler {
 
   public AddressBookResultHandler(Activity activity, ParsedResult result) {
     super(activity, result);
+	BUTTON_TEXTS = new int[]{
+      fakeR.getId("string", "button_add_contact"),
+      fakeR.getId("string", "button_show_map"),
+      fakeR.getId("string", "button_dial"),
+      fakeR.getId("string", "button_email"),
+    };
     AddressBookParsedResult addressResult = (AddressBookParsedResult) result;
     String[] addresses = addressResult.getAddresses();
     boolean hasAddress = addresses != null && addresses.length > 0 && addresses[0].length() > 0;
@@ -212,6 +213,6 @@ public final class AddressBookResultHandler extends ResultHandler {
 
   @Override
   public int getDisplayTitle() {
-    return R.string.result_address_book;
+    return fakeR.getId("string", "result_address_book");
   }
 }

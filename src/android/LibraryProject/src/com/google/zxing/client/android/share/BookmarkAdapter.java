@@ -26,6 +26,7 @@ import android.view.ViewGroup;
 import android.widget.BaseAdapter;
 import android.widget.LinearLayout;
 import android.widget.TextView;
+import com.google.zxing.FakeR;
 
 /**
  * A custom adapter designed to fetch bookmarks from a cursor. Before Honeycomb we used
@@ -39,7 +40,9 @@ final class BookmarkAdapter extends BaseAdapter {
   private final Context context;
   private final Cursor cursor;
 
+  private static FakeR fakeR;
   BookmarkAdapter(Context context, Cursor cursor) {
+	fakeR = new FakeR(context);
     this.context = context;
     this.cursor = cursor;
   }
@@ -67,15 +70,15 @@ final class BookmarkAdapter extends BaseAdapter {
       layout = (LinearLayout) view;
     } else {
       LayoutInflater factory = LayoutInflater.from(context);
-      layout = (LinearLayout) factory.inflate(R.layout.bookmark_picker_list_item, viewGroup, false);
+      layout = (LinearLayout) factory.inflate(fakeR.getId("layout", "bookmark_picker_list_item"), viewGroup, false);
     }
 
     if (!cursor.isClosed()) {
       cursor.moveToPosition(index);
       String title = cursor.getString(BookmarkPickerActivity.TITLE_COLUMN);
-      ((TextView) layout.findViewById(R.id.bookmark_title)).setText(title);
+      ((TextView) layout.findViewById(fakeR.getId("id", "bookmark_title"))).setText(title);
       String url = cursor.getString(BookmarkPickerActivity.URL_COLUMN);
-      ((TextView) layout.findViewById(R.id.bookmark_url)).setText(url);
+      ((TextView) layout.findViewById(fakeR.getId("id", "bookmark_url"))).setText(url);
     } // Otherwise... just don't update as the object is shutting down
     return layout;
   }

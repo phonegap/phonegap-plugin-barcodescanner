@@ -30,14 +30,15 @@ import android.view.View;
  * @author dswitkin@google.com (Daniel Switkin)
  */
 public final class ProductResultHandler extends ResultHandler {
-  private static final int[] buttons = {
-      R.string.button_product_search,
-      R.string.button_web_search,
-      R.string.button_custom_product_search
-  };
+  private static int[] buttons;
 
   public ProductResultHandler(Activity activity, ParsedResult result, Result rawResult) {
     super(activity, result, rawResult);
+	buttons = new int[]{
+		fakeR.getId("string", "button_product_search"),
+		fakeR.getId("string", "button_web_search"),
+		fakeR.getId("string", "button_custom_product_search")
+	};
     showGoogleShopperButton(new View.OnClickListener() {
       @Override
       public void onClick(View view) {
@@ -75,6 +76,6 @@ public final class ProductResultHandler extends ResultHandler {
 
   @Override
   public int getDisplayTitle() {
-    return R.string.result_product;
+    return fakeR.getId("string", "result_product");
   }
 }
