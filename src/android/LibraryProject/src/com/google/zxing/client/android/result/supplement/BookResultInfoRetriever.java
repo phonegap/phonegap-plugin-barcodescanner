@@ -22,6 +22,7 @@ import java.util.Collection;
 
 import android.content.Context;
 import android.widget.TextView;
+import com.google.zxing.FakeR;
 import com.google.zxing.client.android.HttpHelper;
 import com.google.zxing.client.android.LocaleManager;
 import com.google.zxing.client.android.R;
@@ -45,7 +46,7 @@ final class BookResultInfoRetriever extends SupplementalInfoRetriever {
   BookResultInfoRetriever(TextView textView, String isbn, HistoryManager historyManager, Context context) {
     super(textView, historyManager);
     this.isbn = isbn;
-    this.source = context.getString(R.string.msg_google_books);
+    this.source = context.getString(FakeR.getId(context, "string", "msg_google_books"));
     this.context = context;
   }
 

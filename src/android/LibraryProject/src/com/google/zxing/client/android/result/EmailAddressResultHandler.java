@@ -28,13 +28,14 @@ import android.app.Activity;
  * @author dswitkin@google.com (Daniel Switkin)
  */
 public final class EmailAddressResultHandler extends ResultHandler {
-  private static final int[] buttons = {
-      R.string.button_email,
-      R.string.button_add_contact
-  };
+  private static int[] buttons;
 
   public EmailAddressResultHandler(Activity activity, ParsedResult result) {
     super(activity, result);
+	buttons = new int[]{
+		fakeR.getId("string", "button_email"),
+		fakeR.getId("string", "button_add_contact")
+	};
   }
 
   @Override
@@ -67,6 +68,6 @@ public final class EmailAddressResultHandler extends ResultHandler {
 
   @Override
   public int getDisplayTitle() {
-    return R.string.result_email_address;
+    return fakeR.getId("string", "result_email_address");
   }
 }

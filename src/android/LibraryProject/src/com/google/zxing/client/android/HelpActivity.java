@@ -25,6 +25,7 @@ import android.view.KeyEvent;
 import android.webkit.WebView;
 import android.webkit.WebViewClient;
 import android.widget.Button;
+import com.google.zxing.FakeR;
 
 /**
  * An HTML-based help screen with Back and Done buttons at the bottom.
@@ -46,6 +47,8 @@ public final class HelpActivity extends Activity {
   private WebView webView;
   private Button backButton;
 
+  private static FakeR fakeR;
+
   private final Button.OnClickListener backListener = new Button.OnClickListener() {
     @Override
     public void onClick(View view) {
@@ -63,9 +66,12 @@ public final class HelpActivity extends Activity {
   @Override
   protected void onCreate(Bundle icicle) {
     super.onCreate(icicle);
-    setContentView(R.layout.help);
 
-    webView = (WebView)findViewById(R.id.help_contents);
+	fakeR = new FakeR(this);
+
+    setContentView(fakeR.getId("layout", "help"));
+
+    webView = (WebView)findViewById(fakeR.getId("id", "help_contents"));
     webView.setWebViewClient(new HelpClient());
 
     // Froyo has a bug with calling onCreate() twice in a row, which causes the What's New page
@@ -85,9 +91,9 @@ public final class HelpActivity extends Activity {
       webView.loadUrl(BASE_URL + DEFAULT_PAGE);
     }
 
-    backButton = (Button) findViewById(R.id.back_button);
+    backButton = (Button) findViewById(fakeR.getId("id", "back_button"));
     backButton.setOnClickListener(backListener);
-    View doneButton = findViewById(R.id.done_button);
+    View doneButton = findViewById(fakeR.getId("id", "done_button"));
     doneButton.setOnClickListener(doneListener);
   }
 

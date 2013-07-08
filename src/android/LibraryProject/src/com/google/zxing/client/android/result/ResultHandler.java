@@ -40,6 +40,7 @@ import android.preference.PreferenceManager;
 import android.provider.ContactsContract;
 import android.util.Log;
 import android.view.View;
+import com.google.zxing.FakeR;
 
 import java.util.Collection;
 import java.util.Locale;
@@ -104,6 +105,8 @@ public abstract class ResultHandler {
     }
   };
 
+  protected static FakeR fakeR;
+
   ResultHandler(Activity activity, ParsedResult result) {
     this(activity, result, null);
   }
@@ -114,9 +117,11 @@ public abstract class ResultHandler {
     this.rawResult = rawResult;
     this.customProductSearch = parseCustomSearchURL();
 
-    // Make sure the Shopper button is hidden by default. Without this, scanning a product followed
+	fakeR = new FakeR(activity);
+
+	// Make sure the Shopper button is hidden by default. Without this, scanning a product followed
     // by a QR Code would leave the button on screen among the QR Code actions.
-    View shopperButton = activity.findViewById(R.id.shopper_button);
+    View shopperButton = activity.findViewById(fakeR.getId("id", "shopper_button"));
     shopperButton.setVisibility(View.GONE);
   }
 
@@ -171,7 +176,7 @@ public abstract class ResultHandler {
    * @param listener The on click listener to install for this button.
    */
   void showGoogleShopperButton(View.OnClickListener listener) {
-    View shopperButton = activity.findViewById(R.id.shopper_button);
+    View shopperButton = activity.findViewById(fakeR.getId("id", "shopper_button"));
     shopperButton.setVisibility(View.VISIBLE);
     shopperButton.setOnClickListener(listener);
   }
@@ -307,7 +312,7 @@ public abstract class ResultHandler {
   }
 
   final void shareByEmail(String contents) {
-    sendEmailFromUri("mailto:", null, activity.getString(R.string.msg_share_subject_line),
+    sendEmailFromUri("mailto:", null, activity.getString(fakeR.getId("string", "msg_share_subject_line")),
         contents);
   }
 
@@ -328,7 +333,7 @@ public abstract class ResultHandler {
   }
 
   final void shareBySMS(String contents) {
-    sendSMSFromUri("smsto:", activity.getString(R.string.msg_share_subject_line) + ":\n" +
+    sendSMSFromUri("smsto:", activity.getString(fakeR.getId("string", "msg_share_subject_line")) + ":\n" +
         contents);
   }
 
@@ -352,7 +357,7 @@ public abstract class ResultHandler {
     Intent intent = new Intent(Intent.ACTION_SENDTO, Uri.parse(uri));
     // The Messaging app needs to see a valid subject or else it will treat this an an SMS.
     if (subject == null || subject.length() == 0) {
-      putExtra(intent, "subject", activity.getString(R.string.msg_default_mms_subject));
+      putExtra(intent, "subject", activity.getString(fakeR.getId("string", "msg_default_mms_subject")));
     } else {
       putExtra(intent, "subject", subject);
     }
@@ -451,11 +456,11 @@ public abstract class ResultHandler {
     } else {
       // Otherwise offer to install it from Market.
       AlertDialog.Builder builder = new AlertDialog.Builder(activity);
-      builder.setTitle(R.string.msg_google_shopper_missing);
-      builder.setMessage(R.string.msg_install_google_shopper);
-      builder.setIcon(R.drawable.shopper_icon);
-      builder.setPositiveButton(R.string.button_ok, shopperMarketListener);
-      builder.setNegativeButton(R.string.button_cancel, null);
+      builder.setTitle(fakeR.getId("string", "msg_google_shopper_missing"));
+      builder.setMessage(fakeR.getId("string", "msg_install_google_shopper"));
+      builder.setIcon(fakeR.getId("drawable", "shopper_icon"));
+      builder.setPositiveButton(fakeR.getId("string", "button_ok"), shopperMarketListener);
+      builder.setNegativeButton(fakeR.getId("string", "button_cancel"), null);
       builder.show();
     }
   }
@@ -482,9 +487,9 @@ public abstract class ResultHandler {
       rawLaunchIntent(intent);
     } catch (ActivityNotFoundException e) {
       AlertDialog.Builder builder = new AlertDialog.Builder(activity);
-      builder.setTitle(R.string.app_name);
-      builder.setMessage(R.string.msg_intent_failed);
-      builder.setPositiveButton(R.string.button_ok, null);
+      builder.setTitle(fakeR.getId("string", "app_name"));
+      builder.setMessage(fakeR.getId("string", "msg_intent_failed"));
+      builder.setPositiveButton(fakeR.getId("string", "button_ok"), null);
       builder.show();
     }
   }

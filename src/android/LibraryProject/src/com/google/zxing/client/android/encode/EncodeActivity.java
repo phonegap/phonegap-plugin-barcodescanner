@@ -37,6 +37,7 @@ import android.view.Menu;
 import android.view.MenuItem;
 import android.widget.ImageView;
 import android.widget.TextView;
+import com.google.zxing.FakeR;
 
 import java.io.File;
 import java.io.FileNotFoundException;
@@ -60,16 +61,18 @@ public final class EncodeActivity extends Activity {
 
   private QRCodeEncoder qrCodeEncoder;
 
+  private static FakeR fakeR;
   @Override
   public void onCreate(Bundle icicle) {
     super.onCreate(icicle);
+    fakeR = new FakeR(this);
     Intent intent = getIntent();
     if (intent == null) {
       finish();
     } else {
 //      String action = intent.getAction();
 //      if (Intents.Encode.ACTION.equals(action) || Intent.ACTION_SEND.equals(action)) {
-        setContentView(R.layout.encode);
+        setContentView(fakeR.getId("layout", "encode"));
 //      } else {
 //        finish();
 //      }
@@ -79,10 +82,10 @@ public final class EncodeActivity extends Activity {
   @Override
   public boolean onCreateOptionsMenu(Menu menu) {
     MenuInflater menuInflater = getMenuInflater();
-    menuInflater.inflate(R.menu.encode, menu);
+    menuInflater.inflate(fakeR.getId("menu", "encode"), menu);
     boolean useVcard = qrCodeEncoder != null && qrCodeEncoder.isUseVCard();
-    int encodeNameResource = useVcard ? R.string.menu_encode_mecard : R.string.menu_encode_vcard;
-    MenuItem encodeItem = menu.findItem(R.id.menu_encode);
+    int encodeNameResource = useVcard ? fakeR.getId("string", "menu_encode_mecard") : fakeR.getId("string", "menu_encode_vcard");
+    MenuItem encodeItem = menu.findItem(fakeR.getId("id", "menu_encode"));
     encodeItem.setTitle(encodeNameResource);
     Intent intent = getIntent();
     if (intent != null) {
@@ -95,10 +98,10 @@ public final class EncodeActivity extends Activity {
   @Override
   public boolean onOptionsItemSelected(MenuItem item) {
     int itemId = item.getItemId();
-    if (itemId == R.id.menu_share) {
+    if (itemId == fakeR.getId("id", "menu_share")) {
         share();
         return true;
-    } else if (itemId == R.id.menu_encode) {
+    } else if (itemId == fakeR.getId("id", "menu_encode")) {
         Intent intent = getIntent();
         if (intent == null) {
           return false;
@@ -140,7 +143,7 @@ public final class EncodeActivity extends Activity {
     File barcodesRoot = new File(bsRoot, "Barcodes");
     if (!barcodesRoot.exists() && !barcodesRoot.mkdirs()) {
       Log.w(TAG, "Couldn't make dir " + barcodesRoot);
-      showErrorMessage(R.string.msg_unmount_usb);
+      showErrorMessage(fakeR.getId("string", "msg_unmount_usb"));
       return;
     }
     File barcodeFile = new File(barcodesRoot, makeBarcodeFileName(contents) + ".png");
@@ -151,7 +154,7 @@ public final class EncodeActivity extends Activity {
       bitmap.compress(Bitmap.CompressFormat.PNG, 0, fos);
     } catch (FileNotFoundException fnfe) {
       Log.w(TAG, "Couldn't access file " + barcodeFile + " due to " + fnfe);
-      showErrorMessage(R.string.msg_unmount_usb);
+      showErrorMessage(fakeR.getId("string", "msg_unmount_usb"));
       return;
     } finally {
       if (fos != null) {
@@ -164,7 +167,7 @@ public final class EncodeActivity extends Activity {
     }
 
     Intent intent = new Intent(Intent.ACTION_SEND, Uri.parse("mailto:"));
-    intent.putExtra(Intent.EXTRA_SUBJECT, getString(R.string.app_name) + " - " + encoder.getTitle());
+    intent.putExtra(Intent.EXTRA_SUBJECT, getString(fakeR.getId("string", "app_name")) + " - " + encoder.getTitle());
     intent.putExtra(Intent.EXTRA_TEXT, contents);
     intent.putExtra(Intent.EXTRA_STREAM, Uri.parse("file://" + barcodeFile.getAbsolutePath()));
     intent.setType("image/png");
@@ -202,15 +205,15 @@ public final class EncodeActivity extends Activity {
       Bitmap bitmap = qrCodeEncoder.encodeAsBitmap();
       if (bitmap == null) {
         Log.w(TAG, "Could not encode barcode");
-        showErrorMessage(R.string.msg_encode_contents_failed);
+        showErrorMessage(fakeR.getId("string", "msg_encode_contents_failed"));
         qrCodeEncoder = null;
         return;
       }
 
-      ImageView view = (ImageView) findViewById(R.id.image_view);
+      ImageView view = (ImageView) findViewById(fakeR.getId("id", "image_view"));
       view.setImageBitmap(bitmap);
 
-      TextView contents = (TextView) findViewById(R.id.contents_text_view);
+      TextView contents = (TextView) findViewById(fakeR.getId("id", "contents_text_view"));
       if (intent.getBooleanExtra(Intents.Encode.SHOW_CONTENTS, true)) {
         contents.setText(qrCodeEncoder.getDisplayContents());
         setTitle(qrCodeEncoder.getTitle());
@@ -220,7 +223,7 @@ public final class EncodeActivity extends Activity {
       }
     } catch (WriterException e) {
       Log.w(TAG, "Could not encode barcode", e);
-      showErrorMessage(R.string.msg_encode_contents_failed);
+      showErrorMessage(fakeR.getId("string", "msg_encode_contents_failed"));
       qrCodeEncoder = null;
     }
   }
@@ -228,7 +231,7 @@ public final class EncodeActivity extends Activity {
   private void showErrorMessage(int message) {
     AlertDialog.Builder builder = new AlertDialog.Builder(this);
     builder.setMessage(message);
-    builder.setPositiveButton(R.string.button_ok, new FinishListener(this));
+    builder.setPositiveButton(fakeR.getId("string", "button_ok"), new FinishListener(this));
     builder.setOnCancelListener(new FinishListener(this));
     builder.show();
   }

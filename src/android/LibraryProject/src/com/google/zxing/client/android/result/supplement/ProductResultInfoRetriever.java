@@ -19,6 +19,7 @@ package com.google.zxing.client.android.result.supplement;
 import android.content.Context;
 import android.text.Html;
 import android.widget.TextView;
+import com.google.zxing.FakeR;
 import com.google.zxing.client.android.HttpHelper;
 import com.google.zxing.client.android.R;
 import com.google.zxing.client.android.history.HistoryManager;
@@ -43,7 +44,7 @@ final class ProductResultInfoRetriever extends SupplementalInfoRetriever {
   ProductResultInfoRetriever(TextView textView, String productID, HistoryManager historyManager, Context context) {
     super(textView, historyManager);
     this.productID = productID;
-    this.source = context.getString(R.string.msg_google_product);
+    this.source = context.getString(FakeR.getId(context, "string", "msg_google_product"));
     this.context = context;
   }
 

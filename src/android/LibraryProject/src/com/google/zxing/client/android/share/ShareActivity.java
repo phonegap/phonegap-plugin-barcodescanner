@@ -36,6 +36,7 @@ import android.view.KeyEvent;
 import android.view.View;
 import android.widget.Button;
 import android.widget.TextView;
+import com.google.zxing.FakeR;
 
 /**
  * Barcode Scanner can share data like contacts and bookmarks by displaying a QR Code on screen,
@@ -52,6 +53,8 @@ public final class ShareActivity extends Activity {
   private static final int PICK_APP = 2;
 
   private Button clipboardButton;
+
+  private static FakeR fakeR;
 
   private final Button.OnClickListener contactListener = new Button.OnClickListener() {
     @Override
@@ -119,14 +122,15 @@ public final class ShareActivity extends Activity {
   @Override
   public void onCreate(Bundle icicle) {
     super.onCreate(icicle);
-    setContentView(R.layout.share);
+	fakeR = new FakeR(this);
+    setContentView(fakeR.getId("layout", "share"));
 
-    findViewById(R.id.share_contact_button).setOnClickListener(contactListener);
-    findViewById(R.id.share_bookmark_button).setOnClickListener(bookmarkListener);
-    findViewById(R.id.share_app_button).setOnClickListener(appListener);
-    clipboardButton = (Button) findViewById(R.id.share_clipboard_button);
+    findViewById(fakeR.getId("id", "share_contact_button")).setOnClickListener(contactListener);
+    findViewById(fakeR.getId("id", "share_bookmark_button")).setOnClickListener(bookmarkListener);
+    findViewById(fakeR.getId("id", "share_app_button")).setOnClickListener(appListener);
+    clipboardButton = (Button) findViewById(fakeR.getId("id", "share_clipboard_button"));
     clipboardButton.setOnClickListener(clipboardListener);
-    findViewById(R.id.share_text_view).setOnKeyListener(textListener);
+    findViewById(fakeR.getId("id", "share_text_view")).setOnKeyListener(textListener);
   }
 
   @Override

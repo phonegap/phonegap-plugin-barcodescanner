@@ -26,6 +26,7 @@ import android.text.style.StyleSpan;
 import android.util.AttributeSet;
 import android.widget.LinearLayout;
 import android.widget.TextView;
+import com.google.zxing.FakeR;
 
 import java.util.Locale;
 
@@ -38,8 +39,10 @@ public final class SearchBookContentsListItem extends LinearLayout {
   private TextView pageNumberView;
   private TextView snippetView;
 
+  private static FakeR fakeR;
   SearchBookContentsListItem(Context context) {
     super(context);
+	fakeR = new FakeR(context);
   }
 
   public SearchBookContentsListItem(Context context, AttributeSet attrs) {
@@ -49,8 +52,8 @@ public final class SearchBookContentsListItem extends LinearLayout {
   @Override
   protected void onFinishInflate() {
     super.onFinishInflate();
-    pageNumberView = (TextView) findViewById(R.id.page_number_view);
-    snippetView = (TextView) findViewById(R.id.snippet_view);
+    pageNumberView = (TextView) findViewById(fakeR.getId("id", "page_number_view"));
+    snippetView = (TextView) findViewById(fakeR.getId("id", "snippet_view"));
   }
 
   public void set(SearchBookContentsResult result) {

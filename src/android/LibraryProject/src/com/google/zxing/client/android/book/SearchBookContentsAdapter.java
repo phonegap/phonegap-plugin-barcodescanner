@@ -21,6 +21,7 @@ import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
 import android.widget.ArrayAdapter;
+import com.google.zxing.FakeR;
 
 import java.util.List;
 
@@ -33,8 +34,11 @@ import com.google.zxing.client.android.R;
  */
 final class SearchBookContentsAdapter extends ArrayAdapter<SearchBookContentsResult> {
 
+  private static FakeR fakeR;
+
   SearchBookContentsAdapter(Context context, List<SearchBookContentsResult> items) {
-    super(context, R.layout.search_book_contents_list_item, 0, items);
+    super(context, fakeR.getId("layout", "search_book_contents_list_item"), 0, items);
+	fakeR = new FakeR(context);
   }
 
   @Override
@@ -44,7 +48,7 @@ final class SearchBookContentsAdapter extends ArrayAdapter<SearchBookContentsRes
     if (view == null) {
       LayoutInflater factory = LayoutInflater.from(getContext());
       listItem = (SearchBookContentsListItem) factory.inflate(
-          R.layout.search_book_contents_list_item, viewGroup, false);
+          fakeR.getId("layout", "search_book_contents_list_item"), viewGroup, false);
     } else {
       if (view instanceof SearchBookContentsListItem) {
         listItem = (SearchBookContentsListItem) view;

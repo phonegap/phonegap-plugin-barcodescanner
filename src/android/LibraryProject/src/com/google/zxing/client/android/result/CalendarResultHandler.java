@@ -38,12 +38,14 @@ public final class CalendarResultHandler extends ResultHandler {
 
   private static final String TAG = CalendarResultHandler.class.getSimpleName();
 
-  private static final int[] buttons = {
-      R.string.button_add_calendar
-  };
+  private static int[] buttons;
 
   public CalendarResultHandler(Activity activity, ParsedResult result) {
     super(activity, result);
+
+	buttons = new int[]{
+		fakeR.getId("string", "button_add_calendar")
+	};
   }
 
   @Override
@@ -181,6 +183,6 @@ public final class CalendarResultHandler extends ResultHandler {
 
   @Override
   public int getDisplayTitle() {
-    return R.string.result_calendar;
+    return fakeR.getId("string", "result_calendar");
   }
 }
