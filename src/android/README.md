@@ -59,16 +59,20 @@ The process may vary depending on version of Zxing project, but base steps shoul
 [Plugman](https://github.com/apache/cordova-plugman) is a Node.js tool used by PG Build.
 
 Workflow for creating and building example project with the plugin:
+
 1. Create and build example project:
-```
-cordova create hello com.example.hello "Hello World"
-cd hello
-cordova platform add android
-cordova build
-```
+	```
+	cordova create hello com.example.hello "Hello World"
+	cd hello
+	cordova platform add android
+	cordova build
+	```
+
 2. Copy plugin files to "hello\plugins\barcodescanner\".
 
 3. Install the plugin (current dir. being "hello"):
-plugman --plugins_dir plugins --plugin barcodescanner --platform android --project platforms\android
+	```
+	plugman --plugins_dir plugins --plugin barcodescanner --platform android --project platforms\android
+	```
 
 4. Build & deploy Android project with whatever Android IDE (or ANT + ADK tools).
