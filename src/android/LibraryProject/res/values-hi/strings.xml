@@ -15,7 +15,7 @@
  limitations under the License.
  -->
 <resources>
-  <string name="app_name">बारकोड स्कैनर</string>
+  <!-- <string name="app_name">बारकोड स्कैनर</string> -->
   <string name="app_picker_name">अनुप्रयोगों</string>
   <string name="bookmark_picker_name">बुकमार्क्स</string>
   <string name="button_add_calendar">कैलेंडर के लिए जोड़ें</string>

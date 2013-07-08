@@ -15,7 +15,7 @@
  limitations under the License.
  -->
 <resources>
-  <string name="app_name">Barkod Tarayıcısı</string>
+  <!-- <string name="app_name">Barkod Tarayıcısı</string> -->
   <string name="app_picker_name">Uygulamalar</string>
   <string name="bookmark_picker_name">Yer imleri</string>
   <string name="button_add_calendar">Takvime ekle</string>
