@@ -8,7 +8,7 @@ Follows the [Cordova Plugin spec](https://github.com/apache/cordova-plugman/blob
 This plugin leverages Cordova/PhoneGap's [require/define functionality used for plugins](http://simonmacdonald.blogspot.ca/2012/08/so-you-wanna-write-phonegap-200-android.html). 
 
 Note: the Android source for this project includes an Android Library Project.
-pluginstall currently doesn't support Library Project refs, so its been
+plugman currently doesn't support Library Project refs, so its been
 prebuilt as a jar library. Any updates to the Library Project should be
 committed with an updated jar.
 
