@@ -1,7 +1,7 @@
 <?xml version="1.0" encoding="UTF-8"?><plugin xmlns="http://www.phonegap.com/ns/plugins/1.0"
     xmlns:android="http://schemas.android.com/apk/res/android"
     id="com.phonegap.plugins.barcodescanner"
-    version="0.6.0">
+    version="0.6.1">
 
     <name>BarcodeScanner</name>
     
@@ -115,9 +115,6 @@
 		<source-file src="src/android/LibraryProject/res/layout-land/encode.xml" target-dir="res/layout-land"/>
 		<source-file src="src/android/LibraryProject/res/layout-land/share.xml" target-dir="res/layout-land"/>
 		<source-file src="src/android/LibraryProject/res/layout-ldpi/capture.xml" target-dir="res/layout-ldpi"/>
-		<source-file src="src/android/LibraryProject/res/menu/capture.xml" target-dir="res/menu"/>
-		<source-file src="src/android/LibraryProject/res/menu/encode.xml" target-dir="res/menu"/>
-		<source-file src="src/android/LibraryProject/res/menu/history.xml" target-dir="res/menu"/>
 		<source-file src="src/android/LibraryProject/res/raw/beep.ogg" target-dir="res/raw"/>
 		<source-file src="src/android/LibraryProject/res/values/arrays.xml" target-dir="res/values"/>
 		<source-file src="src/android/LibraryProject/res/values/colors.xml" target-dir="res/values"/>
