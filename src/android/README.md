@@ -69,11 +69,18 @@ Workflow for creating and building example project with the plugin:
 	cordova build
 	```
 
-2. Copy plugin files to "hello\plugins\barcodescanner\".
-
-3. Install the plugin (current dir. being "hello"):
+2. Copy plugin files to "hello\plugins\com.phonegap.plugins.barcodescanner\". You can simply download from github:
 	```
-	plugman --plugins_dir plugins --plugin barcodescanner --platform android --project platforms\android
+	git clone https://github.com/wildabeast/BarcodeScanner.git plugins\com.phonegap.plugins.barcodescanner
 	```
 
-4. Build & deploy Android project with whatever Android IDE (or ANT + ADK tools).
+3. If this is a first plguin add ```<plugins></plugins>``` in "platforms\android\res\xml\config.xml" (just above ```</widgets>```).
+
+4. Install the plugin (current dir. being "hello"):
+	```
+	plugman --plugins_dir plugins --plugin com.phonegap.plugins.barcodescanner --platform android --project platforms\android
+	```
+
+5. Build & deploy Android project with whatever Android IDE (or ANT + ADK tools).
+
+Note. Plugin sub-dir (here "com.phonegap.plugins.barcodescanner") need to be the same as the plugin ID only since PhoneGap 3.0.
