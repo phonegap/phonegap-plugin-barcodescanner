@@ -51,7 +51,7 @@
         </config-file>
 		-->
 
-        <config-file target="res/xml/config.xml" parent="plugins">
+        <config-file target="res/xml/config.xml" parent="/*">
 			<feature name="BarcodeScanner">
 				<param name="android-package" value="com.phonegap.plugins.barcodescanner.BarcodeScanner" />
 			</feature>
