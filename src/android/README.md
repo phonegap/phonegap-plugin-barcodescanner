@@ -63,24 +63,28 @@ Workflow for creating and building example project with the plugin:
 
 1. Create and build example project:
 	```
-	cordova create hello com.example.hello "Hello World"
+	cordova create hello com.example.hello "HelloWorld"
 	cd hello
 	cordova platform add android
 	cordova build
 	```
+	
+	Warning! White space characters are not allowed in app name (and any other that cannot be used in an activity or class name). See: https://issues.apache.org/jira/browse/CB-4148
+	
+	Note. If you wish to remove Android platform (to e.g. generate it with your www assests) you will need to remove "platforms\android" and "merges\android\".
 
 2. Copy plugin files to "hello\plugins\com.phonegap.plugins.barcodescanner\". You can simply download from github:
 	```
 	git clone https://github.com/wildabeast/BarcodeScanner.git plugins\com.phonegap.plugins.barcodescanner
 	```
 
-3. If this is a first plguin add ```<plugins></plugins>``` in "platforms\android\res\xml\config.xml" (just above ```</widgets>```).
-
-4. Install the plugin (current dir. being "hello"):
+3. Install the plugin (current dir. being "hello"):
 	```
 	plugman --plugins_dir plugins --plugin com.phonegap.plugins.barcodescanner --platform android --project platforms\android
 	```
+	
+	Note. To manually remove plugin you need to re-create plugins\android.json (and remove changes done by the plugin - you can simply remove whole platform as described in first step and re-create).
 
-5. Build & deploy Android project with whatever Android IDE (or ANT + ADK tools).
+4. Build & deploy Android project with whatever Android IDE (or ANT + ADK tools).
 
 Note. Plugin sub-dir (here "com.phonegap.plugins.barcodescanner") need to be the same as the plugin ID only since PhoneGap 3.0.
