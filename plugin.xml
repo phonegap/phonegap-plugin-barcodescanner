@@ -1,14 +1,14 @@
 <?xml version="1.0" encoding="UTF-8"?><plugin xmlns="http://www.phonegap.com/ns/plugins/1.0"
     xmlns:android="http://schemas.android.com/apk/res/android"
     id="com.phonegap.plugins.barcodescanner"
-    version="0.5.3">
+    version="0.6.1">
 
     <name>BarcodeScanner</name>
     
     <description>Scans Barcodes.</description>
 
     <engines>
-        <engine name="cordova" version=">=2.0.0" />
+        <engine name="cordova" version=">=2.7.0" />
     </engines>    
 
     <asset src="www/barcodescanner.js" target="barcodescanner.js" />
@@ -17,9 +17,11 @@
     <platform name="ios">
 		<plugins-plist key="BarcodeScanner" string="CDVBarcodeScanner" />
 		
-        <!-- Cordova >= 2.3 -->
-        <config-file target="config.xml" parent="plugins">
-            <plugin name="BarcodeScanner" value="CDVBarcodeScanner"/>
+        <!-- Cordova >= 2.7 -->
+        <config-file target="config.xml" parent="/*">
+			<feature name="BarcodeScanner">
+				<param name="ios-package" value="CDVBarcodeScanner" />
+			</feature>
         </config-file>
 
 		<resource-file src="src/ios/scannerOverlay.xib" />
@@ -43,12 +45,16 @@
         <source-file src="R.java" target-dir="src/com/google/zxing/client/android" />
         -->
 		
+		<!--
         <config-file target="res/xml/plugins.xml" parent="/plugins">
             <plugin name="BarcodeScanner" value="com.phonegap.plugins.barcodescanner.BarcodeScanner"/>
         </config-file>
+		-->
 
         <config-file target="res/xml/config.xml" parent="plugins">
-            <plugin name="BarcodeScanner" value="com.phonegap.plugins.barcodescanner.BarcodeScanner"/>
+			<feature name="BarcodeScanner">
+				<param name="android-package" value="com.phonegap.plugins.barcodescanner.BarcodeScanner" />
+			</feature>
         </config-file>
 
         <config-file target="AndroidManifest.xml" parent="/manifest/application">
