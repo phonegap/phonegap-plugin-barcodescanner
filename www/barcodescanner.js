@@ -13,38 +13,38 @@ cordova.define("cordova/plugin/BarcodeScanner",
 
         var exec = require("cordova/exec");
 
-    	/**
-		 * Constructor.
-		 *
-		 * @returns {BarcodeScanner}
-		 */
+        /**
+         * Constructor.
+         *
+         * @returns {BarcodeScanner}
+         */
         function BarcodeScanner() {
-			
-			/**
-			 * Encoding constants.
-			 * 
-			 * @type Object
-			 */
-			this.Encode = {
-				TEXT_TYPE: "TEXT_TYPE",
-				EMAIL_TYPE: "EMAIL_TYPE",
-				PHONE_TYPE: "PHONE_TYPE",
-				SMS_TYPE: "SMS_TYPE"
-				//  CONTACT_TYPE: "CONTACT_TYPE",  // TODO:  not implemented, requires passing a Bundle class from Javascript to Java
-				//  LOCATION_TYPE: "LOCATION_TYPE" // TODO:  not implemented, requires passing a Bundle class from Javascript to Java
-			};
+
+            /**
+             * Encoding constants.
+             *
+             * @type Object
+             */
+            this.Encode = {
+                TEXT_TYPE: "TEXT_TYPE",
+                EMAIL_TYPE: "EMAIL_TYPE",
+                PHONE_TYPE: "PHONE_TYPE",
+                SMS_TYPE: "SMS_TYPE"
+                //  CONTACT_TYPE: "CONTACT_TYPE",  // TODO:  not implemented, requires passing a Bundle class from Javascript to Java
+                //  LOCATION_TYPE: "LOCATION_TYPE" // TODO:  not implemented, requires passing a Bundle class from Javascript to Java
+            };
         };
 
-		/**
-		 * Read code from scanner.
-		 *
-		 * @param {Function} successCallback This function will recieve a result object: {
-		 *		text : '12345-mock',	// The code that was scanned.
-		 *		format : 'FORMAT_NAME',	// Code format.
-		 *		cancelled : true/false,	// Was canceled.
-		 *	}
-		 * @param {Function} errorCallback
-		 */
+        /**
+         * Read code from scanner.
+         *
+         * @param {Function} successCallback This function will recieve a result object: {
+         *        text : '12345-mock',    // The code that was scanned.
+         *        format : 'FORMAT_NAME', // Code format.
+         *        cancelled : true/false, // Was canceled.
+         *    }
+         * @param {Function} errorCallback
+         */
         BarcodeScanner.prototype.scan = function (successCallback, errorCallback) {
             if (errorCallback == null) {
                 errorCallback = function () {
