@@ -8,7 +8,7 @@
     <description>Scans Barcodes.</description>
 
     <engines>
-        <engine name="cordova" version=">=2.7.0" />
+        <engine name="cordova" version=">=2.8.0" />
     </engines>    
 
     <asset src="www/barcodescanner.js" target="barcodescanner.js" />
@@ -17,9 +17,7 @@
 
     <!-- ios -->
     <platform name="ios">
-        <plugins-plist key="BarcodeScanner" string="CDVBarcodeScanner" />
-        
-        <!-- Cordova >= 2.7 -->
+        <!-- Cordova >= 2.8 -->
         <config-file target="config.xml" parent="/*">
             <feature name="BarcodeScanner">
                 <param name="ios-package" value="CDVBarcodeScanner" />
