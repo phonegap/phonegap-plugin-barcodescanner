@@ -28,7 +28,7 @@
 
         <header-file src="src/ios/zxing-all-in-one.h" />
 
-        <source-file src="src/ios/CDVBarcodeScanner.mm"  />
+        <source-file src="src/ios/CDVBarcodeScanner.mm" compiler-flags="-fno-objc-arc" />
         <source-file src="src/ios/zxing-all-in-one.cpp" />
 
         <framework src="libiconv.dylib" />

@@ -46,8 +46,8 @@
 //------------------------------------------------------------------------------
 @interface CDVBarcodeScanner : CDVPlugin {}
 - (NSString*)isScanNotPossible;
-- (void)scan:(NSMutableArray*)arguments withDict:(NSMutableDictionary*)options;
-- (void)encode:(NSMutableArray*)arguments withDict:(NSMutableDictionary*)options;
+- (void)scan:(CDVInvokedUrlCommand*)command;
+- (void)encode:(CDVInvokedUrlCommand*)command;
 - (void)returnSuccess:(NSString*)scannedText format:(NSString*)format cancelled:(BOOL)cancelled callback:(NSString*)callback;
 - (void)returnError:(NSString*)message callback:(NSString*)callback;
 @end
@@ -120,18 +120,18 @@
 }
 
 //--------------------------------------------------------------------------
-- (void)scan:(NSMutableArray*)arguments withDict:(NSMutableDictionary*)options {
+- (void)scan:(CDVInvokedUrlCommand*)command {
     CDVbcsProcessor* processor;
     NSString*       callback;
     NSString*       capabilityError;
     
-    callback = [arguments objectAtIndex:0];
+    callback = command.callbackId;
     
     // We allow the user to define an alternate xib file for loading the overlay. 
     NSString *overlayXib = nil;
-    if ( [arguments count] == 2 )
+    if ( [command.arguments count] >= 1 )
     {
-        overlayXib = [arguments objectAtIndex:1];
+        overlayXib = [command.arguments objectAtIndex:0];
     }
     
     capabilityError = [self isScanNotPossible];
@@ -152,8 +152,8 @@
 }
 
 //--------------------------------------------------------------------------
-- (void)encode:(NSMutableArray*)arguments withDict:(NSMutableDictionary*)options {
-    [self returnError:@"encode function not supported" callback:[arguments objectAtIndex:0]];
+- (void)encode:(CDVInvokedUrlCommand*)command {
+    [self returnError:@"encode function not supported" callback:command.callbackId];
 }
 
 //--------------------------------------------------------------------------
