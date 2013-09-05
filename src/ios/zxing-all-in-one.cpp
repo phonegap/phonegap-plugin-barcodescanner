@@ -1940,7 +1940,7 @@ GreyscaleLuminanceSource::GreyscaleLuminanceSource(unsigned char* greyData, int 
 
 unsigned char* GreyscaleLuminanceSource::getRow(int y, unsigned char* row) {
   if (y < 0 || y >= this->getHeight()) {
-    throw IllegalArgumentException("Requested row is outside the image: " + y);
+    throw IllegalArgumentException("Requested row is outside the image.");
   }
   int width = getWidth();
   // TODO(flyashi): determine if row has enough size.
@@ -2017,7 +2017,7 @@ GreyscaleRotatedLuminanceSource::GreyscaleRotatedLuminanceSource(unsigned char* 
 // The API asks for rows, but we're rotated, so we return columns.
 unsigned char* GreyscaleRotatedLuminanceSource::getRow(int y, unsigned char* row) {
   if (y < 0 || y >= getHeight()) {
-    throw IllegalArgumentException("Requested row is outside the image: " + y);
+    throw IllegalArgumentException("Requested row is outside the image");
   }
   int width = getWidth();
   if (row == NULL) {
@@ -10309,7 +10309,7 @@ namespace {
       int secondThirdBytes = bits.readBits(16);
       return ((firstByte & 0x1F) << 16) | secondThirdBytes;
     }
-    throw IllegalArgumentException("Bad ECI bits starting with byte " + firstByte);
+    throw IllegalArgumentException("Bad ECI bits starting with byte ");
   }
 }
 
