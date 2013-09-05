@@ -5,8 +5,6 @@ Cross-platform BarcodeScanner for Cordova / PhoneGap.
 
 Follows the [Cordova Plugin spec](https://github.com/apache/cordova-plugman/blob/master/plugin_spec.md), so that it works with [Plugman](https://github.com/apache/cordova-plugman).
 
-This plugin leverages Cordova/PhoneGap's [require/define functionality used for plugins](http://simonmacdonald.blogspot.ca/2012/08/so-you-wanna-write-phonegap-200-android.html). 
-
 Note: the Android source for this project includes an Android Library Project.
 plugman currently doesn't support Library Project refs, so its been
 prebuilt as a jar library. Any updates to the Library Project should be
@@ -49,9 +47,7 @@ The following barcode types are currently supported:
 
 A full example could be:
 ```
-   var scanner = cordova.require("cordova/plugin/BarcodeScanner");
-
-   scanner.scan(
+   cordova.plugins.barcodeScanner.scan(
       function (result) {
           alert("We got a barcode\n" +
                 "Result: " + result.text + "\n" +
@@ -76,9 +72,7 @@ Supported encoding types:
 ```
 A full example could be:
 
-   var scanner = cordova.require("cordova/plugin/BarcodeScanner");
-
-   scanner.encode(BarcodeScanner.Encode.TEXT_TYPE, "http://www.nytimes.com", function(success) {
+   cordova.plugins.barcodeScanner.encode(BarcodeScanner.Encode.TEXT_TYPE, "http://www.nytimes.com", function(success) {
   	        alert("encode success: " + success);
   	      }, function(fail) {
   	        alert("encoding failed: " + fail);
