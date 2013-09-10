@@ -81,6 +81,7 @@ Workflow for creating and building example project with the plugin:
 3. Install the plugin (current dir. being "hello"):
 	```
 	plugman --plugins_dir plugins --plugin com.phonegap.plugins.barcodescanner --platform android --project platforms\android
+	plugman install --plugins_dir plugins --plugin com.phonegap.plugins.barcodescanner --platform android --project platforms\android
 	```
 	
 	Note. To manually remove plugin you need to re-create plugins\android.json (and remove changes done by the plugin - you can simply remove whole platform as described in first step and re-create).
