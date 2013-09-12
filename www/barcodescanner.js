@@ -7,10 +7,6 @@
  */
 
 
-cordova.define("cordova/plugin/BarcodeScanner",
-    
-    function (require, exports, module) {
-
         var exec = require("cordova/exec");
 
         /**
@@ -88,4 +84,4 @@ cordova.define("cordova/plugin/BarcodeScanner",
 
         var barcodeScanner = new BarcodeScanner();
         module.exports = barcodeScanner;
-    });
+
