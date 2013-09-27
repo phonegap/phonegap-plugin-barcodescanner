@@ -6,6 +6,7 @@
  * Copyright (c) 2011, IBM Corporation
  */
 
+    var ScannerLoader = function (require, exports, module) {
 
         var exec = require("cordova/exec");
 
@@ -84,4 +85,13 @@
 
         var barcodeScanner = new BarcodeScanner();
         module.exports = barcodeScanner;
+
+    }
+
+    ScannerLoader(require, exports, module);
+
+    cordova.define("cordova/plugin/BarcodeScanner", ScannerLoader);
+
+
+
 
