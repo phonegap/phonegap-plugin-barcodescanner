@@ -35,6 +35,7 @@
         <framework src="AVFoundation.framework" />
         <framework src="AssetsLibrary.framework" />
         <framework src="CoreVideo.framework" />
+        <framework src="QuartzCore.framework" />
     </platform>
 
     <!-- android -->
