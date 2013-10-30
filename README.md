@@ -61,7 +61,7 @@ A full example could be:
 ```
 
 ## Encoding a Barcode ##
-The plugin creates the object `window.plugins.barcodeScanner` with the method `encode(type, data, success, fail)`. 
+The plugin creates the object `cordova.plugins.barcodeScanner` with the method `encode(type, data, success, fail)`. 
 Supported encoding types:
 
 * TEXT_TYPE
