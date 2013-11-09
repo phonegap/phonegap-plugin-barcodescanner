@@ -16,17 +16,21 @@ namespace BarcodeScanner
 {
     public partial class Scan : PhoneApplicationPage
     {
-        private PhotoCamera _phoneCamera;
-        private IBarcodeReader _barcodeReader;
-        private DispatcherTimer _scanTimer;
-        private WriteableBitmap _previewBuffer;
+        private PhotoCamera phoneCamera;
+        private IBarcodeReader barcodeReader;
+        private DispatcherTimer scanTimer;
+        private WriteableBitmap previewBuffer;
+
+        private string scannedCode = string.Empty;
+
+        private bool scanSucceeded;
 
         public Scan()
         {
             InitializeComponent();
         }
 
-        public Cordova.Extension.Commands.BarcodeScanner BarcodePlugin
+        public Cordova.Extension.Commands.BarcodeScanner BarcodeScannerPlugin
         {
             get;
             set;
@@ -35,52 +39,55 @@ namespace BarcodeScanner
         protected override void OnNavigatedTo(System.Windows.Navigation.NavigationEventArgs e)
         {
             // Initialize the camera object
-            _phoneCamera = new PhotoCamera();
-            _phoneCamera.Initialized += cam_Initialized;
+            phoneCamera = new PhotoCamera();
+            phoneCamera.Initialized += OnCameraInitialized;
 
-            CameraButtons.ShutterKeyHalfPressed += CameraButtons_ShutterKeyHalfPressed;
+            CameraButtons.ShutterKeyHalfPressed += OnCameraButtonShutterKeyHalfPressed;
 
             //Display the camera feed in the UI
-            viewfinderBrush.SetSource(_phoneCamera);
+            viewfinderBrush.SetSource(phoneCamera);
 
 
             // This timer will be used to scan the camera buffer every 250ms and scan for any barcodes
-            _scanTimer = new DispatcherTimer();
-            _scanTimer.Interval = TimeSpan.FromMilliseconds(250);
-            _scanTimer.Tick += (o, arg) => ScanForBarcode();
+            scanTimer = new DispatcherTimer();
+            scanTimer.Interval = TimeSpan.FromMilliseconds(250);
+            scanTimer.Tick += (o, arg) => ScanForBarcode();
 
             base.OnNavigatedTo(e);
         }
 
-        void CameraButtons_ShutterKeyHalfPressed(object sender, EventArgs e)
+        private void OnCameraButtonShutterKeyHalfPressed(object sender, EventArgs e)
         {
-            _phoneCamera.Focus();
+            phoneCamera.Focus();
         }
 
         protected override void OnNavigatingFrom(System.Windows.Navigation.NavigatingCancelEventArgs e)
         {
-            //we're navigating away from this page, we won't be scanning any barcodes
-            _scanTimer.Stop();
+            scanTimer.Stop();
 
-            if (_phoneCamera != null)
+            if (phoneCamera != null)
             {
-                // Cleanup
-                _phoneCamera.Dispose();
-                _phoneCamera.Initialized -= cam_Initialized;
-                CameraButtons.ShutterKeyHalfPressed -= CameraButtons_ShutterKeyHalfPressed;
+                phoneCamera.Dispose();
+                phoneCamera.Initialized -= OnCameraInitialized;
+                CameraButtons.ShutterKeyHalfPressed -= OnCameraButtonShutterKeyHalfPressed;
+            }
+
+            if (!scanSucceeded)
+            {
+                BarcodeScannerPlugin.OnScanFailed("Cancelled by user");
             }
         }
 
-        void cam_Initialized(object sender, Microsoft.Devices.CameraOperationCompletedEventArgs e)
+        void OnCameraInitialized(object sender, Microsoft.Devices.CameraOperationCompletedEventArgs e)
         {
             if (e.Succeeded)
             {
                 this.Dispatcher.BeginInvoke(delegate()
                 {
-                    _phoneCamera.FlashMode = FlashMode.Off;
-                    _previewBuffer = new WriteableBitmap((int)_phoneCamera.PreviewResolution.Width, (int)_phoneCamera.PreviewResolution.Height);
+                    phoneCamera.FlashMode = FlashMode.Off;
+                    previewBuffer = new WriteableBitmap((int)phoneCamera.PreviewResolution.Width, (int)phoneCamera.PreviewResolution.Height);
 
-                    _barcodeReader = new BarcodeReader();
+                    barcodeReader = new BarcodeReader();
 
                     // By default, BarcodeReader will scan every supported barcode type
                     // If we want to limit the type of barcodes our app can read, 
@@ -91,46 +98,54 @@ namespace BarcodeScanner
                     //supportedBarcodeFormats.Add(BarcodeFormat.DATA_MATRIX);
                     //_bcReader.PossibleFormats = supportedBarcodeFormats;
 
-                    _barcodeReader.Options.TryHarder = true;
+                    barcodeReader.Options.TryHarder = true;
 
-                    _barcodeReader.ResultFound += _bcReader_ResultFound;
-                    _scanTimer.Start();
+                    barcodeReader.ResultFound += OnBarcodeResultFound;
+                    scanTimer.Start();
                 });
             }
             else
             {
                 Dispatcher.BeginInvoke(() =>
                 {
-                    MessageBox.Show("Unable to initialize the camera");
+                    BarcodeScannerPlugin.OnScanFailed("Unable to initialize the camera");
                 });
             }
         }
 
-        void _bcReader_ResultFound(Result obj)
+        private void OnBarcodeResultFound(Result obj)
         {
-            // If a new barcode is found, vibrate the device and display the barcode details in the UI
-            if (!obj.Text.Equals(tbBarcodeData.Text))
+            if (BarcodeIsValid(obj.Text))
             {
                 var barcodeScannerResult = new BarcodeScannerResult();
                 barcodeScannerResult.format = obj.BarcodeFormat.ToString();
                 barcodeScannerResult.text = obj.Text;
+                scanSucceeded = true;
 
-                BarcodePlugin.ResultReceived(barcodeScannerResult);
+                BarcodeScannerPlugin.OnScanSucceeded(barcodeScannerResult);
                 NavigationService.GoBack();
             }
+        }
+
+        private bool BarcodeIsValid(string barcode)
+        {
+            if (barcode.Equals(scannedCode))
+            {
+                return false;
+            }
+
+            return true;
         }
 
         private void ScanForBarcode()
         {
             //grab a camera snapshot
-            _phoneCamera.GetPreviewBufferArgb32(_previewBuffer.Pixels);
-            _previewBuffer.Invalidate();
+            phoneCamera.GetPreviewBufferArgb32(previewBuffer.Pixels);
+            previewBuffer.Invalidate();
 
             //scan the captured snapshot for barcodes
             //if a barcode is found, the ResultFound event will fire
-            _barcodeReader.Decode(_previewBuffer);
-
+            barcodeReader.Decode(previewBuffer);
         }
-
     }
 }

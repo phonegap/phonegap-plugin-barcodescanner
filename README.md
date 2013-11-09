@@ -1,6 +1,11 @@
 BarcodeScanner
 ==============
 
+Added version that runs with windows mobile devices.
+To run on those devices, the zxing.net library must be added to the project (Install as nuget packet - more information on http://www.nuget.org/packages/ZXing.Net)
+
+Windows Phone currently only supports Scaning for codes, feel free to extend it that it can also encode.
+
 Cross-platform BarcodeScanner for Cordova / PhoneGap.
 
 Follows the [Cordova Plugin spec](https://github.com/apache/cordova-plugman/blob/master/plugin_spec.md), so that it works with [Plugman](https://github.com/apache/cordova-plugman).

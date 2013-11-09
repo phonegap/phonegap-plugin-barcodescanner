@@ -35,11 +35,6 @@
                 </VideoBrush>
             </Canvas.Background>
         </Canvas>
-        <!--Used for debugging >-->
-        <StackPanel Grid.Row="1" Margin="20, 0">
-            <TextBlock x:Name="tbBarcodeType" FontWeight="ExtraBold" />
-            <TextBlock x:Name="tbBarcodeData" FontWeight="ExtraBold" TextWrapping="Wrap" />
-        </StackPanel>
     </Grid>
 
 </phone:PhoneApplicationPage>

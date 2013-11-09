@@ -11,36 +11,36 @@ namespace Cordova.Extension.Commands
 {
     public class BarcodeScanner : BaseCommand
     {
-        PhoneApplicationFrame currentRootVisual;
+        private PhoneApplicationFrame currentRootVisual;
+
         public void scan(string options)
         {
             Deployment.Current.Dispatcher.BeginInvoke(() =>
             {
                 currentRootVisual = Application.Current.RootVisual as PhoneApplicationFrame;
-                currentRootVisual.Navigated += frame_Navigated;
+                currentRootVisual.Navigated += OnFrameNavigated;
                 currentRootVisual.Navigate(new Uri("/Plugins/com.phonegap.plugins.barcodescanner/Scan.xaml", UriKind.Relative));
             });            
         }
 
-        void frame_Navigated(object sender, NavigationEventArgs e)
+        private void OnFrameNavigated(object sender, NavigationEventArgs e)
         {
             var scanPage = e.Content as Scan;
             if (scanPage != null)
             {
-                scanPage.BarcodePlugin = this;
+                scanPage.BarcodeScannerPlugin = this;
             }
         }
 
-        internal void ResultReceived(BarcodeScannerResult scanResult)
-        {
-            var resultString = JsonHelper.Serialize(scanResult);
-            
-            DispatchCommandResult(new PluginResult(PluginResult.Status.OK, resultString));
-        }
-
-        internal void ScanFailed(string error)
+        public void OnScanFailed(string error)
         {
             DispatchCommandResult(new PluginResult(PluginResult.Status.ERROR, error));
+        }
+
+        public void OnScanSucceeded(BarcodeScannerResult scanResult)
+        {
+            var resultString = JsonHelper.Serialize(scanResult);
+            DispatchCommandResult(new PluginResult(PluginResult.Status.OK, resultString));
         }
     }
 }
