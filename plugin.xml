@@ -1,7 +1,7 @@
 <?xml version="1.0" encoding="UTF-8"?><plugin xmlns="http://www.phonegap.com/ns/plugins/1.0"
     xmlns:android="http://schemas.android.com/apk/res/android"
     id="com.phonegap.plugins.barcodescanner"
-    version="1.0.1">
+    version="1.0.2">
 
     <name>BarcodeScanner</name>
     <description>Scans Barcodes.</description>
@@ -37,6 +37,32 @@
         <framework src="CoreVideo.framework" />
         <framework src="QuartzCore.framework" />
     </platform>
+	
+	<platform name="wp7">
+		<config-file target="config.xml" parent="/*">
+            <feature name="BarcodeScanner">
+                <param name="wp-package" value="BarcodeScanner"/>
+            </feature>
+        </config-file>
+		
+		<source-file src="src/wp/BarcodeScanner.cs" />	
+		<source-file src="src/wp/Result.cs" />	
+		<source-file src="src/wp/Scan.xaml.cs" />	
+		<source-file src="src/wp/Scan.xaml" />	
+	</platform>
+	
+	<platform name="wp8">
+		<config-file target="config.xml" parent="/*">
+            <feature name="BarcodeScanner">
+                <param name="wp-package" value="BarcodeScanner"/>
+            </feature>
+        </config-file>
+		
+		<source-file src="src/wp/BarcodeScanner.cs" />	
+		<source-file src="src/wp/Result.cs" />	
+		<source-file src="src/wp/Scan.xaml.cs" />	
+		<source-file src="src/wp/Scan.xaml" />	
+	</platform>
 
     <!-- android -->
     <platform name="android">
