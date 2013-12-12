@@ -4,7 +4,7 @@
     version="1.2.0">
 
     <name>BarcodeScanner</name>
-    <description>Scans Barcodes.</description>
+    <description>You can use the BarcodeScanner plugin to scan different types of barcodes (using the device's camera) and get the metadata encoded in them for processing within your application.</description>
     <license>MIT</license>
 
     <engines>
