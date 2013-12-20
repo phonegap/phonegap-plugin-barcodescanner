@@ -25,6 +25,7 @@
         </config-file>
 
         <resource-file src="src/ios/scannerOverlay.xib" />
+        <resource-file src="src/ios/CDVBarcodeScanner.bundle" />
 
         <header-file src="src/ios/zxing-all-in-one.h" />
 
@@ -36,6 +37,7 @@
         <framework src="AssetsLibrary.framework" />
         <framework src="CoreVideo.framework" />
         <framework src="QuartzCore.framework" />
+        <framework src="AudioToolbox.framework" />
     </platform>
 
     <!-- android -->
