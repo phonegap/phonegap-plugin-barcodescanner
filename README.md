@@ -3,7 +3,7 @@ BarcodeScanner
 
 Cross-platform BarcodeScanner for Cordova / PhoneGap.
 
-Follows the [Cordova Plugin spec](https://github.com/apache/cordova-plugman/blob/master/plugin_spec.md), so that it works with [Plugman](https://github.com/apache/cordova-plugman).
+Follows the [Cordova Plugin spec](http://cordova.apache.org/docs/en/3.0.0/plugin_ref_spec.md), so that it works with [Plugman](https://github.com/apache/cordova-plugman).
 
 ### Supported Platforms
 
