@@ -38,31 +38,24 @@
         <framework src="QuartzCore.framework" />
     </platform>
 	
-	<platform name="wp7">
-		<config-file target="config.xml" parent="/*">
+	<!-- wp8 -->
+    <platform name="wp8">
+        <config-file target="config.xml" parent="/*">
             <feature name="BarcodeScanner">
                 <param name="wp-package" value="BarcodeScanner"/>
             </feature>
         </config-file>
-		
-		<source-file src="src/wp/BarcodeScanner.cs" />	
-		<source-file src="src/wp/BarcodeScannerResult.cs" />	
-		<source-file src="src/wp/Scan.xaml.cs" />	
-		<source-file src="src/wp/Scan.xaml" />	
-	</platform>
-	
-	<platform name="wp8">
-		<config-file target="config.xml" parent="/*">
-            <feature name="BarcodeScanner">
-                <param name="wp-package" value="BarcodeScanner"/>
-            </feature>
+
+        <config-file target="Properties/WMAppManifest.xml" parent="/Deployment/App/Capabilities">
+            <Capability Name="ID_CAP_ISV_CAMERA" />
         </config-file>
-		
-		<source-file src="src/wp/BarcodeScanner.cs" />	
-		<source-file src="src/wp/BarcodeScannerResult.cs" />	
-		<source-file src="src/wp/Scan.xaml.cs" />	
-		<source-file src="src/wp/Scan.xaml" />	
-	</platform>
+
+        <source-file src="src/wp8/BarcodeScanner.cs" />
+		<source-file src="src/wp8/BarcodeScannerResult.cs" />
+		<source-file src="src/wp8/Scan.xaml" />
+		<source-file src="src/wp8/Scan.xaml.cs" />
+		<source-file src="src/wp8/zxing.wp8.0.dll" />
+    </platform>
 
     <!-- android -->
     <platform name="android">
