@@ -37,8 +37,8 @@
         <framework src="CoreVideo.framework" />
         <framework src="QuartzCore.framework" />
     </platform>
-	
-	<!-- wp8 -->
+
+    <!-- wp8 -->
     <platform name="wp8">
         <config-file target="config.xml" parent="/*">
             <feature name="BarcodeScanner">
@@ -51,10 +51,10 @@
         </config-file>
 
         <source-file src="src/wp8/BarcodeScanner.cs" />
-		<source-file src="src/wp8/BarcodeScannerResult.cs" />
-		<source-file src="src/wp8/Scan.xaml" />
-		<source-file src="src/wp8/Scan.xaml.cs" />
-		<source-file src="src/wp8/zxing.wp8.0.dll" />
+        <source-file src="src/wp8/BarcodeScannerResult.cs" />
+        <source-file src="src/wp8/Scan.xaml" />
+        <source-file src="src/wp8/Scan.xaml.cs" />
+        <framework src="src/wp8/zxing.wp8.0.dll" custom="true" />
     </platform>
 
     <!-- android -->
