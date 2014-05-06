@@ -284,4 +284,15 @@
             <string name="wifi_type_label">Type</string>
         </config-file>
     </platform>
+
+    <platform name="windows8">
+        <js-module src="src/windows8/BarcodeScannerProxy.js" name="BarcodeScannerProxy">
+            <merges target="" />
+        </js-module>
+        <config-file target="package.appxmanifest" parent="/Package/Capabilities">
+            <DeviceCapability Name="webcam" />
+        </config-file>
+        <framework src="src/windows8/lib/ZXing.winmd" custom="true" />
+        <framework src="src/windows8/lib/WinRTBarcodeReader.winmd" custom="true" />
+    </platform>
 </plugin>
