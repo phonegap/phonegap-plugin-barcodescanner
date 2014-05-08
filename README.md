@@ -5,6 +5,12 @@ Cross-platform BarcodeScanner for Cordova / PhoneGap.
 
 Follows the [Cordova Plugin spec](https://github.com/apache/cordova-plugman/blob/master/plugin_spec.md), so that it works with [Plugman](https://github.com/apache/cordova-plugman).
 
+### Supported Platforms
+
+- Android
+- iOS
+- Windows 8
+
 Note: the Android source for this project includes an Android Library Project.
 plugman currently doesn't support Library Project refs, so its been
 prebuilt as a jar library. Any updates to the Library Project should be
@@ -43,6 +49,24 @@ The following barcode types are currently supported:
 * CODE_39
 * ITF
 
+### Windows8
+
+* UPC_A
+* UPC_E
+* EAN_8
+* EAN_13
+* CODE_39
+* CODE_93
+* CODE_128
+* ITF
+* CODABAR
+* MSI
+* RSS14
+* QR_CODE
+* DATA_MATRIX
+* AZTEC
+* PDF417
+
 `success` and `fail` are callback functions. Success is passed an object with data, type and cancelled properties. Data is the text representation of the barcode data, type is the type of barcode detected and cancelled is whether or not the user cancelled the scan.
 
 A full example could be:
@@ -61,7 +85,9 @@ A full example could be:
 ```
 
 ## Encoding a Barcode ##
+
 The plugin creates the object `cordova.plugins.barcodeScanner` with the method `encode(type, data, success, fail)`. 
+
 Supported encoding types:
 
 * TEXT_TYPE
@@ -73,12 +99,15 @@ Supported encoding types:
 A full example could be:
 
    cordova.plugins.barcodeScanner.encode(BarcodeScanner.Encode.TEXT_TYPE, "http://www.nytimes.com", function(success) {
-  	        alert("encode success: " + success);
-  	      }, function(fail) {
-  	        alert("encoding failed: " + fail);
-  	      }
-  	    );
+            alert("encode success: " + success);
+          }, function(fail) {
+            alert("encoding failed: " + fail);
+          }
+        );
 ```
+
+## Windows8 quirks ##
+Windows8 implenemtation currently doesn't support encode functionality.
 
 ## Thanks on Github ##
 
