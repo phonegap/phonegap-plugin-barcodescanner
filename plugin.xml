@@ -15,8 +15,6 @@
         <clobbers target="cordova.plugins.barcodeScanner" />
     </js-module>
 
-    <asset src="www/barcodescanner.js" target="barcodescanner.js" />
-
     <!-- ios -->
     <platform name="ios">
         <!-- Cordova >= 2.8 -->
@@ -294,5 +292,27 @@
         </config-file>
         <framework src="src/windows8/lib/ZXing.winmd" custom="true" />
         <framework src="src/windows8/lib/WinRTBarcodeReader.winmd" custom="true" />
+    </platform>
+
+    <!-- Windows Phone 8 -->
+    <platform name="wp8">
+
+        <config-file target="config.xml" parent="/*">
+            <feature name="BarcodeScanner">
+                <param name="wp-package" value="BarcodeScanner"/>
+            </feature>
+        </config-file>
+
+        <config-file target="Properties/WMAppManifest.xml" parent="/Deployment/App/Capabilities">
+            <Capability Name="ID_CAP_ISV_CAMERA" />
+        </config-file>
+
+        <framework src="src/wp8/lib/zxing.wp8.0.dll" custom="true" />
+
+        <source-file src="src/wp8/BarcodeScanner.cs" />
+        <source-file src="src/wp8/BarcodeScannerTask.cs" />
+        <source-file src="src/wp8/BarcodeScannerUI.xaml" />
+        <source-file src="src/wp8/BarcodeScannerUI.xaml.cs" />
+
     </platform>
 </plugin>
