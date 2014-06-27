@@ -433,7 +433,7 @@ parentViewController:(UIViewController*)parentViewController
         decodeHints.addFormat(BarcodeFormat_EAN_13);
         decodeHints.addFormat(BarcodeFormat_CODE_128);
         decodeHints.addFormat(BarcodeFormat_CODE_39);
-        //            decodeHints.addFormat(BarcodeFormat_ITF);   causing crashes
+        decodeHints.addFormat(BarcodeFormat_ITF);
         
         // here's the meat of the decode process
         Ref<LuminanceSource>   luminanceSource   ([self getLuminanceSourceFromSample: sampleBuffer imageBytes:&imageBytes]);
