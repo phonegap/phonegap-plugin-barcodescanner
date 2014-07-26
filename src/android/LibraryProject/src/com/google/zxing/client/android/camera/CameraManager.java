@@ -70,12 +70,13 @@ public final class CameraManager {
    * Opens the camera driver and initializes the hardware parameters.
    *
    * @param holder The surface object which the camera will draw preview frames into.
+   * @param preferFrontCamera Indicates whether or not we prefer the front cam over the one on the back of the device.
    * @throws IOException Indicates the camera driver failed to open.
    */
-  public synchronized void openDriver(SurfaceHolder holder) throws IOException {
+  public synchronized void openDriver(SurfaceHolder holder, boolean preferFrontCamera) throws IOException {
     Camera theCamera = camera;
     if (theCamera == null) {
-      theCamera = new OpenCameraManager().build().open();
+      theCamera = new OpenCameraManager().build().open(preferFrontCamera);
       if (theCamera == null) {
         throw new IOException();
       }

@@ -44,7 +44,6 @@ import java.util.regex.Pattern;
 import com.google.zxing.client.android.Intents;
 import com.google.zxing.client.android.HttpHelper;
 import com.google.zxing.client.android.LocaleManager;
-import com.google.zxing.client.android.R;
 import com.google.zxing.client.android.common.executor.AsyncTaskExecInterface;
 import com.google.zxing.client.android.common.executor.AsyncTaskExecManager;
 

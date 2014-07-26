@@ -25,8 +25,6 @@ import com.google.zxing.FakeR;
 
 import java.util.List;
 
-import com.google.zxing.client.android.R;
-
 /**
  * Manufactures list items which represent SBC results.
  *

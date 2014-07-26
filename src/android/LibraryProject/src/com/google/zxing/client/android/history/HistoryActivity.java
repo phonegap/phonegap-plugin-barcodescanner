@@ -35,7 +35,6 @@ import android.widget.ListView;
 import com.google.zxing.FakeR;
 import com.google.zxing.client.android.CaptureActivity;
 import com.google.zxing.client.android.Intents;
-import com.google.zxing.client.android.R;
 
 import java.util.List;
 

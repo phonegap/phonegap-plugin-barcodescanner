@@ -153,6 +153,11 @@ public final class Intents {
      */
     public static final String SAVE_HISTORY = "SAVE_HISTORY";
 
+    /**
+     * Set to true if we should scan with the frontcamera (if there is one)
+     */
+    public static final String PREFER_FRONTCAMERA = "PREFER_FRONTCAMERA";
+
     private Scan() {
     }
   }

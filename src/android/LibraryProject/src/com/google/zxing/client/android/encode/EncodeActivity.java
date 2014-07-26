@@ -23,7 +23,6 @@ import com.google.zxing.WriterException;
 import com.google.zxing.client.android.Contents;
 import com.google.zxing.client.android.FinishListener;
 import com.google.zxing.client.android.Intents;
-import com.google.zxing.client.android.R;
 
 import android.app.Activity;
 import android.app.AlertDialog;
