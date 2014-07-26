@@ -54,7 +54,7 @@ The process may vary depending on version of Zxing project, but base steps shoul
 	3. Add FakeR initialization in each class it was added (note that if some classes extend other then you might want to add a protected fakeR variable to their parent - see e.g. ResultHandler class and it's children).
 	4. Comment out ```(<string name="app_name">[^<>]+</string>)``` from strings.xml (to avoid replacing original application name).
 4. Build LibraryProject, rename and copy it.
-  1. To build from the command prompt, cd to the src dir and use: jar cf com.google.zxing.client.android.captureactivity.jar com
+  1. To build from the command prompt, cd to the src dir, compile it and use: jar cf com.google.zxing.client.android.captureactivity.jar com
 
 ## Building with plugman ##
 
