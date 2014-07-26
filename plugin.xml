@@ -123,6 +123,7 @@
         <source-file src="src/android/LibraryProject/res/drawable/launcher_icon.png" target-dir="res/drawable"/>
         <source-file src="src/android/LibraryProject/res/drawable/share_via_barcode.png" target-dir="res/drawable"/>
         <source-file src="src/android/LibraryProject/res/drawable/shopper_icon.png" target-dir="res/drawable"/>
+        <source-file src="src/android/LibraryProject/res/drawable/flip_camera.png" target-dir="res/drawable"/>
         <source-file src="src/android/LibraryProject/res/drawable-hdpi/launcher_icon.png" target-dir="res/drawable-hdpi"/>
         <source-file src="src/android/LibraryProject/res/drawable-hdpi/shopper_icon.png" target-dir="res/drawable-hdpi"/>
         <source-file src="src/android/LibraryProject/res/drawable-xhdpi/launcher_icon.png" target-dir="res/drawable-xhdpi"/>
