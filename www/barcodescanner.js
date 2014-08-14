@@ -31,17 +31,18 @@
             };
         };
 
-        /**
-         * Read code from scanner.
-         *
-         * @param {Function} successCallback This function will recieve a result object: {
+  /**
+   * Read code from scanner.
+   *
+   * @param {Function} successCallback This function will recieve a result object: {
          *        text : '12345-mock',    // The code that was scanned.
          *        format : 'FORMAT_NAME', // Code format.
          *        cancelled : true/false, // Was canceled.
          *    }
-         * @param {Function} errorCallback
-         */
-        BarcodeScanner.prototype.scan = function (successCallback, errorCallback) {
+   * @param {Function} errorCallback
+   * @param options
+   */
+        BarcodeScanner.prototype.scan = function (successCallback, errorCallback, options) {
             if (errorCallback == null) {
                 errorCallback = function () {
                 };
@@ -57,7 +58,7 @@
                 return;
             }
 
-            exec(successCallback, errorCallback, 'BarcodeScanner', 'scan', []);
+            exec(successCallback, errorCallback, 'BarcodeScanner', 'scan', [options]);
         };
 
         //-------------------------------------------------------------------

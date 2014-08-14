@@ -8,6 +8,7 @@
  */
 package com.phonegap.plugins.barcodescanner;
 
+import com.google.zxing.client.android.Intents;
 import org.json.JSONArray;
 import org.json.JSONException;
 import org.json.JSONObject;
@@ -35,6 +36,7 @@ public class BarcodeScanner extends CordovaPlugin {
     private static final String TEXT = "text";
     private static final String DATA = "data";
     private static final String TYPE = "type";
+    private static final String PREFER_FRONTCAMERA = "preferFrontCamera";
     private static final String SCAN_INTENT = "com.phonegap.plugins.barcodescanner.SCAN";
     private static final String ENCODE_DATA = "ENCODE_DATA";
     private static final String ENCODE_TYPE = "ENCODE_TYPE";
@@ -96,7 +98,12 @@ public class BarcodeScanner extends CordovaPlugin {
                 return true;
             }
         } else if (action.equals(SCAN)) {
-            scan();
+          JSONObject obj = args.optJSONObject(0);
+          boolean preferFrontCamera = false;
+          if (obj != null) {
+            preferFrontCamera = obj.optBoolean(PREFER_FRONTCAMERA, false);
+          }
+          scan(preferFrontCamera);
         } else {
             return false;
         }
@@ -106,11 +113,13 @@ public class BarcodeScanner extends CordovaPlugin {
     /**
      * Starts an intent to scan and decode a barcode.
      */
-    public void scan() {
+    public void scan(boolean preferFrontCamera) {
         Intent intentScan = new Intent(SCAN_INTENT);
         intentScan.addCategory(Intent.CATEGORY_DEFAULT);
         // avoid calling other phonegap apps
         intentScan.setPackage(this.cordova.getActivity().getApplicationContext().getPackageName());
+
+        intentScan.putExtra(Intents.Scan.PREFER_FRONTCAMERA, preferFrontCamera);
 
         this.cordova.startActivityForResult((CordovaPlugin) this, intentScan, REQUEST_CODE);
     }

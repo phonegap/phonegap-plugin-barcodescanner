@@ -129,14 +129,15 @@
     NSString*       capabilityError;
     
     callback = command.callbackId;
-    
-    // We allow the user to define an alternate xib file for loading the overlay. 
-    NSString *overlayXib = nil;
-    if ( [command.arguments count] >= 1 )
-    {
-        overlayXib = [command.arguments objectAtIndex:0];
+  
+    NSDictionary* options = [command.arguments objectAtIndex:0];
+    if ([options isKindOfClass:[NSNull class]]) {
+      options = [NSDictionary dictionary];
     }
-    
+    BOOL preferFrontCamera = [[options objectForKey:@"preferFrontCamera"] boolValue];
+  // We allow the user to define an alternate xib file for loading the overlay.
+    NSString *overlayXib = [options objectForKey:@"overlayXib"];
+
     capabilityError = [self isScanNotPossible];
     if (capabilityError) {
         [self returnError:capabilityError callback:callback];
@@ -153,6 +154,11 @@
     [processor retain];
     [processor retain];
     // queue [processor scanBarcode] to run on the event loop
+
+    if (preferFrontCamera) {
+      processor.isFrontCamera = true;
+    }
+
     [processor performSelector:@selector(scanBarcode) withObject:nil afterDelay:0];
 }
 
