@@ -158,6 +158,11 @@ public final class Intents {
      */
     public static final String PREFER_FRONTCAMERA = "PREFER_FRONTCAMERA";
 
+    /**
+     * Set to true if we show the button to flip the camera (if available)
+     */
+    public static final String SHOW_FLIP_CAMERA_BUTTON = "SHOW_FLIP_CAMERA_BUTTON";
+
     private Scan() {
     }
   }

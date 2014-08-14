@@ -749,17 +749,24 @@ public final class CaptureActivity extends Activity implements SurfaceHolder.Cal
     viewfinderView.setVisibility(View.VISIBLE);
     lastResult = null;
 
-    // in case the device has multiple camera's, offer a flip button
-    if (Camera.getNumberOfCameras() > 1) { //
-      flipButton.setVisibility(View.VISIBLE);
-      flipButton.setOnClickListener(new Button.OnClickListener() {
-        @Override
-        public void onClick(View v) {
-          getIntent().putExtra(Intents.Scan.PREFER_FRONTCAMERA,
-              !getIntent().hasExtra(Intents.Scan.PREFER_FRONTCAMERA) ||
-                  !getIntent().getBooleanExtra(Intents.Scan.PREFER_FRONTCAMERA, false));
-          recreate();
-        }});
+    // in case the device has multiple camera's and we want to show the flip button: show the flip button :)
+    if (getIntent().getBooleanExtra(Intents.Scan.SHOW_FLIP_CAMERA_BUTTON, false)) {
+      if (Camera.getNumberOfCameras() > 1) {
+        flipButton.setVisibility(View.VISIBLE);
+        flipButton.setOnClickListener(new Button.OnClickListener() {
+          @Override
+          public void onClick(View v) {
+
+            getIntent().putExtra(Intents.Scan.PREFER_FRONTCAMERA,
+                !getIntent().hasExtra(Intents.Scan.PREFER_FRONTCAMERA) ||
+                    !getIntent().getBooleanExtra(Intents.Scan.PREFER_FRONTCAMERA, false));
+
+            getIntent().putExtra(Intents.Scan.SHOW_FLIP_CAMERA_BUTTON, true);
+
+            recreate();
+          }
+        });
+      }
     }
   }
 

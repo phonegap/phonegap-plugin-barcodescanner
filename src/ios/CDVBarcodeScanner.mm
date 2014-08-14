@@ -67,6 +67,7 @@
 @property (nonatomic)         BOOL                        is2D;
 @property (nonatomic)         BOOL                        capturing;
 @property (nonatomic)         BOOL                        isFrontCamera;
+@property (nonatomic)         BOOL                        isShowFlipCameraButton;
 @property (nonatomic)         BOOL                        isFlipped;
 
 
@@ -135,7 +136,8 @@
       options = [NSDictionary dictionary];
     }
     BOOL preferFrontCamera = [[options objectForKey:@"preferFrontCamera"] boolValue];
-  // We allow the user to define an alternate xib file for loading the overlay.
+    BOOL showFlipCameraButton = [[options objectForKey:@"showFlipCameraButton"] boolValue];
+    // We allow the user to define an alternate xib file for loading the overlay.
     NSString *overlayXib = [options objectForKey:@"overlayXib"];
 
     capabilityError = [self isScanNotPossible];
@@ -157,6 +159,10 @@
 
     if (preferFrontCamera) {
       processor.isFrontCamera = true;
+    }
+  
+    if (showFlipCameraButton) {
+      processor.isShowFlipCameraButton = true;
     }
 
     [processor performSelector:@selector(scanBarcode) withObject:nil afterDelay:0];
@@ -782,10 +788,18 @@ parentViewController:(UIViewController*)parentViewController
                         target:(id)self
                         action:@selector(shutterButtonPressed)
                         ];
-    
-    toolbar.items = [NSArray arrayWithObjects:flexSpace,cancelButton,flexSpace, flipCamera ,shutterButton,nil];
+  
+    if (_processor.isShowFlipCameraButton) {
+      toolbar.items = [NSArray arrayWithObjects:flexSpace,cancelButton,flexSpace, flipCamera ,shutterButton,nil];
+    } else {
+      toolbar.items = [NSArray arrayWithObjects:flexSpace,cancelButton,flexSpace ,shutterButton,nil];
+    }
 #else
-    toolbar.items = [NSArray arrayWithObjects:flexSpace,cancelButton,flexSpace, flipCamera,nil];
+    if (_processor.isShowFlipCameraButton) {
+      toolbar.items = [NSArray arrayWithObjects:flexSpace,cancelButton,flexSpace, flipCamera,nil];
+    } else {
+      toolbar.items = [NSArray arrayWithObjects:flexSpace,cancelButton,flexSpace,nil];
+    }
 #endif
     bounds = overlayView.bounds;
     
