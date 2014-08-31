@@ -215,4 +215,11 @@
             android:text="@string/msg_default_status"
             android:textColor="@color/status_text"/>
 
+  <Button android:id="@+id/flip_button"
+          android:layout_width="wrap_content"
+          android:layout_height="wrap_content"
+          android:layout_gravity="top|left"
+          android:drawableLeft="@drawable/flip_camera"
+          android:visibility="invisible"/>
+
 </FrameLayout>

@@ -24,7 +24,6 @@ import com.google.zxing.Result;
 import com.google.zxing.WriterException;
 import com.google.zxing.client.android.Contents;
 import com.google.zxing.client.android.Intents;
-import com.google.zxing.client.android.R;
 import com.google.zxing.client.result.AddressBookParsedResult;
 import com.google.zxing.client.result.ParsedResult;
 import com.google.zxing.client.result.ResultParser;

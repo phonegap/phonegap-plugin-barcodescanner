@@ -27,7 +27,8 @@ final class DefaultOpenCameraInterface implements OpenCameraInterface {
    * Calls {@link Camera#open()}.
    */
   @Override
-  public Camera open() {
+  public Camera open(boolean preferFrontCamera) {
+    // Note: preferFrontCamera ignored on purpose (low value, lot of test effort)
     return Camera.open();
   }
   

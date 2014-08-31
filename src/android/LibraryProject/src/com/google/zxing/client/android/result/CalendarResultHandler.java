@@ -18,7 +18,7 @@ package com.google.zxing.client.android.result;
 
 import android.content.ActivityNotFoundException;
 import android.util.Log;
-import com.google.zxing.client.android.R;
+
 import com.google.zxing.client.result.CalendarParsedResult;
 import com.google.zxing.client.result.ParsedResult;
 

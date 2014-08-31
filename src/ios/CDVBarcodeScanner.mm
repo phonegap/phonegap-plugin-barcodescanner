@@ -67,6 +67,7 @@
 @property (nonatomic)         BOOL                        is2D;
 @property (nonatomic)         BOOL                        capturing;
 @property (nonatomic)         BOOL                        isFrontCamera;
+@property (nonatomic)         BOOL                        isShowFlipCameraButton;
 @property (nonatomic)         BOOL                        isFlipped;
 
 
@@ -129,14 +130,16 @@
     NSString*       capabilityError;
     
     callback = command.callbackId;
-    
-    // We allow the user to define an alternate xib file for loading the overlay. 
-    NSString *overlayXib = nil;
-    if ( [command.arguments count] >= 1 )
-    {
-        overlayXib = [command.arguments objectAtIndex:0];
+  
+    NSDictionary* options = [command.arguments objectAtIndex:0];
+    if ([options isKindOfClass:[NSNull class]]) {
+      options = [NSDictionary dictionary];
     }
-    
+    BOOL preferFrontCamera = [[options objectForKey:@"preferFrontCamera"] boolValue];
+    BOOL showFlipCameraButton = [[options objectForKey:@"showFlipCameraButton"] boolValue];
+    // We allow the user to define an alternate xib file for loading the overlay.
+    NSString *overlayXib = [options objectForKey:@"overlayXib"];
+
     capabilityError = [self isScanNotPossible];
     if (capabilityError) {
         [self returnError:capabilityError callback:callback];
@@ -153,6 +156,15 @@
     [processor retain];
     [processor retain];
     // queue [processor scanBarcode] to run on the event loop
+
+    if (preferFrontCamera) {
+      processor.isFrontCamera = true;
+    }
+  
+    if (showFlipCameraButton) {
+      processor.isShowFlipCameraButton = true;
+    }
+
     [processor performSelector:@selector(scanBarcode) withObject:nil afterDelay:0];
 }
 
@@ -776,10 +788,18 @@ parentViewController:(UIViewController*)parentViewController
                         target:(id)self
                         action:@selector(shutterButtonPressed)
                         ];
-    
-    toolbar.items = [NSArray arrayWithObjects:flexSpace,cancelButton,flexSpace, flipCamera ,shutterButton,nil];
+  
+    if (_processor.isShowFlipCameraButton) {
+      toolbar.items = [NSArray arrayWithObjects:flexSpace,cancelButton,flexSpace, flipCamera ,shutterButton,nil];
+    } else {
+      toolbar.items = [NSArray arrayWithObjects:flexSpace,cancelButton,flexSpace ,shutterButton,nil];
+    }
 #else
-    toolbar.items = [NSArray arrayWithObjects:flexSpace,cancelButton,flexSpace, flipCamera,nil];
+    if (_processor.isShowFlipCameraButton) {
+      toolbar.items = [NSArray arrayWithObjects:flexSpace,cancelButton,flexSpace, flipCamera,nil];
+    } else {
+      toolbar.items = [NSArray arrayWithObjects:flexSpace,cancelButton,flexSpace,nil];
+    }
 #endif
     bounds = overlayView.bounds;
     

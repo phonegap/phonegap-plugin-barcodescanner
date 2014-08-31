@@ -21,7 +21,7 @@ import com.google.zxing.client.android.Contents;
 import com.google.zxing.client.android.Intents;
 import com.google.zxing.client.android.LocaleManager;
 import com.google.zxing.client.android.PreferencesActivity;
-import com.google.zxing.client.android.R;
+
 import com.google.zxing.client.android.book.SearchBookContentsActivity;
 import com.google.zxing.client.result.ParsedResult;
 import com.google.zxing.client.result.ParsedResultType;

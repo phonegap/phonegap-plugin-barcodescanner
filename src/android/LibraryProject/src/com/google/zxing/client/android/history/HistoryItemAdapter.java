@@ -26,7 +26,6 @@ import android.widget.LinearLayout;
 import android.widget.TextView;
 import com.google.zxing.FakeR;
 import com.google.zxing.Result;
-import com.google.zxing.client.android.R;
 
 import java.util.ArrayList;
 

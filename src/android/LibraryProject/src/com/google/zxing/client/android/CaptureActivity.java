@@ -16,6 +16,8 @@
 
 package com.google.zxing.client.android;
 
+import android.hardware.Camera;
+import android.widget.Button;
 import com.google.zxing.BarcodeFormat;
 import com.google.zxing.Result;
 import com.google.zxing.ResultMetadataType;
@@ -28,6 +30,7 @@ import com.google.zxing.client.android.result.ResultButtonListener;
 import com.google.zxing.client.android.result.ResultHandler;
 import com.google.zxing.client.android.result.ResultHandlerFactory;
 import com.google.zxing.client.android.result.supplement.SupplementalInfoRetriever;
+import com.google.zxing.client.android.share.BookmarkPickerActivity;
 import com.google.zxing.client.android.share.ShareActivity;
 
 import android.app.Activity;
@@ -110,6 +113,7 @@ public final class CaptureActivity extends Activity implements SurfaceHolder.Cal
   private Result savedResultToShow;
   private ViewfinderView viewfinderView;
   private TextView statusView;
+  private Button flipButton;
   private View resultView;
   private Result lastResult;
   private boolean hasSurface;
@@ -172,6 +176,7 @@ public final class CaptureActivity extends Activity implements SurfaceHolder.Cal
 
     resultView = findViewById(fakeR.getId("id", "result_view"));
     statusView = (TextView) findViewById(fakeR.getId("id", "status_view"));
+    flipButton = (Button) findViewById(fakeR.getId("id", "flip_button"));
 
     handler = null;
     lastResult = null;
@@ -701,8 +706,11 @@ public final class CaptureActivity extends Activity implements SurfaceHolder.Cal
       Log.w(TAG, "initCamera() while already open -- late SurfaceView callback?");
       return;
     }
+
+    boolean preferFrontCamera = getIntent().getBooleanExtra(Intents.Scan.PREFER_FRONTCAMERA, false);
+
     try {
-      cameraManager.openDriver(surfaceHolder);
+      cameraManager.openDriver(surfaceHolder, preferFrontCamera);
       // Creating the handler starts the preview, which can also throw a RuntimeException.
       if (handler == null) {
         handler = new CaptureActivityHandler(this, decodeFormats, characterSet, cameraManager);
@@ -738,9 +746,28 @@ public final class CaptureActivity extends Activity implements SurfaceHolder.Cal
   private void resetStatusView() {
     resultView.setVisibility(View.GONE);
     statusView.setText(fakeR.getId("string", "msg_default_status"));
-    statusView.setVisibility(View.VISIBLE);
     viewfinderView.setVisibility(View.VISIBLE);
     lastResult = null;
+
+    // in case the device has multiple camera's and we want to show the flip button: show the flip button :)
+    if (getIntent().getBooleanExtra(Intents.Scan.SHOW_FLIP_CAMERA_BUTTON, false)) {
+      if (Camera.getNumberOfCameras() > 1) {
+        flipButton.setVisibility(View.VISIBLE);
+        flipButton.setOnClickListener(new Button.OnClickListener() {
+          @Override
+          public void onClick(View v) {
+
+            getIntent().putExtra(Intents.Scan.PREFER_FRONTCAMERA,
+                !getIntent().hasExtra(Intents.Scan.PREFER_FRONTCAMERA) ||
+                    !getIntent().getBooleanExtra(Intents.Scan.PREFER_FRONTCAMERA, false));
+
+            getIntent().putExtra(Intents.Scan.SHOW_FLIP_CAMERA_BUTTON, true);
+
+            recreate();
+          }
+        });
+      }
+    }
   }
 
   public void drawViewfinder() {
