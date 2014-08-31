@@ -50,6 +50,11 @@ The following barcode types are currently supported:
 
 `success` and `fail` are callback functions. Success is passed an object with data, type and cancelled properties. Data is the text representation of the barcode data, type is the type of barcode detected and cancelled is whether or not the user cancelled the scan.
 
+On iOS and Android you can pass in options to (ignored on WP8):
+* `preferFrontCamera` default false: prefer starting the scanner with the front camera (if multiple cameras are available).
+* `showFlipCameraButton` default false: show a button on the scan UI to toggle the back/front camera (if multiple cameras are available).
+
+
 A full example could be:
 ```
    cordova.plugins.barcodeScanner.scan(
@@ -61,6 +66,10 @@ A full example could be:
       }, 
       function (error) {
           alert("Scanning failed: " + error);
+      },
+      {
+          "preferFrontCamera" : true,
+          "showFlipCameraButton" : true
       }
    );
 ```
