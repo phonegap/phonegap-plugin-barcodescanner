@@ -291,14 +291,33 @@
     </platform>
 
     <platform name="windows8">
-        <js-module src="src/windows8/BarcodeScannerProxy.js" name="BarcodeScannerProxy">
+        <js-module src="src/windows/BarcodeScannerProxy.js" name="BarcodeScannerProxy">
             <merges target="" />
         </js-module>
         <config-file target="package.appxmanifest" parent="/Package/Capabilities">
             <DeviceCapability Name="webcam" />
         </config-file>
-        <framework src="src/windows8/lib/ZXing.winmd" custom="true" />
-        <framework src="src/windows8/lib/WinRTBarcodeReader.winmd" custom="true" />
+        <framework src="src/windows/lib/ZXing.winmd" custom="true" />
+        <framework src="src/windows/lib/WinRTBarcodeReader.winmd" custom="true" />
+    </platform>
+
+    <platform name="windows">
+        <js-module src="src/windows/BarcodeScannerProxy.js" name="BarcodeScannerProxy">
+            <merges target="" />
+        </js-module>
+
+        <config-file target="package.windows.appxmanifest" parent="/Package/Capabilities">
+            <DeviceCapability Name="webcam" />
+        </config-file>
+        <config-file target="package.windows80.appxmanifest" parent="/Package/Capabilities">
+            <DeviceCapability Name="webcam" />
+        </config-file>
+        <config-file target="package.phone.appxmanifest" parent="/Package/Capabilities">
+            <DeviceCapability Name="webcam" />
+        </config-file>
+
+        <framework src="src/windows/lib/ZXing.winmd" custom="true" />
+        <framework src="src/windows/lib/WinRTBarcodeReader.winmd" custom="true" />
     </platform>
 
     <!-- Windows Phone 8 -->
