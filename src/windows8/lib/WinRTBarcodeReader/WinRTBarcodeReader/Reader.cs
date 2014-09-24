@@ -15,6 +15,7 @@ namespace WinRTBarcodeReader
     using System.Threading.Tasks;
 
     using Windows.Foundation;
+    using Windows.Graphics.Imaging;
     using Windows.Media.Capture;
     using Windows.Media.MediaProperties;
     using Windows.Storage.Streams;
@@ -29,34 +30,34 @@ namespace WinRTBarcodeReader
         #region Private fields
 
         /// <summary>
-        /// MediaCapture instance, used for barcode search.
+        ///     Data reader, used to create bitmap array.
+        /// </summary>
+        private readonly BarcodeReader barcodeReader;
+
+        /// <summary>
+        ///     The cancel search flag.
+        /// </summary>
+        private readonly CancellationTokenSource cancelSearch;
+
+        /// <summary>
+        ///     MediaCapture instance, used for barcode search.
         /// </summary>
         private readonly MediaCapture capture;
 
         /// <summary>
-        /// Encoding properties for mediaCapture object.
+        ///     Encoding properties for mediaCapture object.
         /// </summary>
         private readonly ImageEncodingProperties encodingProps;
 
         /// <summary>
-        /// Image stream for MediaCapture content.
+        ///     Flag that indicates successful barcode search.
+        /// </summary>
+        private bool barcodeFoundOrCancelled;
+
+        /// <summary>
+        ///     Image stream for MediaCapture content.
         /// </summary>
         private InMemoryRandomAccessStream imageStream;
-
-        /// <summary>
-        /// Data reader, used to create bitmap array.
-        /// </summary>
-        private DataReader datareader;
-
-        /// <summary>
-        /// Flag that indicates successful barcode search.
-        /// </summary>
-        private bool barcodeFound;
-
-        /// <summary>
-        /// The cancel search flag.
-        /// </summary>
-        private CancellationTokenSource cancelSearch;
 
         #endregion
 
@@ -71,9 +72,12 @@ namespace WinRTBarcodeReader
         public Reader(MediaCapture capture, uint width, uint height)
         {
             this.capture = capture;
-            this.encodingProps = new ImageEncodingProperties { Subtype = "BMP", Width = width, Height = height};
-            this.barcodeFound = false;
-            this.cancelSearch = new CancellationTokenSource();
+            encodingProps = ImageEncodingProperties.CreateJpeg();
+            encodingProps.Width = width;
+            encodingProps.Height = height;
+
+            barcodeReader = new BarcodeReader {Options = {TryHarder = true}};
+            cancelSearch = new CancellationTokenSource();
         }
 
         #endregion
@@ -108,17 +112,14 @@ namespace WinRTBarcodeReader
         private async Task<Result> Read()
         {
             Result result = null;
-            while (!this.barcodeFound)
+            try
             {
-                try
+                while (result == null)
                 {
-                    result = await this.GetCameraImage(this.cancelSearch.Token);
-                }
-                catch (OperationCanceledException)
-                {
-                    result = null;
+                    result = await GetCameraImage(cancelSearch.Token);
                 }
             }
+            catch (OperationCanceledException) { }
 
             return result;
         }
@@ -134,60 +135,35 @@ namespace WinRTBarcodeReader
         /// </returns>
         private async Task<Result> GetCameraImage(CancellationToken cancelToken)
         {
-            Result result = null;
-            await Task.Run(
-                async () =>
-                    {
-                        this.imageStream = new InMemoryRandomAccessStream();
-                        await this.capture.CapturePhotoToStreamAsync(this.encodingProps, this.imageStream);
-                        await this.imageStream.FlushAsync();
-
-                        this.datareader = new DataReader(this.imageStream);
-                        await this.datareader.LoadAsync((uint)this.imageStream.Size);
-                        var bitmap = new byte[this.encodingProps.Width * this.encodingProps.Height * 4];
-                        uint index = 0;
-                        while (this.datareader.UnconsumedBufferLength > 0)
-                        {
-                            bitmap[index] = datareader.ReadByte();
-                            index++;
-                        }
-
-                        result = await this.DecodeBitmap(bitmap);
-
-                        if (result != null)
-                        {
-                            this.barcodeFound = true;
-                        }
-                    },
-                cancelToken).ConfigureAwait(false);
-            return result;
-        }
-
-        /// <summary>
-        /// Searches the bitmap for barcode.
-        /// </summary>
-        /// <param name="bitmap">Array of bytes, represents bitmap</param>
-        /// <param name="format">Bitmap format, default is BGRA32</param>
-        /// <returns>String, encoded with barcode or empty string if barcode not found</returns>
-        private async Task<Result> DecodeBitmap(byte[] bitmap, BitmapFormat format = BitmapFormat.BGRA32)
-        {
-            Result result = null;
-            try
+            if (cancelToken.IsCancellationRequested)
             {
-                await Task.Run(
-                    () =>
-                        {
-                            var c = new BarcodeReader();
-                            result = c.Decode(
-                                bitmap,
-                                (int)this.encodingProps.Width,
-                                (int)this.encodingProps.Height,
-                                format);
-                        }).ConfigureAwait(false);
+                throw new OperationCanceledException(cancelToken);
             }
-            catch (Exception)
-            {
-            }
+
+            imageStream = new InMemoryRandomAccessStream();
+
+            await capture.CapturePhotoToStreamAsync(encodingProps, imageStream);
+            await imageStream.FlushAsync();
+
+            var decoder = await BitmapDecoder.CreateAsync(imageStream);
+
+            byte[] pixels =
+                (await
+                    decoder.GetPixelDataAsync(BitmapPixelFormat.Rgba8,
+                        BitmapAlphaMode.Ignore,
+                        new BitmapTransform(),
+                        ExifOrientationMode.IgnoreExifOrientation,
+                        ColorManagementMode.DoNotColorManage)).DetachPixelData();
+
+            const BitmapFormat format = BitmapFormat.RGB32;
+
+            imageStream.Dispose();
+
+            var result =
+                await
+                    Task.Run(
+                        () => barcodeReader.Decode(pixels, (int) decoder.PixelWidth, (int) decoder.PixelHeight, format),
+                        cancelToken);
 
             return result;
         }
