@@ -16,11 +16,9 @@
 
 package com.google.zxing.client.android.camera;
 
-import android.app.Activity;
 import android.content.Context;
 import android.content.SharedPreferences;
 import android.graphics.Point;
-import android.graphics.Rect;
 import android.hardware.Camera;
 import android.preference.PreferenceManager;
 import android.util.DisplayMetrics;
@@ -28,16 +26,10 @@ import android.util.Log;
 import android.util.TypedValue;
 import android.view.Display;
 import android.view.Surface;
-import android.view.Window;
 import android.view.WindowManager;
-
 import com.google.zxing.client.android.PreferencesActivity;
 
-import java.util.ArrayList;
-import java.util.Collection;
-import java.util.Collections;
-import java.util.Comparator;
-import java.util.List;
+import java.util.*;
 
 /**
  * A class which deals with reading, parsing, and setting the camera parameters which are used to
@@ -90,7 +82,7 @@ final class CameraConfigurationManager {
       }
     }
 //    height -= statusBarHeight();
-//    height -= 40; // statusBarHeight();
+    height -= 50;
 
     screenResolution.set(width, height);
 
@@ -269,6 +261,15 @@ final class CameraConfigurationManager {
       Log.i(TAG, "No suitable preview sizes, using default: " + bestSize);
     }
 
+    WindowManager manager = (WindowManager) this.context.getSystemService(Context.WINDOW_SERVICE);
+    int rotation = manager.getDefaultDisplay().getRotation();
+    // don't vertically stretch the camera view on portrait mode
+    if (rotation == Surface.ROTATION_0) {
+      if (bestSize.y <= bestSize.x) {
+        bestSize.y = (int) ((float)bestSize.y / screenAspectRatio * ((float)bestSize.x / (float)  bestSize.y));
+      }
+    }
+
     Log.i(TAG, "Found best approximate preview size: " + bestSize);
     return bestSize;
   }
@@ -288,12 +289,4 @@ final class CameraConfigurationManager {
     Log.i(TAG, "Settable value: " + result);
     return result;
   }
-/*
-  private int statusBarHeight() {
-    Window window = this.activity.getWindow();
-    Rect rect = new Rect();
-    window.getDecorView().getWindowVisibleDisplayFrame(rect);
-    return rect.top;
-  }
-  */
 }

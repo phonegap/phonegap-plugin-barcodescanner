@@ -16,6 +16,8 @@
 
 package com.google.zxing.client.android;
 
+import android.content.pm.ActivityInfo;
+import android.content.res.Configuration;
 import android.hardware.Camera;
 import android.widget.Button;
 import com.google.zxing.BarcodeFormat;
@@ -138,6 +140,14 @@ public final class CaptureActivity extends Activity implements SurfaceHolder.Cal
 
   CameraManager getCameraManager() {
     return cameraManager;
+  }
+
+  @Override
+  public void onConfigurationChanged(Configuration newConfig) {
+    super.onConfigurationChanged(newConfig);
+    // recreate is required for cases when no targetSdkVersion has been set in AndroidManifest.xml
+    // and the orientation has changed
+    recreate();
   }
 
   @Override

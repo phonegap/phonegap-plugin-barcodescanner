@@ -44,8 +44,8 @@ public final class CameraManager {
 
   private static final int MIN_FRAME_WIDTH = 240;
   private static final int MIN_FRAME_HEIGHT = 240;
-  private static final int MAX_FRAME_WIDTH = 960;
-  private static final int MAX_FRAME_HEIGHT = 700;
+  private static final int MAX_FRAME_WIDTH = 880;
+  private static final int MAX_FRAME_HEIGHT = 680;
 
   private final Context context;
   private final CameraConfigurationManager configManager;
@@ -256,10 +256,6 @@ public final class CameraManager {
         // Called early, before init even finished
         return null;
       }
-//      rect.left = rect.left * cameraResolution.x / screenResolution.x;
-//      rect.right = rect.right * cameraResolution.x / screenResolution.x;
-//      rect.top = rect.top * cameraResolution.y / screenResolution.y;
-//      rect.bottom = rect.bottom * cameraResolution.y / screenResolution.y;
 
       Display display = windowManager.getDefaultDisplay();
       int rotation = display.getRotation();
@@ -308,30 +304,12 @@ public final class CameraManager {
    * @return A PlanarYUVLuminanceSource instance.
    */
   public PlanarYUVLuminanceSource buildLuminanceSource(byte[] data, int width, int height) {
-    // Hack of orientation
-    Display display = windowManager.getDefaultDisplay();
-    int rotation = display.getRotation();
-
-    byte[] rotatedData = new byte[data.length];
-    if (rotation == Surface.ROTATION_0) {
-      for (int y = 0; y < height; y++) {
-        for (int x = 0; x < width; x++) {
-          rotatedData[x * height + height - y - 1] = data[x + y * width];
-        }
-      }
-      int tmp = width;
-      width = height;
-      height = tmp;
-    } else {
-      rotatedData = null;
-    }
-
     Rect rect = getFramingRectInPreview();
     if (rect == null) {
       return null;
     }
     // Go ahead and assume it's YUV rather than die.
-    return new PlanarYUVLuminanceSource(rotation == Surface.ROTATION_0 ? rotatedData: data, width, height, rect.left, rect.top,
-                                         rect.width(), rect.height(), false);
+    return new PlanarYUVLuminanceSource(data, width, height, rect.left, rect.top,
+        rect.width(), rect.height(), false);
   }
 }
