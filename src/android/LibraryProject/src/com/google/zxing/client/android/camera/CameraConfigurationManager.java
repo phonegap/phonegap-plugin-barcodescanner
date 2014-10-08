@@ -16,13 +16,19 @@
 
 package com.google.zxing.client.android.camera;
 
+import android.app.Activity;
 import android.content.Context;
 import android.content.SharedPreferences;
 import android.graphics.Point;
+import android.graphics.Rect;
 import android.hardware.Camera;
 import android.preference.PreferenceManager;
+import android.util.DisplayMetrics;
 import android.util.Log;
+import android.util.TypedValue;
 import android.view.Display;
+import android.view.Surface;
+import android.view.Window;
 import android.view.WindowManager;
 
 import com.google.zxing.client.android.PreferencesActivity;
@@ -48,11 +54,13 @@ final class CameraConfigurationManager {
   private static final int MAX_PREVIEW_PIXELS = 1280 * 720;
 
   private final Context context;
+//  private final Activity activity;
   private Point screenResolution;
   private Point cameraResolution;
 
   CameraConfigurationManager(Context context) {
-    this.context = context;
+    this.context = context.getApplicationContext();
+//    this.activity = (Activity) context;
   }
 
   /**
@@ -62,23 +70,43 @@ final class CameraConfigurationManager {
     Camera.Parameters parameters = camera.getParameters();
     WindowManager manager = (WindowManager) context.getSystemService(Context.WINDOW_SERVICE);
     Display display = manager.getDefaultDisplay();
-    int width = display.getWidth();
-    int height = display.getHeight();
-    // We're landscape-only, and have apparently seen issues with display thinking it's portrait 
-    // when waking from sleep. If it's not landscape, assume it's mistaken and reverse them:
-    if (width < height) {
-      Log.i(TAG, "Display reports portrait orientation; assuming this is incorrect");
-      int temp = width;
-      width = height;
-      height = temp;
+    DisplayMetrics metrics = new DisplayMetrics();
+    display.getMetrics(metrics);
+
+    screenResolution = new Point();
+    int width = metrics.widthPixels;
+    int height = metrics.heightPixels;
+
+    // Remove action bar height
+    TypedValue typedValue = new TypedValue();
+    DisplayMetrics displayMetrics = this.context.getResources().getDisplayMetrics();
+    if (this.context.getTheme().resolveAttribute(android.R.attr.actionBarSize, typedValue, true)) {
+      height -= TypedValue.complexToDimensionPixelSize(typedValue.data, displayMetrics);
+    } else {
+      if (display.getRotation() == Surface.ROTATION_0) {
+        height -= 40 * displayMetrics.density;
+      } else {
+        height -= 48 * displayMetrics.density;
+      }
     }
-    screenResolution = new Point(width, height);
+//    height -= statusBarHeight();
+//    height -= 40; // statusBarHeight();
+
+    screenResolution.set(width, height);
+
     Log.i(TAG, "Screen resolution: " + screenResolution);
     cameraResolution = findBestPreviewSizeValue(parameters, screenResolution);
     Log.i(TAG, "Camera resolution: " + cameraResolution);
   }
 
   void setDesiredCameraParameters(Camera camera, boolean safeMode) {
+    // Checkout of screen orientation
+    WindowManager manager = (WindowManager) this.context.getSystemService(Context.WINDOW_SERVICE);
+    int rotation = manager.getDefaultDisplay().getRotation();
+    if (rotation == Surface.ROTATION_0) {
+      camera.setDisplayOrientation(90);
+    }
+
     Camera.Parameters parameters = camera.getParameters();
 
     if (parameters == null) {
@@ -260,5 +288,12 @@ final class CameraConfigurationManager {
     Log.i(TAG, "Settable value: " + result);
     return result;
   }
-
+/*
+  private int statusBarHeight() {
+    Window window = this.activity.getWindow();
+    Rect rect = new Rect();
+    window.getDecorView().getWindowVisibleDisplayFrame(rect);
+    return rect.top;
+  }
+  */
 }

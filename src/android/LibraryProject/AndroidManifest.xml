@@ -50,8 +50,8 @@
 
   <application android:icon="@drawable/launcher_icon"
                android:label="@string/app_name">
+
     <activity android:name=".CaptureActivity"
-              android:screenOrientation="landscape"
               android:clearTaskOnLaunch="true"
               android:stateNotNeeded="true"
               android:configChanges="orientation|keyboardHidden"
