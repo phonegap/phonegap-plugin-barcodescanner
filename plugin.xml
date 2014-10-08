@@ -1,7 +1,7 @@
 <?xml version="1.0" encoding="UTF-8"?><plugin xmlns="http://www.phonegap.com/ns/plugins/1.0"
     xmlns:android="http://schemas.android.com/apk/res/android"
     id="com.phonegap.plugins.barcodescanner"
-    version="1.2.3">
+    version="1.2.4">
 
     <name>BarcodeScanner</name>
     <description>You can use the BarcodeScanner plugin to scan different types of barcodes (using the device's camera) and get the metadata encoded in them for processing within your application.</description>
@@ -80,7 +80,6 @@
         <config-file target="AndroidManifest.xml" parent="/manifest/application">
             <activity
                 android:name="com.google.zxing.client.android.CaptureActivity"
-                android:screenOrientation="landscape"
                 android:clearTaskOnLaunch="true"
                 android:configChanges="orientation|keyboardHidden"
                 android:theme="@android:style/Theme.NoTitleBar.Fullscreen"

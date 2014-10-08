@@ -3,3 +3,4 @@ bin/
 .classpath
 .project
 *.iml
+local.properties
