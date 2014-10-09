@@ -293,22 +293,31 @@ public final class CameraManager {
     }
   }
 
-  /**
-   * A factory method to build the appropriate LuminanceSource object based on the format
-   * of the preview buffers, as described by Camera.Parameters.
-   *
-   * @param data A preview frame.
-   * @param width The width of the image.
-   * @param height The height of the image.
-   * @return A PlanarYUVLuminanceSource instance.
-   */
   public PlanarYUVLuminanceSource buildLuminanceSource(byte[] data, int width, int height) {
+    // Hack of orientation
+    Display display = windowManager.getDefaultDisplay();
+    int rotation = display.getRotation();
+
+    byte[] rotatedData = new byte[data.length];
+    if (rotation == Surface.ROTATION_0) {
+      for (int y = 0; y < height; y++) {
+        for (int x = 0; x < width; x++) {
+          rotatedData[x * height + height - y - 1] = data[x + y * width];
+        }
+      }
+      int tmp = width;
+      width = height;
+      height = tmp;
+    } else {
+      rotatedData = null;
+    }
+
     Rect rect = getFramingRectInPreview();
     if (rect == null) {
       return null;
     }
     // Go ahead and assume it's YUV rather than die.
-    return new PlanarYUVLuminanceSource(data, width, height, rect.left, rect.top,
+    return new PlanarYUVLuminanceSource(rotation == Surface.ROTATION_0 ? rotatedData : data, width, height, rect.left, rect.top,
         rect.width(), rect.height(), false);
   }
 }
