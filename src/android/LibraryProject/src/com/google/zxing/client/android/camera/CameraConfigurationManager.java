@@ -263,12 +263,6 @@ final class CameraConfigurationManager {
 
     WindowManager manager = (WindowManager) this.context.getSystemService(Context.WINDOW_SERVICE);
     int rotation = manager.getDefaultDisplay().getRotation();
-    // don't vertically stretch the camera view on portrait mode
-    if (rotation == Surface.ROTATION_0) {
-      if (bestSize.y <= bestSize.x) {
-        bestSize.y = (int) ((float)bestSize.y / screenAspectRatio * ((float)bestSize.x / (float)  bestSize.y));
-      }
-    }
 
     Log.i(TAG, "Found best approximate preview size: " + bestSize);
     return bestSize;
