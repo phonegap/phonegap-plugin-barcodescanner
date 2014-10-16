@@ -17,13 +17,12 @@
 package com.google.zxing.client.android.camera;
 
 import android.content.Context;
+import android.content.res.Configuration;
 import android.graphics.Point;
 import android.graphics.Rect;
 import android.hardware.Camera;
 import android.os.Handler;
 import android.util.Log;
-import android.view.Display;
-import android.view.Surface;
 import android.view.SurfaceHolder;
 import android.view.WindowManager;
 import com.google.zxing.PlanarYUVLuminanceSource;
@@ -257,9 +256,8 @@ public final class CameraManager {
         return null;
       }
 
-      Display display = windowManager.getDefaultDisplay();
-      int rotation = display.getRotation();
-      if (rotation == Surface.ROTATION_0) {
+      int rotation = context.getApplicationContext().getResources().getConfiguration().orientation;
+      if (rotation == Configuration.ORIENTATION_PORTRAIT) {
         rect.left = rect.left * cameraResolution.y / screenResolution.x;
         rect.right = rect.right * cameraResolution.y / screenResolution.x;
         rect.top = rect.top * cameraResolution.x / screenResolution.y;
@@ -295,12 +293,9 @@ public final class CameraManager {
   }
 
   public PlanarYUVLuminanceSource buildLuminanceSource(byte[] data, int width, int height) {
-    // Hack of orientation
-    Display display = windowManager.getDefaultDisplay();
-    int rotation = display.getRotation();
-
     byte[] rotatedData = new byte[data.length];
-    if (rotation == Surface.ROTATION_0) {
+    int rotation = context.getApplicationContext().getResources().getConfiguration().orientation;
+    if (rotation == Configuration.ORIENTATION_PORTRAIT) {
       for (int y = 0; y < height; y++) {
         for (int x = 0; x < width; x++) {
           rotatedData[x * height + height - y - 1] = data[x + y * width];
@@ -318,7 +313,7 @@ public final class CameraManager {
       return null;
     }
     // Go ahead and assume it's YUV rather than die.
-    return new PlanarYUVLuminanceSource(rotation == Surface.ROTATION_0 ? rotatedData : data, width, height, rect.left, rect.top,
+    return new PlanarYUVLuminanceSource(rotation == Configuration.ORIENTATION_PORTRAIT ? rotatedData : data, width, height, rect.left, rect.top,
         rect.width(), rect.height(), false);
   }
 }

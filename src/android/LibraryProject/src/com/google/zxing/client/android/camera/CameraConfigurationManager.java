@@ -18,6 +18,7 @@ package com.google.zxing.client.android.camera;
 
 import android.content.Context;
 import android.content.SharedPreferences;
+import android.content.res.Configuration;
 import android.graphics.Point;
 import android.hardware.Camera;
 import android.preference.PreferenceManager;
@@ -25,7 +26,6 @@ import android.util.DisplayMetrics;
 import android.util.Log;
 import android.util.TypedValue;
 import android.view.Display;
-import android.view.Surface;
 import android.view.WindowManager;
 import com.google.zxing.client.android.PreferencesActivity;
 
@@ -75,7 +75,8 @@ final class CameraConfigurationManager {
     if (this.context.getTheme().resolveAttribute(android.R.attr.actionBarSize, typedValue, true)) {
       height -= TypedValue.complexToDimensionPixelSize(typedValue.data, displayMetrics);
     } else {
-      if (display.getRotation() == Surface.ROTATION_0) {
+      int rotation = context.getApplicationContext().getResources().getConfiguration().orientation;
+      if (rotation == Configuration.ORIENTATION_PORTRAIT) {
         height -= 40 * displayMetrics.density;
       } else {
         height -= 48 * displayMetrics.density;
@@ -92,10 +93,9 @@ final class CameraConfigurationManager {
   }
 
   void setDesiredCameraParameters(Camera camera, boolean safeMode) {
-    // Checkout of screen orientation
-    WindowManager manager = (WindowManager) this.context.getSystemService(Context.WINDOW_SERVICE);
-    int rotation = manager.getDefaultDisplay().getRotation();
-    if (rotation == Surface.ROTATION_0) {
+    // Checkout screen orientation
+    int rotation = context.getApplicationContext().getResources().getConfiguration().orientation;
+    if (rotation == Configuration.ORIENTATION_PORTRAIT) {
       camera.setDisplayOrientation(90);
     }
 
