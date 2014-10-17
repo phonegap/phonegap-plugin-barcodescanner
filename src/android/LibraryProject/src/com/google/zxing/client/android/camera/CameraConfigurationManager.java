@@ -26,6 +26,7 @@ import android.util.DisplayMetrics;
 import android.util.Log;
 import android.util.TypedValue;
 import android.view.Display;
+import android.view.Surface;
 import android.view.WindowManager;
 import com.google.zxing.client.android.PreferencesActivity;
 
@@ -46,7 +47,7 @@ final class CameraConfigurationManager {
   private static final int MAX_PREVIEW_PIXELS = 1280 * 720;
 
   private final Context context;
-//  private final Activity activity;
+  //  private final Activity activity;
   private Point screenResolution;
   private Point cameraResolution;
 
@@ -95,8 +96,22 @@ final class CameraConfigurationManager {
   void setDesiredCameraParameters(Camera camera, boolean safeMode) {
     // Checkout screen orientation
     int rotation = context.getApplicationContext().getResources().getConfiguration().orientation;
+
+    WindowManager windowManager = (WindowManager) context.getSystemService(Context.WINDOW_SERVICE);
+    Display display = windowManager.getDefaultDisplay();
+    int deviceSpecificRotation = display.getRotation();
+
     if (rotation == Configuration.ORIENTATION_PORTRAIT) {
-      camera.setDisplayOrientation(90);
+      if (deviceSpecificRotation == Surface.ROTATION_0 || deviceSpecificRotation == Surface.ROTATION_90) {
+        camera.setDisplayOrientation(90);
+      } else {
+        camera.setDisplayOrientation(270);
+      }
+    } else {
+      // landscape
+      if (deviceSpecificRotation == Surface.ROTATION_180 || deviceSpecificRotation == Surface.ROTATION_270) {
+        camera.setDisplayOrientation(180);
+      }
     }
 
     Camera.Parameters parameters = camera.getParameters();
@@ -120,19 +135,19 @@ final class CameraConfigurationManager {
     if (prefs.getBoolean(PreferencesActivity.KEY_AUTO_FOCUS, true)) {
       if (safeMode || prefs.getBoolean(PreferencesActivity.KEY_DISABLE_CONTINUOUS_FOCUS, false)) {
         focusMode = findSettableValue(parameters.getSupportedFocusModes(),
-                                      Camera.Parameters.FOCUS_MODE_AUTO);
+            Camera.Parameters.FOCUS_MODE_AUTO);
       } else {
         focusMode = findSettableValue(parameters.getSupportedFocusModes(),
-                                      "continuous-picture", // Camera.Parameters.FOCUS_MODE_CONTINUOUS_PICTURE in 4.0+
-                                      "continuous-video",   // Camera.Parameters.FOCUS_MODE_CONTINUOUS_VIDEO in 4.0+
-                                      Camera.Parameters.FOCUS_MODE_AUTO);
+            "continuous-picture", // Camera.Parameters.FOCUS_MODE_CONTINUOUS_PICTURE in 4.0+
+            "continuous-video",   // Camera.Parameters.FOCUS_MODE_CONTINUOUS_VIDEO in 4.0+
+            Camera.Parameters.FOCUS_MODE_AUTO);
       }
     }
     // Maybe selected auto-focus but not available, so fall through here:
     if (!safeMode && focusMode == null) {
       focusMode = findSettableValue(parameters.getSupportedFocusModes(),
-                                    Camera.Parameters.FOCUS_MODE_MACRO,
-                                    "edof"); // Camera.Parameters.FOCUS_MODE_EDOF in 2.2+
+          Camera.Parameters.FOCUS_MODE_MACRO,
+          "edof"); // Camera.Parameters.FOCUS_MODE_EDOF in 2.2+
     }
     if (focusMode != null) {
       parameters.setFocusMode(focusMode);
@@ -172,11 +187,11 @@ final class CameraConfigurationManager {
     String flashMode;
     if (newSetting) {
       flashMode = findSettableValue(parameters.getSupportedFlashModes(),
-                                    Camera.Parameters.FLASH_MODE_TORCH,
-                                    Camera.Parameters.FLASH_MODE_ON);
+          Camera.Parameters.FLASH_MODE_TORCH,
+          Camera.Parameters.FLASH_MODE_ON);
     } else {
       flashMode = findSettableValue(parameters.getSupportedFlashModes(),
-                                    Camera.Parameters.FLASH_MODE_OFF);
+          Camera.Parameters.FLASH_MODE_OFF);
     }
     if (flashMode != null) {
       parameters.setFlashMode(flashMode);
