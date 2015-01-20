@@ -32,22 +32,22 @@ namespace WinRTBarcodeReader
         /// <summary>
         ///     Data reader, used to create bitmap array.
         /// </summary>
-        private readonly BarcodeReader barcodeReader;
+        private BarcodeReader barcodeReader;
 
         /// <summary>
         ///     The cancel search flag.
         /// </summary>
-        private readonly CancellationTokenSource cancelSearch;
+        private CancellationTokenSource cancelSearch;
 
         /// <summary>
         ///     MediaCapture instance, used for barcode search.
         /// </summary>
-        private readonly MediaCapture capture;
+        private MediaCapture capture;
 
         /// <summary>
         ///     Encoding properties for mediaCapture object.
         /// </summary>
-        private readonly ImageEncodingProperties encodingProps;
+        private ImageEncodingProperties encodingProps;
 
         /// <summary>
         ///     Flag that indicates successful barcode search.
@@ -69,7 +69,7 @@ namespace WinRTBarcodeReader
         /// <param name="capture">MediaCapture instance.</param>
         /// <param name="width">Capture frame width.</param>
         /// <param name="height">Capture frame height.</param>
-        public Reader(MediaCapture capture, uint width, uint height)
+        public void Init(MediaCapture capture, uint width, uint height)
         {
             this.capture = capture;
             encodingProps = ImageEncodingProperties.CreateJpeg();

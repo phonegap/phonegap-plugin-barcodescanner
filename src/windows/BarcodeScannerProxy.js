@@ -116,7 +116,8 @@ module.exports = {
          */
         function startBarcodeSearch(width, height) {
 
-            reader = new WinRTBarcodeReader.Reader(capture, width, height);
+            reader = new WinRTBarcodeReader.Reader();
+            reader.init(capture, width, height);
             reader.readCode().done(function (result) {
                 destroyPreview();
                 success({ text: result && result.text, format: result && result.barcodeFormat, cancelled: !result });
