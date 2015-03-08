@@ -98,13 +98,27 @@ var stopRead = function stopRead (succ, fail) {
 			if (gotCode == false) {
 				gotCode = true;
 				succ(data);
-				stopRead(function(data){}, function(data){});
+				stopRead(
+                    function(result){
+                        // console.log("stopRead success!");
+                    },
+                    function(err){
+                        console.log("stopRead Error : " + err.error + " description : "+ err.description);
+                    }
+                );
 			}
 		};
 
 		var failure = function (data) {
 			fail(data);
-			stopRead(function(data){}, function(data){});
+			stopRead(
+                function(result){
+                    // console.log("stopRead success!");
+                },
+                function(err){
+                    console.log("stopReadError : " + err.error + " description : " + err.description);
+                }
+            );
 		};
 
 		startRead(success, failure);
