@@ -152,9 +152,6 @@
                  parentViewController:self.viewController
                  alterateOverlayXib:overlayXib
                  ];
-    [processor retain];
-    [processor retain];
-    [processor retain];
     // queue [processor scanBarcode] to run on the event loop
 
     if (preferFrontCamera) {
@@ -667,7 +664,7 @@ parentViewController:(UIViewController*)parentViewController
 //--------------------------------------------------------------------------
 - (void)dealloc {
     self.view = nil;
-//    self.processor = nil;
+    self.processor = nil;
     self.shutterPressed = NO;
     self.alternateXib = nil;
     self.overlayView = nil;      
