@@ -39,6 +39,8 @@
         <framework src="AssetsLibrary.framework" />
         <framework src="CoreVideo.framework" />
         <framework src="QuartzCore.framework" />
+        <framework src="CoreGraphics.framework" />
+        <framework src="CoreImage.framework" />
     </platform>
 
     <!-- android -->
