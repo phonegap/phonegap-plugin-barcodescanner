@@ -46,7 +46,7 @@
 - (NSString*)isScanNotPossible;
 - (void)scan:(CDVInvokedUrlCommand*)command;
 - (void)encode:(CDVInvokedUrlCommand*)command;
-- (void)returnImage:(NSString*)filePath callback:(NSString*)callback;
+- (void)returnImage:(NSString*)filePath format:(NSString*)format callback:(NSString*)callback;
 - (void)returnSuccess:(NSString*)scannedText format:(NSString*)format cancelled:(BOOL)cancelled flipped:(BOOL)flipped callback:(NSString*)callback;
 - (void)returnError:(NSString*)message callback:(NSString*)callback;
 @end
@@ -190,10 +190,14 @@
     [processor performSelector:@selector(generateImage) withObject:nil afterDelay:0];
 }
 
-- (void)returnImage:(NSString*)filePath callback:(NSString*)callback{
+- (void)returnImage:(NSString*)filePath format:(NSString*)format callback:(NSString*)callback{
+    NSMutableDictionary* resultDict = [[[NSMutableDictionary alloc] init] autorelease];
+    [resultDict setObject:format forKey:@"format"];
+    [resultDict setObject:filePath forKey:@"file"];
+    
     CDVPluginResult* result = [CDVPluginResult
                                resultWithStatus: CDVCommandStatus_OK
-                               messageAsString:filePath
+                               messageAsDictionary:resultDict
                                ];
     
     [[self commandDelegate] sendPluginResult:result callbackId:callback];
@@ -734,7 +738,7 @@ parentViewController:(UIViewController*)parentViewController
     [UIImageJPEGRepresentation(qrImage, 1.0) writeToFile:filePath atomically:YES];
     
     /* return file path back to cordova */
-    [self.plugin returnImage:filePath callback: self.callback];
+    [self.plugin returnImage:filePath format:@"QR_CODE" callback: self.callback];
 }
 @end
 
