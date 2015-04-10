@@ -28,6 +28,8 @@ namespace WPCordovaClassLib.Cordova.Commands
         /// </summary>
         public event EventHandler<ScanResult> Completed;
 
+        private BarcodeScannerUI barcodeScanner;
+
         /// <summary>
         /// Shows barcode scanner interface.
         /// </summary>
@@ -43,8 +45,23 @@ namespace WPCordovaClassLib.Cordova.Commands
                 }
 
                 root.Navigated += this.OnNavigated;
+                root.BackKeyPress += this.root_BackKeyPress;
                 root.Navigate(new Uri("/Plugins/com.phonegap.plugins.barcodescanner/BarcodeScannerUI.xaml", UriKind.Relative));
             });
+        }
+
+        void root_BackKeyPress(object sender, System.ComponentModel.CancelEventArgs e)
+        {
+            if(barcodeScanner != null)
+                barcodeScanner.CleanUp(); 
+            
+            var phoneApplicationFrame = Application.Current.RootVisual as PhoneApplicationFrame;
+            if (phoneApplicationFrame != null)
+            {
+                phoneApplicationFrame.Navigated -= this.OnNavigated;
+                phoneApplicationFrame.BackKeyPress -= this.root_BackKeyPress;
+            }
+            this.Completed(this, new ScanResult(TaskResult.Cancel));
         }
 
         /// <summary>
@@ -65,7 +82,7 @@ namespace WPCordovaClassLib.Cordova.Commands
                 phoneApplicationFrame.Navigated -= this.OnNavigated;
             }
 
-            var barcodeScanner = (BarcodeScannerUI)e.Content;
+            barcodeScanner = (BarcodeScannerUI)e.Content;
 
             if (barcodeScanner != null)
             {
@@ -73,7 +90,11 @@ namespace WPCordovaClassLib.Cordova.Commands
             }
             else if (this.Completed != null)
             {
-                this.Completed(this, new ScanResult(TaskResult.Cancel));
+                this.Completed(this, new ScanResult(TaskResult.Cancel)); 
+                if (phoneApplicationFrame != null)
+                {
+                    phoneApplicationFrame.BackKeyPress -= this.root_BackKeyPress;
+                }
             }
         }
 
