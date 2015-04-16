@@ -20,7 +20,12 @@
     Foreground="{StaticResource PhoneForegroundBrush}"
     SupportedOrientations="Portrait" Orientation="Portrait"
     mc:Ignorable="d"
-    shell:SystemTray.IsVisible="True">
+    shell:SystemTray.IsVisible="True" CacheMode="BitmapCache" >
+    <phone:PhoneApplicationPage.ApplicationBar>
+        <shell:ApplicationBar IsVisible="True" IsMenuEnabled="False" Mode="Minimized">
+            <shell:ApplicationBarIconButton IconUri="/www/Images/appbar.cancel.png" IsEnabled="True" Text="Cancel" Click="CancelScan"/>
+        </shell:ApplicationBar>
+    </phone:PhoneApplicationPage.ApplicationBar>
 
     <Grid Background="Transparent">
         <Canvas x:Name="CameraCanvas">
@@ -35,6 +40,7 @@
                 </VideoBrush>
             </Canvas.Background>
         </Canvas>
+        <Rectangle Margin="0" Stroke="Red" Height="2"/>
     </Grid>
 
 </phone:PhoneApplicationPage>
