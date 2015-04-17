@@ -8,11 +8,11 @@
     <license>MIT</license>
 
     <repo>https://github.com/wildabeast/BarcodeScanner</repo>
-    <issue>https://github.com/wildabeast/BarcodeScanner/issues</issue> 
-    
+    <issue>https://github.com/wildabeast/BarcodeScanner/issues</issue>
+
     <engines>
         <engine name="cordova" version=">=3.0.0" />
-    </engines>    
+    </engines>
 
     <js-module src="www/barcodescanner.js" name="BarcodeScanner">
         <clobbers target="cordova.plugins.barcodeScanner" />
@@ -52,7 +52,7 @@
         <!--
         <source-file src="R.java" target-dir="src/com/google/zxing/client/android" />
         -->
-        
+
         <!--
         <config-file target="res/xml/plugins.xml" parent="/plugins">
             <plugin name="BarcodeScanner" value="com.phonegap.plugins.barcodescanner.BarcodeScanner"/>
@@ -107,7 +107,7 @@
             search: (src/android/LibraryProject/(.+?)/[^/]+)$
             replace: <source-file src="$1" target-dir="$2"/>
         -->
-        
+
         <source-file src="src/android/LibraryProject/res/drawable/launcher_icon.png" target-dir="res/drawable"/>
         <source-file src="src/android/LibraryProject/res/drawable/share_via_barcode.png" target-dir="res/drawable"/>
         <source-file src="src/android/LibraryProject/res/drawable/shopper_icon.png" target-dir="res/drawable"/>
@@ -291,14 +291,27 @@
     </platform>
 
     <platform name="windows8">
-        <js-module src="src/windows8/BarcodeScannerProxy.js" name="BarcodeScannerProxy">
+        <js-module src="src/windows/BarcodeScannerProxy.js" name="BarcodeScannerProxy">
             <merges target="" />
         </js-module>
+
         <config-file target="package.appxmanifest" parent="/Package/Capabilities">
             <DeviceCapability Name="webcam" />
         </config-file>
-        <framework src="src/windows8/lib/ZXing.winmd" custom="true" />
-        <framework src="src/windows8/lib/WinRTBarcodeReader.winmd" custom="true" />
+
+        <framework src="src/windows/lib/WinRTBarcodeReader.csproj" custom="true" type="projectReference"/>
+    </platform>
+
+    <platform name="windows">
+        <js-module src="src/windows/BarcodeScannerProxy.js" name="BarcodeScannerProxy">
+            <merges target="" />
+        </js-module>
+
+        <config-file target="package.appxmanifest" parent="/Package/Capabilities">
+            <DeviceCapability Name="webcam" />
+        </config-file>
+
+        <framework src="src/windows/lib/WinRTBarcodeReader.csproj" custom="true" type="projectReference"/>
     </platform>
 
     <!-- Windows Phone 8 -->
