@@ -520,7 +520,7 @@ parentViewController:(UIViewController*)parentViewController
         //            [self dumpImage: [[self getImageFromLuminanceSource:luminanceSource] autorelease]];
         Ref<Binarizer>         binarizer         (new HybridBinarizer(luminanceSource));
         Ref<BinaryBitmap>      bitmap            (new BinaryBitmap(binarizer));
-        Ref<oned::EAN13Reader> reader            (new oned::EAN13Reader());
+        Ref<MultiFormatReader> reader            (new MultiFormatReader());
         Ref<Result>            result            (reader->decode(bitmap, decodeHints));
         Ref<String>            resultText        (result->getText());
         BarcodeFormat          formatVal =       result->getBarcodeFormat();
