@@ -70,7 +70,18 @@
          *    }
          * @param {Function} errorCallback
          */
-        BarcodeScanner.prototype.scan = function (successCallback, errorCallback) {
+        BarcodeScanner.prototype.scan = function (successCallback, errorCallback, config) {
+
+            if(config instanceof Array) {
+                // do nothing
+            } else {
+                if(typeof(config) === 'object') {
+                    config = [ config ];
+                } else {
+                    config = [];
+                }
+            }
+
             if (errorCallback == null) {
                 errorCallback = function () {
                 };
@@ -86,7 +97,7 @@
                 return;
             }
 
-            exec(successCallback, errorCallback, 'BarcodeScanner', 'scan', []);
+            exec(successCallback, errorCallback, 'BarcodeScanner', 'scan', config);
         };
 
         //-------------------------------------------------------------------
