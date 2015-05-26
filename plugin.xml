@@ -1,6 +1,6 @@
 <?xml version="1.0" encoding="UTF-8"?><plugin xmlns="http://www.phonegap.com/ns/plugins/1.0"
     xmlns:android="http://schemas.android.com/apk/res/android"
-    id="com.phonegap.plugins.barcodescanner"
+    id="biz.cepm.plugins.barcodescanner"
     version="2.2.0">
 
     <name>BarcodeScanner</name>
@@ -61,7 +61,7 @@
 
         <config-file target="res/xml/config.xml" parent="/*">
             <feature name="BarcodeScanner">
-                <param name="android-package" value="com.phonegap.plugins.barcodescanner.BarcodeScanner" />
+                <param name="android-package" value="biz.cepm.plugins.barcodescanner.BarcodeScanner" />
             </feature>
         </config-file>
 
@@ -81,7 +81,7 @@
             </activity>
             <activity android:name="com.google.zxing.client.android.encode.EncodeActivity" android:label="@string/share_name">
                 <intent-filter>
-                    <action android:name="com.phonegap.plugins.barcodescanner.ENCODE"/>
+                    <action android:name="biz.cepm.plugins.barcodescanner.ENCODE"/>
                     <category android:name="android.intent.category.DEFAULT"/>
                 </intent-filter>
             </activity>
