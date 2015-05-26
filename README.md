@@ -12,7 +12,7 @@ Follows the [Cordova Plugin spec](http://cordova.apache.org/docs/en/5.0.0/plugin
     
 This requires phonegap 5.0+ ( current stable v3.0.0 )
 
-   phonegap plugin add phonegap-plugin-barcodescanner
+    phonegap plugin add phonegap-plugin-barcodescanner
 
 Older versions of phonegap can still install via the __deprecated__ id ( stale v2.0.1 )
 
