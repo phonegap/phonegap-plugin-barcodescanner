@@ -18,20 +18,19 @@ package com.google.zxing.client.android.camera;
 
 import android.content.Context;
 import android.content.SharedPreferences;
+import android.content.res.Configuration;
 import android.graphics.Point;
 import android.hardware.Camera;
 import android.preference.PreferenceManager;
+import android.util.DisplayMetrics;
 import android.util.Log;
+import android.util.TypedValue;
 import android.view.Display;
+import android.view.Surface;
 import android.view.WindowManager;
-
 import com.google.zxing.client.android.PreferencesActivity;
 
-import java.util.ArrayList;
-import java.util.Collection;
-import java.util.Collections;
-import java.util.Comparator;
-import java.util.List;
+import java.util.*;
 
 /**
  * A class which deals with reading, parsing, and setting the camera parameters which are used to
@@ -48,11 +47,13 @@ final class CameraConfigurationManager {
   private static final int MAX_PREVIEW_PIXELS = 1280 * 720;
 
   private final Context context;
+  //  private final Activity activity;
   private Point screenResolution;
   private Point cameraResolution;
 
   CameraConfigurationManager(Context context) {
-    this.context = context;
+    this.context = context.getApplicationContext();
+//    this.activity = (Activity) context;
   }
 
   /**
@@ -62,23 +63,57 @@ final class CameraConfigurationManager {
     Camera.Parameters parameters = camera.getParameters();
     WindowManager manager = (WindowManager) context.getSystemService(Context.WINDOW_SERVICE);
     Display display = manager.getDefaultDisplay();
-    int width = display.getWidth();
-    int height = display.getHeight();
-    // We're landscape-only, and have apparently seen issues with display thinking it's portrait 
-    // when waking from sleep. If it's not landscape, assume it's mistaken and reverse them:
-    if (width < height) {
-      Log.i(TAG, "Display reports portrait orientation; assuming this is incorrect");
-      int temp = width;
-      width = height;
-      height = temp;
+    DisplayMetrics metrics = new DisplayMetrics();
+    display.getMetrics(metrics);
+
+    screenResolution = new Point();
+    int width = metrics.widthPixels;
+    int height = metrics.heightPixels;
+
+    // Remove action bar height
+    TypedValue typedValue = new TypedValue();
+    DisplayMetrics displayMetrics = this.context.getResources().getDisplayMetrics();
+    if (this.context.getTheme().resolveAttribute(android.R.attr.actionBarSize, typedValue, true)) {
+      height -= TypedValue.complexToDimensionPixelSize(typedValue.data, displayMetrics);
+    } else {
+      int rotation = context.getApplicationContext().getResources().getConfiguration().orientation;
+      if (rotation == Configuration.ORIENTATION_PORTRAIT) {
+        height -= 40 * displayMetrics.density;
+      } else {
+        height -= 48 * displayMetrics.density;
+      }
     }
-    screenResolution = new Point(width, height);
+//    height -= statusBarHeight();
+    height -= 50;
+
+    screenResolution.set(width, height);
+
     Log.i(TAG, "Screen resolution: " + screenResolution);
     cameraResolution = findBestPreviewSizeValue(parameters, screenResolution);
     Log.i(TAG, "Camera resolution: " + cameraResolution);
   }
 
   void setDesiredCameraParameters(Camera camera, boolean safeMode) {
+    // Checkout screen orientation
+    int rotation = context.getApplicationContext().getResources().getConfiguration().orientation;
+
+    WindowManager windowManager = (WindowManager) context.getSystemService(Context.WINDOW_SERVICE);
+    Display display = windowManager.getDefaultDisplay();
+    int deviceSpecificRotation = display.getRotation();
+
+    if (rotation == Configuration.ORIENTATION_PORTRAIT) {
+      if (deviceSpecificRotation == Surface.ROTATION_0 || deviceSpecificRotation == Surface.ROTATION_90) {
+        camera.setDisplayOrientation(90);
+      } else {
+        camera.setDisplayOrientation(270);
+      }
+    } else {
+      // landscape
+      if (deviceSpecificRotation == Surface.ROTATION_180 || deviceSpecificRotation == Surface.ROTATION_270) {
+        camera.setDisplayOrientation(180);
+      }
+    }
+
     Camera.Parameters parameters = camera.getParameters();
 
     if (parameters == null) {
@@ -100,19 +135,19 @@ final class CameraConfigurationManager {
     if (prefs.getBoolean(PreferencesActivity.KEY_AUTO_FOCUS, true)) {
       if (safeMode || prefs.getBoolean(PreferencesActivity.KEY_DISABLE_CONTINUOUS_FOCUS, false)) {
         focusMode = findSettableValue(parameters.getSupportedFocusModes(),
-                                      Camera.Parameters.FOCUS_MODE_AUTO);
+            Camera.Parameters.FOCUS_MODE_AUTO);
       } else {
         focusMode = findSettableValue(parameters.getSupportedFocusModes(),
-                                      "continuous-picture", // Camera.Parameters.FOCUS_MODE_CONTINUOUS_PICTURE in 4.0+
-                                      "continuous-video",   // Camera.Parameters.FOCUS_MODE_CONTINUOUS_VIDEO in 4.0+
-                                      Camera.Parameters.FOCUS_MODE_AUTO);
+            "continuous-picture", // Camera.Parameters.FOCUS_MODE_CONTINUOUS_PICTURE in 4.0+
+            "continuous-video",   // Camera.Parameters.FOCUS_MODE_CONTINUOUS_VIDEO in 4.0+
+            Camera.Parameters.FOCUS_MODE_AUTO);
       }
     }
     // Maybe selected auto-focus but not available, so fall through here:
     if (!safeMode && focusMode == null) {
       focusMode = findSettableValue(parameters.getSupportedFocusModes(),
-                                    Camera.Parameters.FOCUS_MODE_MACRO,
-                                    "edof"); // Camera.Parameters.FOCUS_MODE_EDOF in 2.2+
+          Camera.Parameters.FOCUS_MODE_MACRO,
+          "edof"); // Camera.Parameters.FOCUS_MODE_EDOF in 2.2+
     }
     if (focusMode != null) {
       parameters.setFocusMode(focusMode);
@@ -152,11 +187,11 @@ final class CameraConfigurationManager {
     String flashMode;
     if (newSetting) {
       flashMode = findSettableValue(parameters.getSupportedFlashModes(),
-                                    Camera.Parameters.FLASH_MODE_TORCH,
-                                    Camera.Parameters.FLASH_MODE_ON);
+          Camera.Parameters.FLASH_MODE_TORCH,
+          Camera.Parameters.FLASH_MODE_ON);
     } else {
       flashMode = findSettableValue(parameters.getSupportedFlashModes(),
-                                    Camera.Parameters.FLASH_MODE_OFF);
+          Camera.Parameters.FLASH_MODE_OFF);
     }
     if (flashMode != null) {
       parameters.setFlashMode(flashMode);
@@ -241,6 +276,9 @@ final class CameraConfigurationManager {
       Log.i(TAG, "No suitable preview sizes, using default: " + bestSize);
     }
 
+    WindowManager manager = (WindowManager) this.context.getSystemService(Context.WINDOW_SERVICE);
+    int rotation = manager.getDefaultDisplay().getRotation();
+
     Log.i(TAG, "Found best approximate preview size: " + bestSize);
     return bestSize;
   }
@@ -260,5 +298,4 @@ final class CameraConfigurationManager {
     Log.i(TAG, "Settable value: " + result);
     return result;
   }
-
 }
