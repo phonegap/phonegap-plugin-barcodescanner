@@ -83,8 +83,8 @@ final class DecodeHandler extends Handler {
     int tmp = width; // Here we are swapping, that's the difference to #11
     width = height;
     height = tmp;
-    data = rotatedData;
-    PlanarYUVLuminanceSource source = activity.getCameraManager().buildLuminanceSource(data, width, height);
+    
+    PlanarYUVLuminanceSource source = activity.getCameraManager().buildLuminanceSource(rotatedData, width, height);
     if (source != null) {
       BinaryBitmap bitmap = new BinaryBitmap(new HybridBinarizer(source));
       try {
