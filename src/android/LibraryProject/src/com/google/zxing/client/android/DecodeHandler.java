@@ -120,15 +120,6 @@ final class DecodeHandler extends Handler {
   private static Bitmap toBitmap(LuminanceSource source, int[] pixels) {
     int width = source.getWidth();
     int height = source.getHeight();
-    
-    byte[] rotatedData = new byte[data.length];
-	for (int y = 0; y < height; y++) {
-	    for (int x = 0; x < width; x++)
-	         rotatedData[x * height + height - y - 1] = data[x + y * width];
-	 }
-	int tmp = width;         
-	width = height;
-	height = tmp;
 
     Bitmap bitmap = Bitmap.createBitmap(width, height, Bitmap.Config.ARGB_8888);
     bitmap.setPixels(pixels, 0, width, 0, 0, width, height);
