@@ -69,9 +69,9 @@ final class CameraConfigurationManager {
     // when waking from sleep. If it's not landscape, assume it's mistaken and reverse them:
     //if    (width > height) {
     //  Log.i(TAG, "Display reports portrait orientation; assuming this is incorrect");
-      int temp = width;
-      width = height;
-      height = temp;
+    //  int temp = width;
+    //  width = height;
+    //  height = temp;
     //}
     screenResolution = new Point(width, height);
     Log.i(TAG, "Screen resolution: " + screenResolution);
