@@ -78,6 +78,7 @@ public final class EncodeActivity extends Activity {
     }
   }
 
+
   /*
   @Override
   public boolean onCreateOptionsMenu(Menu menu) {
