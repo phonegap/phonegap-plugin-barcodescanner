@@ -1,7 +1,7 @@
 <?xml version="1.0" encoding="UTF-8"?><plugin xmlns="http://www.phonegap.com/ns/plugins/1.0"
     xmlns:android="http://schemas.android.com/apk/res/android"
     id="com.phonegap.plugins.barcodescanner"
-    version="1.2.9">
+    version="1.2.10">
 
     <name>BarcodeScanner</name>
     <description>You can use the BarcodeScanner plugin to scan different types of barcodes (using the device's camera) and get the metadata encoded in them for processing within your application.</description>
@@ -225,6 +225,7 @@
             <string name="menu_encode_vcard">Use vCard</string>
             <string name="menu_help">Help</string>
             <string name="menu_history">History</string>
+            <string name="menu_settings">Settings</string>
             <string name="menu_share">Share</string>
             <string name="msg_bulk_mode_scanned">Bulk mode: barcode scanned and saved</string>
             <string name="msg_camera_framework_bug">Sorry, the Android camera encountered a problem. You may need to restart the device.</string>
