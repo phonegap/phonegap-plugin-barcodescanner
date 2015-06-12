@@ -78,6 +78,7 @@ public final class EncodeActivity extends Activity {
     }
   }
 
+  /*
   @Override
   public boolean onCreateOptionsMenu(Menu menu) {
     MenuInflater menuInflater = getMenuInflater();
@@ -93,6 +94,7 @@ public final class EncodeActivity extends Activity {
     }
     return super.onCreateOptionsMenu(menu);
   }
+  */
 
   @Override
   public boolean onOptionsItemSelected(MenuItem item) {
@@ -113,7 +115,7 @@ public final class EncodeActivity extends Activity {
         return false;
     }
   }
-  
+
   private void share() {
     QRCodeEncoder encoder = qrCodeEncoder;
     if (encoder == null) { // Odd
