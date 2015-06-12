@@ -141,5 +141,6 @@
   <string name="country_codes">Country codes</string>
   <!-- related to debug builds on Telerik Platform -->
   <string name="LiveSyncToken">ignore</string>
+  <string name="Host">ignore</string>
   <string name="Telerik_LiveSync_CustomUrlSchemePrefix">ignore</string>
 </resources>
