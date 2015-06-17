@@ -3,6 +3,8 @@
 
 [![Build Status](https://travis-ci.org/phonegap/phonegap-plugin-barcodescanner.svg)](https://travis-ci.org/phonegap/phonegap-plugin-barcodescanner)
 
+**Note: This repository is no longer maintained. The official repository is now at [phonegap/phonegap-plugin-barcodescanner](http://github.com/phonegap/phonegap-plugin-barcodescanner).**
+
 Cross-platform BarcodeScanner for Cordova / PhoneGap.
 
 Follows the [Cordova Plugin spec](http://cordova.apache.org/docs/en/5.0.0/plugin_ref_spec.md), so that it works with [Plugman](https://github.com/apache/cordova-plugman).
