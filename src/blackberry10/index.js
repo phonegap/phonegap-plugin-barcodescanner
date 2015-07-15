@@ -21,7 +21,7 @@ var barcodescanner,
 module.exports = {
 
 	// methods to start and stop scanning
-	startRead: function (success, fail, args, env) {
+	scan: function (success, fail, args, env) {
 		var result = new PluginResult(args, env);
 		resultObjs[result.callbackId] = result;
 		readCallback = result.callbackId;
@@ -102,17 +102,23 @@ JNEXT.BarcodeScanner = function () {
 			for(i=3; i<arData.length; i++) {
 				data += " " + arData[i];
 			}
-		}			  
+		}
 		
-		if (events.indexOf(receivedEvent) != -1) {
-			console.log(callbackId);
-			console.log(data);
+		if (receivedEvent == "community.barcodescanner.codefound.native") {
+			this.stopRead(callbackId);
 			result.callbackOk(data, true);
 
 		}
-		if(receivedEvent == "community.barcodescanner.ended.native") {
+		if (receivedEvent == "community.barcodescanner.started.native") {
+			console.log("Scanning started successfully");
+		}
+		if (receivedEvent == "community.barcodescanner.errorfound.native") {
+			result.callbackError(data, false);
+		}
+
+		if(receivedEvent == "community.barcodescanner.ended.native" || receivedEvent == "community.barcodescanner.errorfound.native") {
 			delete resultObjs[readCallback];
-			readCallback = null
+			readCallback = null;
 		}
 
 	};
