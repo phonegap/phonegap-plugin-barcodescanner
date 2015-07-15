@@ -167,7 +167,7 @@ BlackBerry 10 implenematation currently doesn't support encode functionality.
 ## Thanks on Github ##
 
 So many -- check out the original [iOS](https://github.com/phonegap/phonegap-plugins/tree/DEPRECATED/iOS/BarcodeScanner),  [Android](https://github.com/phonegap/phonegap-plugins/tree/DEPRECATED/Android/BarcodeScanner) and 
-[BlackBerry 10](https://github.com/umcsdon/WebWorks-Community-APIs/tree/master/BB10-Cordova/BarcodeScanner) repos.
+[BlackBerry 10](https://github.com/blackberry/WebWorks-Community-APIs/tree/master/BB10-Cordova/BarcodeScanner) repos.
 
 ## Licence ##
 
