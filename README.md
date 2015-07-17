@@ -156,13 +156,14 @@ A full example could be:
 ```
 
 ## Windows8 quirks ##
-Windows 8 implenemtation currently doesn't support encode functionality.
+Windows 8 implementation currently doesn't support encode functionality.
 
 ## Windows Phone 8 quirks ##
-Windows Phone 8 implenemtation currently doesn't support encode functionality.
+Windows Phone 8 implementation currently doesn't support encode functionality.
 
 ## BlackBerry 10 quirks
-BlackBerry 10 implenematation currently doesn't support encode functionality.
+BlackBerry 10 implementation currently doesn't support encode functionality.
+Cancelling a scan on BlackBerry 10 is done by touching the screen.
 
 ## Thanks on Github ##
 

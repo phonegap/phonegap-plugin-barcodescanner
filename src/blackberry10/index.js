@@ -38,21 +38,15 @@ module.exports = {
 		}
 		if (handle !== null) {
 			var values = { group: group, handle: handle };
-			result.ok(barcodescanner.getInstance().startRead(result.callbackId, values), true);
+			barcodescanner.getInstance().startRead(result.callbackId, values);
+			// result.noResult(true); // calls the error handler for some reason
 		} else {
 			result.error("Failed to find window handle", false);
 		}
 	},
-	stopRead: function (success, fail, args, env) {
-		var result = new PluginResult(args, env);
-		resultObjs[result.callbackId] = result;
-		result.ok(barcodescanner.getInstance().stopRead(result.callbackId), true);
-	},
-	add: function (success, fail) {
-		console.log('Frame Available event listening');
-	},
-	remove: function (success, fail) {
-		console.log('End listening to frames');
+
+	encode: function (success, fail, args, env) {
+		
 	}
 };
 
@@ -89,7 +83,7 @@ JNEXT.BarcodeScanner = function () {
 		var arData = strData.split(" "),
 			callbackId = arData[0],
 			receivedEvent = arData[1],
-			data = receivedEvent + " " + arData[2],
+			data = arData[2],
 			result = resultObjs[callbackId],
 			events = ["community.barcodescanner.codefound.native",
 					  "community.barcodescanner.errorfound.native",
@@ -105,15 +99,19 @@ JNEXT.BarcodeScanner = function () {
 		}
 		
 		if (receivedEvent == "community.barcodescanner.codefound.native") {
+			if (result) {
+				result.callbackOk(data, false);
+			}
 			this.stopRead(callbackId);
-			result.callbackOk(data, true);
 
 		}
 		if (receivedEvent == "community.barcodescanner.started.native") {
 			console.log("Scanning started successfully");
 		}
 		if (receivedEvent == "community.barcodescanner.errorfound.native") {
-			result.callbackError(data, false);
+			if (result) {
+				result.callbackError(data, false);
+			}
 		}
 
 		if(receivedEvent == "community.barcodescanner.ended.native" || receivedEvent == "community.barcodescanner.errorfound.native") {
