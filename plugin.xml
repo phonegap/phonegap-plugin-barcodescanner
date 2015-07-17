@@ -347,5 +347,20 @@
             <runs />
         </js-module>
     </platform>
-
+    
+    <!-- BlackBerry 10 -->
+    <platform name="blackberry10">
+        <source-file src="src/blackberry10/index.js" target-dir="BarcodeScanner" />
+        <lib-file src="src/blackberry10/native/device/libBarcodeScanner.so" arch="device"/>
+        <lib-file src="src/blackberry10/native/simulator/libBarcodeScanner.so" arch="simulator"/>
+        <config-file target="www/config.xml" parent="/widget">
+            <feature name="BarcodeScanner">
+		<param name="blackberry-package" value="phonegap-plugin-barcodescanner" />
+	    </feature>
+        </config-file>
+        <config-file target="www/config.xml" parent="/widget/rim:permissions">
+            <rim:permit>use_camera</rim:permit>
+        </config-file>
+        <dependency id="cordova-plugin-bb-app" />
+    </platform>
 </plugin>
