@@ -39,6 +39,72 @@ var BARCODE_FORMAT = {
     262144: 'PLESSEY'
 };
 
+/**
+ * @param {Function<Object>} callback
+ */
+function findCamera(callback) {
+    // Enumerate cameras and add them to the list
+    var deviceInfo = Windows.Devices.Enumeration.DeviceInformation;
+    deviceInfo.findAllAsync(Windows.Devices.Enumeration.DeviceClass.videoCapture).done(function (cameras) {
+        var camerasConfigs = cameras.map(function(camera) {
+            var cameraConfig = {
+                id: camera.id,
+                isFrontLocation: false,
+                isBackLocation: false
+            };
+
+            if (camera.enclosureLocation !== null) {
+                cameraConfig.isFrontLocation = camera.enclosureLocation.panel === Windows.Devices.Enumeration.Panel.front;
+                cameraConfig.isBackLocation = camera.enclosureLocation.panel === Windows.Devices.Enumeration.Panel.back;
+            }
+
+            return cameraConfig;
+        });
+
+        var selectedCameraConfig = null;
+        camerasConfigs.forEach(function(cameraConfig) {
+            if (cameraConfig.isBackLocation) {
+                selectedCameraConfig = cameraConfig;
+            }
+        });
+
+        if (selectedCameraConfig === null) {
+            selectedCameraConfig = camerasConfigs[0];
+        }
+
+        callback(selectedCameraConfig.id)
+    }, function() {
+        // error happened
+    });
+}
+
+/**
+ * @param {Windows.Graphics.Display.DisplayOrientations} displayOrientation
+ * @return {Number}
+ */
+function videoPreviewRotationLookup(displayOrientation) {
+    var degreesToRotate;
+
+    switch (displayOrientation) {
+        case Windows.Graphics.Display.DisplayOrientations.landscape: 
+            degreesToRotate = 0;
+            break;           
+        case Windows.Graphics.Display.DisplayOrientations.portrait:
+            degreesToRotate = 90;
+            break;
+        case Windows.Graphics.Display.DisplayOrientations.landscapeFlipped: 
+            degreesToRotate = 180;
+            break;
+        case Windows.Graphics.Display.DisplayOrientations.portraitFlipped: 
+            degreesToRotate = 270;
+            break;
+        default:
+            degreesToRotate = 0;
+            break;
+    }
+    return degreesToRotate;
+}
+
 module.exports = {
 
     /**
@@ -48,7 +114,6 @@ module.exports = {
      * @param  {array} args       Arguments array
      */
     scan: function (success, fail, args) {
-
         var capturePreview,
             capturePreviewAlignmentMark,
             captureCancelButton,
@@ -61,6 +126,7 @@ module.exports = {
          * Creates a preview frame and necessary objects
          */
         function createPreview() {
+            Windows.Graphics.Display.DisplayInformation.getForCurrentView().addEventListener("orientationchanged", updatePreviewForRotation, false);
 
             // Create fullscreen preview
             var capturePreviewFrameStyle = document.createElement('link');
@@ -164,35 +230,43 @@ module.exports = {
          * Starts stream transmission to preview frame and then run barcode search
          */
         function startPreview() {
-            var captureSettings = new Windows.Media.Capture.MediaCaptureInitializationSettings();
-            captureSettings.streamingCaptureMode = Windows.Media.Capture.StreamingCaptureMode.video;
-            captureSettings.photoCaptureSource = Windows.Media.Capture.PhotoCaptureSource.videoPreview;
+            findCamera(function(id) {
+                var captureSettings = new Windows.Media.Capture.MediaCaptureInitializationSettings();
+                captureSettings.streamingCaptureMode = Windows.Media.Capture.StreamingCaptureMode.video;
+                captureSettings.photoCaptureSource = Windows.Media.Capture.PhotoCaptureSource.videoPreview;
+                captureSettings.videoDeviceId = id;
 
-            capture.initializeAsync(captureSettings).done(function () {
+                capture = new Windows.Media.Capture.MediaCapture();
+                capture.initializeAsync(captureSettings).done(function () {
 
-                var controller = capture.videoDeviceController;
-                var deviceProps = controller.getAvailableMediaStreamProperties(Windows.Media.Capture.MediaStreamType.videoRecord);
+                    var controller = capture.videoDeviceController;
+                    var deviceProps = controller.getAvailableMediaStreamProperties(Windows.Media.Capture.MediaStreamType.videoRecord);
 
-                deviceProps = Array.prototype.slice.call(deviceProps);
-                deviceProps = deviceProps.filter(function (prop) {
-                    // filter out streams with "unknown" subtype - causes errors on some devices
-                    return prop.subtype !== "Unknown";
-                }).sort(function (propA, propB) {
-                    // sort properties by resolution
-                    return propB.width - propA.width;
-                });
+                    deviceProps = Array.prototype.slice.call(deviceProps);
+                    deviceProps = deviceProps.filter(function (prop) {
+                        // filter out streams with "unknown" subtype - causes errors on some devices
+                        return prop.subtype !== "Unknown";
+                    }).sort(function (propA, propB) {
+                        // sort properties by resolution
+                        return propB.width - propA.width;
+                    });
 
-                var maxResProps = deviceProps[0];
+                    var maxResProps = deviceProps[0];
 
-                controller.setMediaStreamPropertiesAsync(Windows.Media.Capture.MediaStreamType.videoRecord, maxResProps).done(function () {
+                    controller.setMediaStreamPropertiesAsync(Windows.Media.Capture.MediaStreamType.videoRecord, maxResProps).done(function () {
                     // handle portrait orientation
                     if (Windows.Graphics.Display.DisplayProperties.nativeOrientation == Windows.Graphics.Display.DisplayOrientations.portrait) {
                         capture.setPreviewRotation(Windows.Media.Capture.VideoRotation.clockwise90Degrees);
                         capturePreview.msZoom = true;
                     }
 
-                    capturePreview.src = URL.createObjectURL(capture);
-                    capturePreview.play();
+                        capturePreview.src = URL.createObjectURL(capture);
+                        capturePreview.play();
+
+                        // Insert preview frame and controls into page
+                        document.body.appendChild(capturePreview);
+                        document.body.appendChild(capturePreviewAlignmentMark);
+                        document.body.appendChild(captureCancelButton);
 
                     // Insert preview frame and controls into page
                     document.body.appendChild(capturePreviewFrame);
