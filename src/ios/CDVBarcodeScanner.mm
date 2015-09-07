@@ -183,23 +183,17 @@
                                resultWithStatus: CDVCommandStatus_OK
                                messageAsDictionary: resultDict
                                ];
-    
-    NSString* js = [result toSuccessCallbackString:callback];
-    if (!flipped) {
-        [self writeJavascript:js];
-    }
+    [self.commandDelegate sendPluginResult:result callbackId:callback];
 }
 
 //--------------------------------------------------------------------------
 - (void)returnError:(NSString*)message callback:(NSString*)callback {
     CDVPluginResult* result = [CDVPluginResult
-                               resultWithStatus: CDVCommandStatus_OK
+                               resultWithStatus: CDVCommandStatus_ERROR
                                messageAsString: message
                                ];
     
-    NSString* js = [result toErrorCallbackString:callback];
-    
-    [self writeJavascript:js];
+    [self.commandDelegate sendPluginResult:result callbackId:callback];
 }
 
 @end
@@ -277,8 +271,8 @@ parentViewController:(UIViewController*)parentViewController
 //--------------------------------------------------------------------------
 - (void)openDialog {
     [self.parentViewController
-     presentModalViewController:self.viewController
-     animated:YES
+     presentViewController:self.viewController
+     animated:YES completion:nil
      ];
 }
 
@@ -286,7 +280,7 @@ parentViewController:(UIViewController*)parentViewController
 - (void)barcodeScanDone {
     self.capturing = NO;
     [self.captureSession stopRunning];
-    [self.parentViewController dismissModalViewControllerAnimated: YES];
+    [self.parentViewController dismissViewControllerAnimated: YES completion:nil];
     
     // viewcontroller holding onto a reference to us, release them so they
     // will release us
