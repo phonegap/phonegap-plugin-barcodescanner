@@ -33,6 +33,8 @@ The following barcode types are currently supported:
 * CODABAR
 * ITF
 * RSS14
+
+Not by default, but supported if you pass in the "formats" option:
 * PDF417
 * RSS_EXPANDED
 
@@ -50,9 +52,13 @@ The following barcode types are currently supported:
 
 `success` and `fail` are callback functions. Success is passed an object with data, type and cancelled properties. Data is the text representation of the barcode data, type is the type of barcode detected and cancelled is whether or not the user cancelled the scan.
 
-On iOS and Android you can pass in options to (ignored on WP8):
+On iOS and Android you can pass in options (ignored on WP8):
 * `preferFrontCamera` default false: prefer starting the scanner with the front camera (if multiple cameras are available).
 * `showFlipCameraButton` default false: show a button on the scan UI to toggle the back/front camera (if multiple cameras are available).
+
+And on Android you can also pass in these:
+* `prompt` default: Place a barcode inside the viewfinder rectangle to scan it.
+* `formats` default: all but PDF_417 and RSS_EXPANDED
 
 
 A full example could be:
@@ -69,7 +75,9 @@ A full example could be:
       },
       {
           "preferFrontCamera" : true,
-          "showFlipCameraButton" : true
+          "showFlipCameraButton" : true,
+          "prompt" : "Place a barcode inside the scan area", // supported on Android only
+          "formats" : "QR_CODE,PDF_417" // default: all but PDF_417 and RSS_EXPANDED
       }
    );
 ```

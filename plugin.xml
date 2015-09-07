@@ -86,7 +86,7 @@
                 android:windowSoftInputMode="stateAlwaysHidden"
                 android:exported="false">
                 <intent-filter>
-                    <action android:name="com.phonegap.plugins.barcodescanner.SCAN"/>
+                    <action android:name="com.google.zxing.client.android.SCAN"/>
                     <category android:name="android.intent.category.DEFAULT"/>
                 </intent-filter>
             </activity>
