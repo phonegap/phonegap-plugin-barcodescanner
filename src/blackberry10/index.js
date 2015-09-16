@@ -100,7 +100,8 @@ JNEXT.BarcodeScanner = function () {
 		
 		if (receivedEvent == "community.barcodescanner.codefound.native") {
 			if (result) {
-				result.callbackOk(data, false);
+				var parsed = JSON.parse(data);
+				result.callbackOk(parsed, false);
 			}
 			this.stopRead(callbackId);
 
