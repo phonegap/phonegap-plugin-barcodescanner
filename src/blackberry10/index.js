@@ -39,7 +39,7 @@ module.exports = {
 		if (handle !== null) {
 			var values = { group: group, handle: handle };
 			barcodescanner.getInstance().startRead(result.callbackId, values);
-			// result.noResult(true); // calls the error handler for some reason
+			result.noResult(true);
 		} else {
 			result.error("Failed to find window handle", false);
 		}
