@@ -15,7 +15,6 @@
  limitations under the License.
  -->
 <resources>
-  <!-- <string name="app_name">Barcode Scanner</string> -->
   <string name="app_picker_name">Aplicacions</string>
   <string name="bookmark_picker_name">Adreces d\'interès</string>
   <string name="button_add_calendar">Afegeix a l\'agenda</string>
@@ -136,12 +135,4 @@
   <string name="wifi_changing_network">Sollicitant connexió a la xarxa\u2026</string>
   <string name="wifi_ssid_label">Nom de la xarxa</string>
   <string name="wifi_type_label">Tipus</string>
-
-  <!-- added because of lint warnings and translatable=false did not work -->
-  <string name="app_name">Barcode Scanner</string>
-  <string name="country_codes">Country codes</string>
-  <!-- related to debug builds on Telerik Platform -->
-  <string name="LiveSyncToken">ignore</string>
-  <string name="Host">ignore</string>
-  <string name="Telerik_LiveSync_CustomUrlSchemePrefix">ignore</string>
 </resources>

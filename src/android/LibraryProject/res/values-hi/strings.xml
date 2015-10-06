@@ -15,7 +15,6 @@
  limitations under the License.
  -->
 <resources>
-  <!-- <string name="app_name">बारकोड स्कैनर</string> -->
   <string name="app_picker_name">अनुप्रयोगों</string>
   <string name="bookmark_picker_name">बुकमार्क्स</string>
   <string name="button_add_calendar">कैलेंडर के लिए जोड़ें</string>
@@ -136,12 +135,4 @@
   <string name="wifi_changing_network">नेटवर्क के लिए कनेक्शन का अनुरोध कर रहा है \u2026</string>
   <string name="wifi_ssid_label">नेटवर्क नाम</string>
   <string name="wifi_type_label">टाइप</string>
-
-  <!-- added because of lint warnings and translatable=false did not work -->
-  <string name="app_name">Barcode Scanner</string>
-  <string name="country_codes">Country codes</string>
-  <!-- related to debug builds on Telerik Platform -->
-  <string name="LiveSyncToken">ignore</string>
-  <string name="Host">ignore</string>
-  <string name="Telerik_LiveSync_CustomUrlSchemePrefix">ignore</string>
 </resources>
