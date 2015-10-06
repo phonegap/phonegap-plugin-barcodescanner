@@ -301,5 +301,8 @@
             <string name="wifi_ssid_label">Network Name</string>
             <string name="wifi_type_label">Type</string>
         </config-file>
+
+        <framework src="src/android/ignorelinterrors.gradle" custom="true" type="gradleReference"/>
+
     </platform>
 </plugin>
