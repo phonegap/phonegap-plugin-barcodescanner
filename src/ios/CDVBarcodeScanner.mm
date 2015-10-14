@@ -403,19 +403,18 @@ parentViewController:(UIViewController*)parentViewController
     
     AVCaptureDevice* __block device = nil;
     if (self.isFrontCamera) {
-        
         NSArray* devices = [AVCaptureDevice devicesWithMediaType:AVMediaTypeVideo];
         [devices enumerateObjectsUsingBlock:^(AVCaptureDevice *obj, NSUInteger idx, BOOL *stop) {
             if (obj.position == AVCaptureDevicePositionFront) {
                 device = obj;
             }
         }];
-    } else {
-        device = [AVCaptureDevice defaultDeviceWithMediaType:AVMediaTypeVideo];
-        if (!device) return @"unable to obtain video capture device";
-        
     }
-    
+    else {
+        device = [AVCaptureDevice defaultDeviceWithMediaType:AVMediaTypeVideo];
+    }
+
+    if (!device) return @"unable to obtain video capture device";
     
     AVCaptureDeviceInput* input = [AVCaptureDeviceInput deviceInputWithDevice:device error:&error];
     if (!input) return @"unable to obtain video capture device input";
@@ -433,11 +432,12 @@ parentViewController:(UIViewController*)parentViewController
     
     [output setSampleBufferDelegate:self queue:dispatch_get_global_queue(DISPATCH_QUEUE_PRIORITY_LOW, 0)];
     
-    if (![captureSession canSetSessionPreset:AVCaptureSessionPresetHigh]) {
+    if ([captureSession canSetSessionPreset:AVCaptureSessionPresetHigh]) {
+        captureSession.sessionPreset = AVCaptureSessionPresetHigh;
+    }
+    else {
         return @"unable to preset high quality video capture";
     }
-    
-    captureSession.sessionPreset = AVCaptureSessionPresetHigh;
     
     if ([captureSession canAddInput:input]) {
         [captureSession addInput:input];
