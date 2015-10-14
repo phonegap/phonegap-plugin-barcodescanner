@@ -69,6 +69,7 @@
 @property (nonatomic)         BOOL                        capturing;
 @property (nonatomic)         BOOL                        isFrontCamera;
 @property (nonatomic)         BOOL                        isFlipped;
+@property (nonatomic, retain) AVCaptureDevice*            inputDevice;
 
 
 - (id)initWithPlugin:(CDVBarcodeScanner*)plugin callback:(NSString*)callback parentViewController:(UIViewController*)parentViewController alterateOverlayXib:(NSString *)alternateXib;
@@ -246,6 +247,7 @@
 @synthesize is2D                 = _is2D;
 @synthesize capturing            = _capturing;
 @synthesize results              = _results;
+@synthesize inputDevice          = _inputDevice;
 
 SystemSoundID _soundFileObject;
 
@@ -283,6 +285,7 @@ parentViewController:(UIViewController*)parentViewController
     self.previewLayer = nil;
     self.alternateXib = nil;
     self.results = nil;
+    self.inputDevice = nil;
     
     self.capturing = NO;
     
@@ -401,22 +404,22 @@ parentViewController:(UIViewController*)parentViewController
     AVCaptureSession* captureSession = [[AVCaptureSession alloc] init];
     self.captureSession = captureSession;
     
-    AVCaptureDevice* __block device = nil;
+    self.inputDevice = nil;
     if (self.isFrontCamera) {
         NSArray* devices = [AVCaptureDevice devicesWithMediaType:AVMediaTypeVideo];
         [devices enumerateObjectsUsingBlock:^(AVCaptureDevice *obj, NSUInteger idx, BOOL *stop) {
             if (obj.position == AVCaptureDevicePositionFront) {
-                device = obj;
+                self.inputDevice = obj;
             }
         }];
     }
     else {
-        device = [AVCaptureDevice defaultDeviceWithMediaType:AVMediaTypeVideo];
+        self.inputDevice = [AVCaptureDevice defaultDeviceWithMediaType:AVMediaTypeVideo];
     }
 
-    if (!device) return @"unable to obtain video capture device";
+    if (!self.inputDevice) return @"unable to obtain video capture device";
     
-    AVCaptureDeviceInput* input = [AVCaptureDeviceInput deviceInputWithDevice:device error:&error];
+    AVCaptureDeviceInput* input = [AVCaptureDeviceInput deviceInputWithDevice:self.inputDevice error:&error];
     if (!input) return @"unable to obtain video capture device input";
     
     AVCaptureVideoDataOutput* output = [[AVCaptureVideoDataOutput alloc] init];
@@ -794,6 +797,9 @@ parentViewController:(UIViewController*)parentViewController
 // view controller for the ui
 //------------------------------------------------------------------------------
 @implementation CDVbcsViewController
+{
+    UIBarButtonItem *switchTorchBtn;
+}
 @synthesize processor      = _processor;
 @synthesize shutterPressed = _shutterPressed;
 @synthesize alternateXib   = _alternateXib;
@@ -818,6 +824,7 @@ parentViewController:(UIViewController*)parentViewController
     self.shutterPressed = NO;
     self.alternateXib = nil;
     self.overlayView = nil;
+    switchTorchBtn = nil;
     [super dealloc];
 }
 
@@ -870,6 +877,24 @@ parentViewController:(UIViewController*)parentViewController
 //--------------------------------------------------------------------------
 - (IBAction)cancelButtonPressed:(id)sender {
     [self.processor performSelector:@selector(barcodeScanCancelled) withObject:nil afterDelay:0];
+}
+
+- (void)switchTorchOnOff:(id)sender
+{
+    AVCaptureDevice    *dvc = self.processor.inputDevice;
+    AVCaptureTorchMode tm = dvc.torchMode == AVCaptureTorchModeOff ? AVCaptureTorchModeOn : AVCaptureTorchModeOff;
+    
+    if ([dvc isTorchModeSupported:tm])
+    {
+        [dvc lockForConfiguration:nil];
+        [dvc setTorchMode:tm];
+        [dvc unlockForConfiguration];
+        
+        NSString *btnName = tm == AVCaptureTorchModeOn ? @"icons8FlashOff" : @"icons8FlashOn";
+        [switchTorchBtn setImage:[UIImage imageNamed:btnName]];
+    }
+    else
+        [switchTorchBtn setEnabled:false];
 }
 
 - (void)flipCameraButtonPressed:(id)sender
@@ -929,18 +954,37 @@ parentViewController:(UIViewController*)parentViewController
                      action:@selector(flipCameraButtonPressed:)
                      ];
     
-    
 #if USE_SHUTTER
     id shutterButton = [[UIBarButtonItem alloc]
                         initWithBarButtonSystemItem:UIBarButtonSystemItemCamera
                         target:(id)self
                         action:@selector(shutterButtonPressed)
                         ];
-    
-    toolbar.items = [NSArray arrayWithObjects:cancelButton,flexSpace, flipCamera ,shutterButton,nil];
-#else
-    toolbar.items = [NSArray arrayWithObjects:cancelButton,flexSpace, flipCamera,nil];
 #endif
+
+    if (self.processor.inputDevice.hasTorch)
+    {
+        switchTorchBtn = [[UIBarButtonItem alloc]
+                          initWithImage:[UIImage imageNamed:@"icons8FlashOn"]
+                          style:UIBarButtonItemStylePlain
+                          target:(id)self
+                          action:@selector(switchTorchOnOff:)
+                          ];
+        
+        toolbar.items = [NSArray arrayWithObjects:cancelButton, flexSpace, switchTorchBtn, flexSpace, flipCamera,
+#if USE_SHUTTER
+                         flexSpace, shutterButton,
+#endif
+                         nil];
+        [switchTorchBtn setEnabled:self.processor.inputDevice.torchAvailable];
+    }
+    else
+        toolbar.items = [NSArray arrayWithObjects:cancelButton, flexSpace, flipCamera,
+#if USE_SHUTTER
+                         flexSpace, shutterButton,
+#endif
+                         nil];
+    
     bounds = overlayView.bounds;
     
     [toolbar sizeToFit];

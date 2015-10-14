@@ -34,6 +34,12 @@
         <resource-file src="src/ios/icons8_buttons/icons8SwitchCamera.png" />
         <resource-file src="src/ios/icons8_buttons/icons8SwitchCamera@2x.png" />
         <resource-file src="src/ios/icons8_buttons/icons8SwitchCamera@2x.png" />
+        <resource-file src="src/ios/icons8_buttons/icons8FlashOff.png" />
+        <resource-file src="src/ios/icons8_buttons/icons8FlashOff@2x.png" />
+        <resource-file src="src/ios/icons8_buttons/icons8FlashOff@2x.png" />
+        <resource-file src="src/ios/icons8_buttons/icons8FlashOn.png" />
+        <resource-file src="src/ios/icons8_buttons/icons8FlashOn@2x.png" />
+        <resource-file src="src/ios/icons8_buttons/icons8FlashOn@2x.png" />
 
         <header-file src="src/ios/zxing-all-in-one.h" />
 
