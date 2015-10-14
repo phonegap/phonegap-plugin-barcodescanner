@@ -923,11 +923,10 @@ parentViewController:(UIViewController*)parentViewController
                     ];
     
     id flipCamera = [[UIBarButtonItem alloc]
-                     initWithImage:[UIImage imageNamed:@"icons8SwitchCamera"]
-                     style:UIBarButtonItemStylePlain
-                     target:(id)self
-                     action:@selector(flipCameraButtonPressed:)
-                     ];
+                       initWithBarButtonSystemItem:UIBarButtonSystemItemCamera
+                       target:(id)self
+                       action:@selector(flipCameraButtonPressed:)
+                       ];
     
 #if USE_SHUTTER
     id shutterButton = [[UIBarButtonItem alloc]
@@ -936,9 +935,9 @@ parentViewController:(UIViewController*)parentViewController
                         action:@selector(shutterButtonPressed)
                         ];
     
-    toolbar.items = [NSArray arrayWithObjects:cancelButton,flexSpace, flipCamera ,shutterButton,nil];
+    toolbar.items = [NSArray arrayWithObjects:flexSpace,cancelButton,flexSpace, flipCamera ,shutterButton,nil];
 #else
-    toolbar.items = [NSArray arrayWithObjects:cancelButton,flexSpace, flipCamera,nil];
+    toolbar.items = [NSArray arrayWithObjects:flexSpace,cancelButton,flexSpace, flipCamera,nil];
 #endif
     bounds = overlayView.bounds;
     
