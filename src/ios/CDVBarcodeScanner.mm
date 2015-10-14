@@ -70,6 +70,8 @@
 @property (nonatomic)         BOOL                        isFrontCamera;
 @property (nonatomic)         BOOL                        isFlipped;
 @property (nonatomic, retain) AVCaptureDevice*            inputDevice;
+@property (nonatomic)         BOOL                        hasToolbarBlack;
+@property (nonatomic)         BOOL                        hasToolbarTranslucent;
 
 
 - (id)initWithPlugin:(CDVBarcodeScanner*)plugin callback:(NSString*)callback parentViewController:(UIViewController*)parentViewController alterateOverlayXib:(NSString *)alternateXib;
@@ -146,11 +148,7 @@
     callback = command.callbackId;
     
     // We allow the user to define an alternate xib file for loading the overlay.
-    NSString *overlayXib = nil;
-    if ( [command.arguments count] >= 1 )
-    {
-        overlayXib = [command.arguments objectAtIndex:0];
-    }
+    NSString *overlayXib = [command argumentAtIndex:0]; // returns nil if argument is not provided
     
     capabilityError = [self isScanNotPossible];
     if (capabilityError) {
@@ -164,6 +162,9 @@
                  parentViewController:self.viewController
                  alterateOverlayXib:overlayXib
                  ];
+    [processor setHasToolbarBlack:[[command argumentAtIndex:1 withDefault:@(NO)] boolValue]];
+    [processor setHasToolbarTranslucent:[[command argumentAtIndex:2 withDefault:@(NO)] boolValue]];
+
     // queue [processor scanBarcode] to run on the event loop
     [processor performSelector:@selector(scanBarcode) withObject:nil afterDelay:0];
 }
@@ -268,6 +269,9 @@ parentViewController:(UIViewController*)parentViewController
     self.is2D      = YES;
     self.capturing = NO;
     self.results = [NSMutableArray new];
+    
+    self.hasToolbarBlack = NO;
+    self.hasToolbarTranslucent = NO;
     
     CFURLRef soundFileURLRef  = CFBundleCopyResourceURL(CFBundleGetMainBundle(), CFSTR("CDVBarcodeScanner.bundle/beep"), CFSTR ("caf"), NULL);
     AudioServicesCreateSystemSoundID(soundFileURLRef, &_soundFileObject);
@@ -933,6 +937,14 @@ parentViewController:(UIViewController*)parentViewController
 
     UIToolbar* toolbar = [[UIToolbar alloc] init];
     toolbar.autoresizingMask = UIViewAutoresizingFlexibleWidth | UIViewAutoresizingFlexibleTopMargin;
+    CDVbcsProcessor* processor = self.processor;
+    if (processor.hasToolbarBlack)
+    {
+        [toolbar setBarStyle:UIBarStyleBlack];
+        [toolbar setTintColor:[UIColor whiteColor]];
+    }
+    if (processor.hasToolbarTranslucent)
+        [toolbar setAlpha:0.7];
     
     id cancelButton = [[UIBarButtonItem alloc]
                        initWithBarButtonSystemItem:UIBarButtonSystemItemCancel

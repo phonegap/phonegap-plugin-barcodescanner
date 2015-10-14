@@ -133,6 +133,12 @@ A full example could be:
    );
 ```
 
+### iOS
+optional parameters:
+* the name of an alternate xib file
+* a boolean (default false) to change the standard coloring of the toolbar from white with blue buttons to black with white buttons
+* a boolean (default false) to change the toolbar from opaque to translucent (setting alpha to 0.7)
+
 ## Encoding a Barcode ##
 
 The plugin creates the object `cordova.plugins.barcodeScanner` with the method `encode(type, data, success, fail)`. 
