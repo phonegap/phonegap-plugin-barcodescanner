@@ -584,6 +584,8 @@ parentViewController:(UIViewController*)parentViewController
 // zxing needs.
 //--------------------------------------------------------------------------
 - (zxing::Ref<zxing::LuminanceSource>) getLuminanceSourceFromSample:(CMSampleBufferRef)sampleBuffer imageBytes:(uint8_t**)ptr {
+    UIInterfaceOrientation ori = [[UIApplication sharedApplication] statusBarOrientation];
+    
     CVImageBufferRef imageBuffer = CMSampleBufferGetImageBuffer(sampleBuffer);
     CVPixelBufferLockBaseAddress(imageBuffer, 0);
     
@@ -592,9 +594,10 @@ parentViewController:(UIViewController*)parentViewController
     size_t   height      =            CVPixelBufferGetHeight(imageBuffer);
     uint8_t* baseAddress = (uint8_t*) CVPixelBufferGetBaseAddress(imageBuffer);
     
-    // only going to get 90% of the min(width,height) of the captured image
-    size_t    greyWidth  = 9 * MIN(width, height) / 10;
-    uint8_t*  greyData   = (uint8_t*) malloc(greyWidth * greyWidth);
+    // only going to get 90% of the width/height of the captured image
+    size_t    greyHeight = 9 * MIN(width, height) / 10
+    ,         greyWidth  = UIInterfaceOrientationIsLandscape(ori) ? 9 * MAX(width, height) / 10 : greyHeight;
+    uint8_t*  greyData   = (uint8_t*) malloc(greyWidth * greyHeight);
     
     // remember this pointer so we can free it later
     *ptr = greyData;
@@ -605,15 +608,15 @@ parentViewController:(UIViewController*)parentViewController
     }
     
     size_t offsetX = (width  - greyWidth) / 2;
-    size_t offsetY = (height - greyWidth) / 2;
+    size_t offsetY = (height - greyHeight) / 2;
     
     // pixel-by-pixel ...
     for (size_t i=0; i<greyWidth; i++) {
-        for (size_t j=0; j<greyWidth; j++) {
+        for (size_t j=0; j<greyHeight; j++) {
             // i,j are the coordinates from the sample buffer
             // ni, nj are the coordinates in the LuminanceSource
             // in this case, there's a rotation taking place
-            size_t ni = greyWidth-j;
+            size_t ni = greyHeight-j;
             size_t nj = i;
             
             size_t baseOffset = (j+offsetY)*bytesPerRow + (i + offsetX)*4;
@@ -624,7 +627,7 @@ parentViewController:(UIViewController*)parentViewController
             0.59 * baseAddress[baseOffset + 1] +
             0.30 * baseAddress[baseOffset + 2];
             
-            greyData[nj*greyWidth + ni] = value;
+            greyData[nj*greyHeight + ni] = value;
         }
     }
     
@@ -633,7 +636,7 @@ parentViewController:(UIViewController*)parentViewController
     using namespace zxing;
     
     Ref<LuminanceSource> luminanceSource (
-                                          new GreyscaleLuminanceSource(greyData, (int)greyWidth, (int)greyWidth, 0, 0, (int)greyWidth, (int)greyWidth)
+                                          new GreyscaleLuminanceSource(greyData, (int)greyHeight, (int)greyWidth, 0, 0, (int)greyHeight, (int)greyWidth)
                                           );
     
     return luminanceSource;
@@ -1008,16 +1011,24 @@ parentViewController:(UIViewController*)parentViewController
     
     [overlayView addSubview: toolbar];
     
-    UIImage* reticleImage = [self buildReticleImage];
-    UIView* reticleView = [[UIImageView alloc] initWithImage: reticleImage];
-    CGFloat minAxis = MIN(rootViewHeight, rootViewWidth);
+    [overlayView addSubview: [self buildReticleView:bounds]];
     
-    rectArea = CGRectMake(
-                          0.5 * (rootViewWidth  - minAxis),
-                          0.5 * (rootViewHeight - minAxis),
-                          minAxis,
-                          minAxis
-                          );
+    return overlayView;
+}
+
+- (UIView *)buildReticleView:(CGRect)bounds {
+    UIImage* reticleImage   = [self buildReticleImage];
+    UIView*  reticleView    = [[UIImageView alloc] initWithImage: reticleImage];
+    CGFloat  rootViewHeight = CGRectGetHeight(bounds)
+    ,        rootViewWidth  = CGRectGetWidth(bounds);
+    CGFloat  minAxis        = MIN(rootViewHeight, rootViewWidth);
+    
+    CGRect  rectArea        = CGRectMake(
+                                         0,
+                                         0.5 * (rootViewHeight - minAxis),
+                                         rootViewWidth,
+                                         minAxis
+                                         );
     
     [reticleView setFrame:rectArea];
     
@@ -1030,9 +1041,7 @@ parentViewController:(UIViewController*)parentViewController
     | UIViewAutoresizingFlexibleBottomMargin
     ;
     
-    [overlayView addSubview: reticleView];
-    
-    return overlayView;
+    return reticleView;
 }
 
 //--------------------------------------------------------------------------
@@ -1047,7 +1056,8 @@ parentViewController:(UIViewController*)parentViewController
 //-------------------------------------------------------------------------
 - (UIImage*)buildReticleImage {
     UIImage* result;
-    UIGraphicsBeginImageContext(CGSizeMake(RETICLE_SIZE, RETICLE_SIZE));
+    CGFloat widthFactor = UIInterfaceOrientationIsLandscape([[UIApplication sharedApplication] statusBarOrientation]) ? 2 : 1;
+    UIGraphicsBeginImageContext(CGSizeMake(widthFactor*RETICLE_SIZE, RETICLE_SIZE));
     CGContextRef context = UIGraphicsGetCurrentContext();
     
     if (self.processor.is1D) {
@@ -1057,7 +1067,7 @@ parentViewController:(UIViewController*)parentViewController
         CGContextBeginPath(context);
         CGFloat lineOffset = RETICLE_OFFSET+(0.5*RETICLE_WIDTH);
         CGContextMoveToPoint(context, lineOffset, RETICLE_SIZE/2);
-        CGContextAddLineToPoint(context, RETICLE_SIZE-lineOffset, 0.5*RETICLE_SIZE);
+        CGContextAddLineToPoint(context, widthFactor*RETICLE_SIZE-lineOffset, 0.5*RETICLE_SIZE);
         CGContextStrokePath(context);
     }
     
@@ -1069,7 +1079,7 @@ parentViewController:(UIViewController*)parentViewController
                             CGRectMake(
                                        RETICLE_OFFSET,
                                        RETICLE_OFFSET,
-                                       RETICLE_SIZE-2*RETICLE_OFFSET,
+                                       widthFactor*RETICLE_SIZE-2*RETICLE_OFFSET,
                                        RETICLE_SIZE-2*RETICLE_OFFSET
                                        )
                             );
@@ -1113,6 +1123,14 @@ parentViewController:(UIViewController*)parentViewController
 
 - (void) willAnimateRotationToInterfaceOrientation:(UIInterfaceOrientation)orientation duration:(NSTimeInterval)duration
 {
+    UIView *overlayView = nil;
+    if (self.alternateXib == nil)
+    {
+        overlayView = self.view.subviews[0];
+        UIView *reticleView = overlayView.subviews[1];
+        [reticleView removeFromSuperview];
+    }
+    
     [CATransaction begin];
     
     self.processor.previewLayer.connection.videoOrientation = orientation;
@@ -1120,6 +1138,10 @@ parentViewController:(UIViewController*)parentViewController
     self.processor.previewLayer.frame = self.view.bounds;
     
     [CATransaction commit];
+    
+    if (overlayView)
+        [overlayView addSubview: [self buildReticleView:overlayView.bounds]];
+    
     [super willAnimateRotationToInterfaceOrientation:orientation duration:duration];
 }
 
