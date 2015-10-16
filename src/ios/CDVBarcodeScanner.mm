@@ -855,6 +855,7 @@ parentViewController:(UIViewController*)parentViewController
 
 //--------------------------------------------------------------------------
 - (void)viewWillAppear:(BOOL)animated {
+    [super viewWillAppear:animated];
     
     // set video orientation to what the camera sees
     self.processor.previewLayer.connection.videoOrientation = [[UIApplication sharedApplication] statusBarOrientation];
