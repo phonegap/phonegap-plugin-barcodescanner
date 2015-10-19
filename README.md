@@ -133,11 +133,11 @@ A full example could be:
    );
 ```
 
-### iOS
-optional parameters:
-* the name of an alternate xib file
-* a boolean (default false) to change the standard coloring of the toolbar from white with blue buttons to black with white buttons
-* a boolean (default false) to change the toolbar from opaque to translucent (setting alpha to 0.7)
+### Preferences (iOS)
+
+-  __BarcodeToolbarBlack__ (boolean, defaults to false). If set to true changes the standard coloring of the toolbar from white with blue buttons to black with white buttons.
+
+-  __BarcodeToolbarTranslucent__ (boolean, defaults to false). If set to true changes the toolbar from opaque to translucent (setting alpha to 0.7)
 
 ## Encoding a Barcode ##
 

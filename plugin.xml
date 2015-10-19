@@ -2,10 +2,10 @@
     xmlns:android="http://schemas.android.com/apk/res/android"
     xmlns:rim="http://www.blackberry.com/ns/widgets"
     id="phonegap-plugin-barcodescanner"
-    version="4.0.2.1">
+    version="4.0.2.2">
 
     <name>BarcodeScanner</name>
-    <description>You can use the BarcodeScanner plugin to scan different types of barcodes (using the device's camera) and get the metadata encoded in them for processing within your application. (version by convey 4.0.2.1 with enhancements for iOS)</description>
+    <description>You can use the BarcodeScanner plugin to scan different types of barcodes (using the device's camera) and get the metadata encoded in them for processing within your application. (Version by convey 4.0.2.2 with enhancements for iOS)</description>
     <license>MIT</license>
 
     <repo>https://github.com/wildabeast/BarcodeScanner</repo>

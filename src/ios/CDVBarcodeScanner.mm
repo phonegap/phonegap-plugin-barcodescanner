@@ -56,10 +56,10 @@
 // class that does the grunt work
 //------------------------------------------------------------------------------
 @interface CDVbcsProcessor : NSObject <AVCaptureVideoDataOutputSampleBufferDelegate> {}
-@property (nonatomic, retain) CDVBarcodeScanner*           plugin;
+@property (nonatomic, retain) CDVBarcodeScanner*          plugin;
 @property (nonatomic, retain) NSString*                   callback;
 @property (nonatomic, retain) UIViewController*           parentViewController;
-@property (nonatomic, retain) CDVbcsViewController*        viewController;
+@property (nonatomic, retain) CDVbcsViewController*       viewController;
 @property (nonatomic, retain) AVCaptureSession*           captureSession;
 @property (nonatomic, retain) AVCaptureVideoPreviewLayer* previewLayer;
 @property (nonatomic, retain) NSString*                   alternateXib;
@@ -106,7 +106,7 @@
 // view controller for the ui
 //------------------------------------------------------------------------------
 @interface CDVbcsViewController : UIViewController <CDVBarcodeScannerOrientationDelegate> {}
-@property (nonatomic, retain) CDVbcsProcessor*  processor;
+@property (nonatomic, retain) CDVbcsProcessor* processor;
 @property (nonatomic, retain) NSString*        alternateXib;
 @property (nonatomic)         BOOL             shutterPressed;
 @property (nonatomic, retain) IBOutlet UIView* overlayView;
@@ -162,8 +162,11 @@
                  parentViewController:self.viewController
                  alterateOverlayXib:overlayXib
                  ];
-    [processor setHasToolbarBlack:[[command argumentAtIndex:1 withDefault:@(NO)] boolValue]];
-    [processor setHasToolbarTranslucent:[[command argumentAtIndex:2 withDefault:@(NO)] boolValue]];
+
+    id toolbarBlack = [self.commandDelegate.settings objectForKey:[@"BarcodeToolbarBlack" lowercaseString]]
+    ,  toolbarTrans = [self.commandDelegate.settings objectForKey:[@"BarcodeToolbarTranslucent" lowercaseString]];
+    [processor setHasToolbarBlack:[(NSNumber*)toolbarBlack boolValue]];
+    [processor setHasToolbarTranslucent:[(NSNumber*)toolbarTrans boolValue]];
 
     // queue [processor scanBarcode] to run on the event loop
     [processor performSelector:@selector(scanBarcode) withObject:nil afterDelay:0];
@@ -273,7 +276,7 @@ parentViewController:(UIViewController*)parentViewController
     self.hasToolbarBlack = NO;
     self.hasToolbarTranslucent = NO;
     
-    CFURLRef soundFileURLRef  = CFBundleCopyResourceURL(CFBundleGetMainBundle(), CFSTR("CDVBarcodeScanner.bundle/beep"), CFSTR ("caf"), NULL);
+    CFURLRef soundFileURLRef = CFBundleCopyResourceURL(CFBundleGetMainBundle(), CFSTR("CDVBarcodeScanner.bundle/beep"), CFSTR ("caf"), NULL);
     AudioServicesCreateSystemSoundID(soundFileURLRef, &_soundFileObject);
     
     return self;
