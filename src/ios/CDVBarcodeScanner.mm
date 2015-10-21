@@ -187,15 +187,12 @@
                  stringToEncode: command.arguments[0][@"data"]
                  ];
     
-    [processor retain];
-    [processor retain];
-    [processor retain];
     // queue [processor generateImage] to run on the event loop
     [processor performSelector:@selector(generateImage) withObject:nil afterDelay:0];
 }
 
 - (void)returnImage:(NSString*)filePath format:(NSString*)format callback:(NSString*)callback{
-    NSMutableDictionary* resultDict = [[[NSMutableDictionary alloc] init] autorelease];
+    NSMutableDictionary* resultDict = [[NSMutableDictionary alloc] init];
     [resultDict setObject:format forKey:@"format"];
     [resultDict setObject:filePath forKey:@"file"];
     
@@ -278,6 +275,7 @@ parentViewController:(UIViewController*)parentViewController
     
     CFURLRef soundFileURLRef = CFBundleCopyResourceURL(CFBundleGetMainBundle(), CFSTR("CDVBarcodeScanner.bundle/beep"), CFSTR ("caf"), NULL);
     AudioServicesCreateSystemSoundID(soundFileURLRef, &_soundFileObject);
+    CFRelease(soundFileURLRef);
     
     return self;
 }
@@ -298,8 +296,6 @@ parentViewController:(UIViewController*)parentViewController
     
     AudioServicesRemoveSystemSoundCompletion(_soundFileObject);
     AudioServicesDisposeSystemSoundID(_soundFileObject);
-    
-    [super dealloc];
 }
 
 //--------------------------------------------------------------------------
@@ -751,9 +747,8 @@ parentViewController:(UIViewController*)parentViewController
     self.plugin = nil;
     self.callback = nil;
     self.stringToEncode = nil;
-    
-    [super dealloc];
 }
+
 //--------------------------------------------------------------------------
 - (void)generateImage{
     /* setup qr filter */
@@ -835,7 +830,6 @@ parentViewController:(UIViewController*)parentViewController
     self.alternateXib = nil;
     self.overlayView = nil;
     switchTorchBtn = nil;
-    [super dealloc];
 }
 
 //--------------------------------------------------------------------------

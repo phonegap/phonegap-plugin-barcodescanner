@@ -32,7 +32,7 @@ It is also possible to install via repo url directly ( unstable )
 - Browser
 
 Note: the Android source for this project includes an Android Library Project.
-plugman currently doesn't support Library Project refs, so its been
+plugman currently doesn't support Library Project refs, so it's been
 prebuilt as a jar library. Any updates to the Library Project should be
 committed with an updated jar.
 
@@ -137,7 +137,7 @@ A full example could be:
 
 -  __BarcodeToolbarBlack__ (boolean, defaults to false). If set to true changes the standard coloring of the toolbar from white with blue buttons to black with white buttons.
 
--  __BarcodeToolbarTranslucent__ (boolean, defaults to false). If set to true changes the toolbar from opaque to translucent (setting alpha to 0.7)
+-  __BarcodeToolbarTranslucent__ (boolean, defaults to false). If set to true changes the toolbar from opaque to translucent (setting alpha to 0.7).
 
 ## Encoding a Barcode ##
 
