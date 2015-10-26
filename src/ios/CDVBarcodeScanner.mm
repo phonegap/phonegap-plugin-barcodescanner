@@ -72,6 +72,8 @@
 @property (nonatomic, retain) AVCaptureDevice*            inputDevice;
 @property (nonatomic)         BOOL                        hasToolbarBlack;
 @property (nonatomic)         BOOL                        hasToolbarTranslucent;
+@property (nonatomic)         NSInteger                   orientationMaskPhone;
+@property (nonatomic)         NSInteger                   orientationMaskPad;
 
 
 - (id)initWithPlugin:(CDVBarcodeScanner*)plugin callback:(NSString*)callback parentViewController:(UIViewController*)parentViewController alterateOverlayXib:(NSString *)alternateXib;
@@ -163,10 +165,15 @@
                  alterateOverlayXib:overlayXib
                  ];
 
-    id toolbarBlack = [self.commandDelegate.settings objectForKey:[@"BarcodeToolbarBlack" lowercaseString]]
-    ,  toolbarTrans = [self.commandDelegate.settings objectForKey:[@"BarcodeToolbarTranslucent" lowercaseString]];
+    NSDictionary* settings = self.commandDelegate.settings;
+    id toolbarBlack = [settings objectForKey:[@"BarcodeToolbarBlack" lowercaseString]]
+    ,  toolbarTrans = [settings objectForKey:[@"BarcodeToolbarTranslucent" lowercaseString]]
+    ,  oriMaskPhone = [settings objectForKey:[@"BarcodeOrientationMaskPhone" lowercaseString]]
+    ,  oriMaskPad   = [settings objectForKey:[@"BarcodeOrientationMaskPad" lowercaseString]];
     [processor setHasToolbarBlack:[(NSNumber*)toolbarBlack boolValue]];
     [processor setHasToolbarTranslucent:[(NSNumber*)toolbarTrans boolValue]];
+    [processor setOrientationMaskPhone:[(NSNumber*)oriMaskPhone integerValue]];
+    [processor setOrientationMaskPad:[(NSNumber*)oriMaskPad integerValue]];
 
     // queue [processor scanBarcode] to run on the event loop
     [processor performSelector:@selector(scanBarcode) withObject:nil afterDelay:0];
@@ -272,6 +279,8 @@ parentViewController:(UIViewController*)parentViewController
     
     self.hasToolbarBlack = NO;
     self.hasToolbarTranslucent = NO;
+    self.orientationMaskPhone = 0;
+    self.orientationMaskPad = 0;
     
     CFURLRef soundFileURLRef = CFBundleCopyResourceURL(CFBundleGetMainBundle(), CFSTR("CDVBarcodeScanner.bundle/beep"), CFSTR ("caf"), NULL);
     AudioServicesCreateSystemSoundID(soundFileURLRef, &_soundFileObject);
@@ -834,32 +843,46 @@ parentViewController:(UIViewController*)parentViewController
 
 //--------------------------------------------------------------------------
 - (void)loadView {
-    self.view = [[UIView alloc] initWithFrame: self.processor.parentViewController.view.frame];
-    
-    // setup capture preview layer
-    AVCaptureVideoPreviewLayer* previewLayer = self.processor.previewLayer;
-    previewLayer.frame = self.view.bounds;
-    previewLayer.videoGravity = AVLayerVideoGravityResizeAspectFill;
-    
-    if ([previewLayer.connection isVideoOrientationSupported]) {
-        [previewLayer.connection setVideoOrientation:AVCaptureVideoOrientationPortrait];
-    }
-    
-    [self.view.layer insertSublayer:previewLayer below:[[self.view.layer sublayers] objectAtIndex:0]];
-    
-    [self.view addSubview:[self buildOverlayView]];
+    self.view = [[UIView alloc] init];
 }
 
 //--------------------------------------------------------------------------
 - (void)viewWillAppear:(BOOL)animated {
     [super viewWillAppear:animated];
+
+    // it can happen that self and/or parent don't support all/the same orientations
+    // and therefore eventually differ in orientation
+    UIInterfaceOrientation ori =[[UIApplication sharedApplication] statusBarOrientation];
+    CGRect theFrame = self.processor.parentViewController.view.frame;
+    CGFloat w = theFrame.size.width
+    ,       h = theFrame.size.height
+    ,       l = MAX(w, h)
+    ,       s = MIN(w, h);
     
-    // set video orientation to what the camera sees
-    self.processor.previewLayer.connection.videoOrientation = [[UIApplication sharedApplication] statusBarOrientation];
+    if (UIInterfaceOrientationIsPortrait(ori)) {
+        w = s;
+        h = l;
+    }
+    else {
+        w = l;
+        h = s;
+    }
+    theFrame = CGRectMake(0.0, 0.0, w, h);
+    self.view.frame = theFrame;
+
+    // setup capture preview layer
+    AVCaptureVideoPreviewLayer* previewLayer = self.processor.previewLayer;
+    previewLayer.frame = theFrame;
+    previewLayer.videoGravity = AVLayerVideoGravityResizeAspectFill;
     
-    // this fixes the bug when the statusbar is landscape, and the preview layer
-    // starts up in portrait (not filling the whole view)
-    self.processor.previewLayer.frame = self.view.bounds;
+    if ([previewLayer.connection isVideoOrientationSupported]) {
+        // set video orientation to what the camera sees
+        [previewLayer.connection setVideoOrientation:ori];
+    }
+    
+    [self.view.layer insertSublayer:previewLayer below:[[self.view.layer sublayers] objectAtIndex:0]];
+    
+    [self.view addSubview:[self buildOverlayView]];
 }
 
 //--------------------------------------------------------------------------
@@ -975,7 +998,7 @@ parentViewController:(UIViewController*)parentViewController
                         ];
 #endif
 
-    if (self.processor.inputDevice.hasTorch)
+    if (processor.inputDevice.hasTorch)
     {
         switchTorchBtn = [[UIBarButtonItem alloc]
                           initWithImage:[UIImage imageNamed:@"icons8FlashOn"]
@@ -989,7 +1012,7 @@ parentViewController:(UIViewController*)parentViewController
                          flexSpace, shutterButton,
 #endif
                          nil];
-        [switchTorchBtn setEnabled:self.processor.inputDevice.torchAvailable];
+        [switchTorchBtn setEnabled:processor.inputDevice.torchAvailable];
     }
     else
         toolbar.items = [NSArray arrayWithObjects:cancelButton, flexSpace, flipCamera,
@@ -1101,13 +1124,20 @@ parentViewController:(UIViewController*)parentViewController
 
 //- (UIInterfaceOrientation)preferredInterfaceOrientationForPresentation {}
 
-- (NSUInteger)supportedInterfaceOrientations
+- (UIInterfaceOrientationMask)supportedInterfaceOrientations
 {
-    if ((self.orientationDelegate != nil) && [self.orientationDelegate respondsToSelector:@selector(supportedInterfaceOrientations)]) {
-        return [self.orientationDelegate supportedInterfaceOrientations];
+    UIUserInterfaceIdiom uiuii = UI_USER_INTERFACE_IDIOM();
+    CDVbcsProcessor* processor = self.processor;
+    UIInterfaceOrientationMask mask = (uiuii == UIUserInterfaceIdiomPhone ? processor.orientationMaskPhone : processor.orientationMaskPad);
+    
+    if (mask == 0) {
+        if ((self.orientationDelegate != nil) && [self.orientationDelegate respondsToSelector:@selector(supportedInterfaceOrientations)])
+            return [self.orientationDelegate supportedInterfaceOrientations];
+        else
+            return (uiuii == UIUserInterfaceIdiomPhone ? UIInterfaceOrientationMaskAllButUpsideDown : UIInterfaceOrientationMaskAll);
     }
     
-    return (UI_USER_INTERFACE_IDIOM() == UIUserInterfaceIdiomPhone ? UIInterfaceOrientationMaskAllButUpsideDown : UIInterfaceOrientationMaskAll);
+    return mask;
 }
 
 - (BOOL)shouldAutorotateToInterfaceOrientation:(UIInterfaceOrientation)interfaceOrientation
