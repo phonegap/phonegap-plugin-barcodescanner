@@ -33,6 +33,16 @@ namespace Cordova.Extension.Commands
 			});
 		}
 
+		public void hasCameraPermission(string options)
+		{
+			DispatchCommandResult(new PluginResult(PluginResult.Status.OK));
+		}
+
+		public void requestCameraPermission(string options)
+		{
+			DispatchCommandResult(new PluginResult(PluginResult.Status.OK));
+		}
+
 		public void OnScanFailed(string error)
 		{
 			this.DispatchCommandResult(new PluginResult(PluginResult.Status.ERROR, error));

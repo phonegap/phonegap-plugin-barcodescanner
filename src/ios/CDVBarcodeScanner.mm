@@ -47,6 +47,8 @@
 @interface CDVBarcodeScanner : CDVPlugin {}
 - (NSString*)isScanNotPossible;
 - (void)scan:(CDVInvokedUrlCommand*)command;
+- (void)hasCameraPermission:(CDVInvokedUrlCommand*)command;
+- (void)requestCameraPermission:(CDVInvokedUrlCommand*)command;
 - (void)encode:(CDVInvokedUrlCommand*)command;
 - (void)returnSuccess:(NSString*)scannedText format:(NSString*)format cancelled:(BOOL)cancelled flipped:(BOOL)flipped callback:(NSString*)callback;
 - (void)returnError:(NSString*)message callback:(NSString*)callback;
@@ -124,6 +126,16 @@
 }
 
 //--------------------------------------------------------------------------
+- (void)hasCameraPermission:(CDVInvokedUrlCommand*)command {
+    CDVPluginResult* pluginResult = [CDVPluginResult resultWithStatus:CDVCommandStatus_OK messageAsInt:YES];
+    [self.commandDelegate sendPluginResult:pluginResult callbackId:command.callbackId];
+}
+
+- (void)requestCameraPermission:(CDVInvokedUrlCommand*)command {
+    CDVPluginResult* pluginResult = [CDVPluginResult resultWithStatus:CDVCommandStatus_OK];
+    [self.commandDelegate sendPluginResult:pluginResult callbackId:command.callbackId];
+}
+
 - (void)scan:(CDVInvokedUrlCommand*)command {
     CDVbcsProcessor* processor;
     NSString*       callback;
