@@ -62,7 +62,7 @@ And on Android you can also pass in these:
 
 
 A full example could be:
-```
+```js
    cordova.plugins.barcodeScanner.scan(
       function (result) {
           alert("We got a barcode\n" +
@@ -82,6 +82,36 @@ A full example could be:
    );
 ```
 
+## Checking permission
+On Android 6 you need to request permission to use the camera at runtime when targeting API level 23+.
+Even if the `uses-permission` tag for the Camera is present in `AndroidManifest.xml`.
+
+Note that `hasCameraPermission` will return true when:
+* You're running this on iOS, or
+* You're targeting an API level lower than 23, or
+* You're using Android < 6, or
+* You've already granted permission.
+
+```js
+  function hasCameraPermission() {
+    cordova.plugins.barcodeScanner.hasCameraPermission(
+      function(result) {
+        // if this is 'false' you probably want to call 'requestCameraPermission' now
+        alert(result);
+      }
+    )
+  }
+
+  function requestCameraPermission() {
+    // no callbacks required as this opens a popup which returns async
+    cordova.plugins.barcodeScanner.requestCameraPermission();
+  }
+```
+
+Note that backward compatibility was added by checking for permission in the `scan` function.
+If permission is needed the `scan` method will now show the permission request popup.
+The user will then need to allow camera access and launch the scanner again.
+
 ## Encoding a Barcode ##
 The plugin creates the object `cordova.plugins.barcodeScanner` with the method `encode(type, data, success, fail)`. 
 Supported encoding types:
@@ -91,9 +121,8 @@ Supported encoding types:
 * PHONE_TYPE
 * SMS_TYPE
 
-```
 A full example could be:
-
+```JS
    cordova.plugins.barcodeScanner.encode(BarcodeScanner.Encode.TEXT_TYPE, "http://www.nytimes.com", function(success) {
   	        alert("encode success: " + success);
   	      }, function(fail) {

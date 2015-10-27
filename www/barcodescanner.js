@@ -29,6 +29,14 @@
                 //  CONTACT_TYPE: "CONTACT_TYPE",  // TODO:  not implemented, requires passing a Bundle class from Javascript to Java
                 //  LOCATION_TYPE: "LOCATION_TYPE" // TODO:  not implemented, requires passing a Bundle class from Javascript to Java
             };
+        }
+
+        BarcodeScanner.prototype.hasCameraPermission = function (callback) {
+            exec(callback, null, 'BarcodeScanner', 'hasCameraPermission', []);
+        };
+
+        BarcodeScanner.prototype.requestCameraPermission = function (callback) {
+            exec(callback, null, 'BarcodeScanner', 'requestCameraPermission', []);
         };
 
   /**

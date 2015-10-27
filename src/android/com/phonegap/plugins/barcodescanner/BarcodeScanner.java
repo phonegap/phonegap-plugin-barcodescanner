@@ -8,19 +8,25 @@
  */
 package com.phonegap.plugins.barcodescanner;
 
-import com.google.zxing.BarcodeFormat;
 import com.google.zxing.client.android.Intents;
+
+import org.apache.cordova.PluginResult;
 import org.json.JSONArray;
 import org.json.JSONException;
 import org.json.JSONObject;
 
+import android.Manifest;
 import android.app.Activity;
 import android.content.Intent;
+import android.content.pm.PackageManager;
+import android.os.Build;
+import android.support.annotation.NonNull;
+import android.support.v4.app.ActivityCompat;
+import android.support.v4.content.ContextCompat;
 import android.util.Log;
 
 import org.apache.cordova.CordovaPlugin;
 import org.apache.cordova.CallbackContext;
-import org.apache.cordova.PluginResult;
 
 /**
  * This calls out to the ZXing barcode reader and returns the result.
@@ -30,6 +36,8 @@ import org.apache.cordova.PluginResult;
 public class BarcodeScanner extends CordovaPlugin {
     public static final int REQUEST_CODE = 0x0ba7c0de;
 
+    private static final String REQUEST_CAMERA_PERMISSION = "requestCameraPermission";
+    private static final String HAS_CAMERA_PERMISSION = "hasCameraPermission";
     private static final String SCAN = "scan";
     private static final String ENCODE = "encode";
     private static final String CANCELLED = "cancelled";
@@ -103,16 +111,49 @@ public class BarcodeScanner extends CordovaPlugin {
             }
         } else if (action.equals(SCAN)) {
             scan(args.optJSONObject(0));
+        } else if (action.equals(HAS_CAMERA_PERMISSION)) {
+            hasCameraPermission();
+        } else if (action.equals(REQUEST_CAMERA_PERMISSION)) {
+            requestCameraPermission();
         } else {
             return false;
         }
         return true;
     }
 
-    /**
-     * Starts an intent to scan and decode a barcode.
-     */
+    public void hasCameraPermission() {
+        this.callbackContext.sendPluginResult(new PluginResult(PluginResult.Status.OK, cameraPermissionGranted()));
+    }
+
+    private boolean cameraPermissionGranted() {
+        boolean hasPermission = Build.VERSION.SDK_INT < 23; // Android M. (6.0)
+        if (!hasPermission) {
+            hasPermission = PackageManager.PERMISSION_GRANTED == ContextCompat.checkSelfPermission(this.cordova.getActivity(), Manifest.permission.CAMERA);
+        }
+        return hasPermission;
+    }
+
+    public void requestCameraPermission() {
+        if (!cameraPermissionGranted()) {
+            ActivityCompat.requestPermissions(
+                this.cordova.getActivity(),
+                new String[]{Manifest.permission.CAMERA},
+                444);
+        }
+        // this method executes async and we seem to have no known way to receive the result, so simply returning ok now
+        this.callbackContext.success();
+    }
+
     public void scan(JSONObject obj) {
+
+        // note that if the dev didn't call requestCameraPermission before scan and cameraPermissionGranted returns false,
+        // then the app will ask permission and the scan method needs to be invoked again (done for backward compat).
+        if (!cameraPermissionGranted()) {
+            requestCameraPermission();
+            this.callbackContext.error("Please allow camera access and try again.");
+            return;
+        }
+
         Intent intentScan = new Intent(SCAN_INTENT);
         intentScan.addCategory(Intent.CATEGORY_DEFAULT);
         // avoid calling other apps using the same intent filter action
