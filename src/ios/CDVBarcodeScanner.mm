@@ -243,6 +243,9 @@
 // class that does the grunt work
 //------------------------------------------------------------------------------
 @implementation CDVbcsProcessor
+{
+    NSInteger cycle;
+}
 
 @synthesize plugin               = _plugin;
 @synthesize callback             = _callback;
@@ -275,12 +278,14 @@ parentViewController:(UIViewController*)parentViewController
     self.is1D      = YES;
     self.is2D      = YES;
     self.capturing = NO;
-    self.results = [NSMutableArray new];
+    self.results   = [NSMutableArray new];
     
-    self.hasToolbarBlack = NO;
+    self.hasToolbarBlack       = NO;
     self.hasToolbarTranslucent = NO;
-    self.orientationMaskPhone = 0;
-    self.orientationMaskPad = 0;
+    self.orientationMaskPhone  = 0;
+    self.orientationMaskPad    = 0;
+    
+    cycle = 0;
     
     CFURLRef soundFileURLRef = CFBundleCopyResourceURL(CFBundleGetMainBundle(), CFSTR("CDVBarcodeScanner.bundle/beep"), CFSTR ("caf"), NULL);
     AudioServicesCreateSystemSoundID(soundFileURLRef, &_soundFileObject);
@@ -643,8 +648,11 @@ parentViewController:(UIViewController*)parentViewController
     
     using namespace zxing;
     
-    Ref<LuminanceSource> luminanceSource (
-                                          new GreyscaleLuminanceSource(greyData, (int)greyHeight, (int)greyWidth, 0, 0, (int)greyHeight, (int)greyWidth)
+    Ref<LuminanceSource> luminanceSource (new GreyscaleLuminanceSource(greyData,
+                                                                       (int)greyHeight, (int)greyWidth,
+                                                                       0, 0,
+                                                                       (int)greyHeight, (int)greyWidth,
+                                                                       (cycle++ % 5 == 0))
                                           );
     
     return luminanceSource;
