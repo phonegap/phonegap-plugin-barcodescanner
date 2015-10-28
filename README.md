@@ -59,7 +59,7 @@ The following barcode types are currently supported:
 
 ### iOS
 
-* QR_CODE
+* QR_CODE (even inverted!)
 * DATA_MATRIX
 * UPC_E
 * UPC_A
@@ -139,9 +139,9 @@ A full example could be:
 
 -  __BarcodeToolbarTranslucent__ (boolean, defaults to false). If set to true changes the toolbar from opaque to translucent (setting alpha to 0.7).
 
--  __BarcodeOrientationMaskPhone__ (integer, defaults to 0). If set to something other than 0, the orientation mask of the calling App (on iPhone) will be overridden, e.g., if the App only supports Portrait, the scanner could nonetheless also support landscape (for better recognition of long one-dimensional codes); for the example the value would be 26 (UIInterfaceOrientationMaskAllButUpsideDown); the other way round portrait only would be 2; for all possible values see Apple's documentation at developer.apple.com/library/prerelease/ios/documentation/UIKit/Reference/UIApplication_Class/index.html#//apple_ref/c/tdef/UIInterfaceOrientationMask. This is only supported for iOS Versions 6.0 and later.
+-  __BarcodeOrientationMaskPhone__ (integer, defaults to 0). If set to something other than 0, the orientation mask of the calling App (on iPhone) will be overridden, e.g., if the App only supports portrait, the scanner could nonetheless also support landscape (for better recognition of long one-dimensional codes); for this 26 (`UIInterfaceOrientationMaskAllButUpsideDown`) would be a good value; the other way round portrait only would be 2; for all possible values see [Apple's documentation](developer.apple.com/library/prerelease/ios/documentation/UIKit/Reference/UIApplication_Class/index.html#//apple_ref/c/tdef/UIInterfaceOrientationMask). This is only supported for iOS Versions 6.0 and later.
 
--  __BarcodeOrientationMaskPad__ (integer, defaults to 0). (Same as above just for iPad instead of iPhone; here the example value would be 30 (UIInterfaceOrientationMaskAll)).
+-  __BarcodeOrientationMaskPad__ (integer, defaults to 0). (Same as above just for iPad instead of iPhone; here the example value would be 30 (`UIInterfaceOrientationMaskAll`)).
 
 ## Encoding a Barcode ##
 
