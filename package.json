@@ -1,7 +1,7 @@
 {
   "name": "phonegap-plugin-barcodescanner",
-  "version": "4.0.2.4",
-  "description": "You can use the BarcodeScanner plugin to scan different types of barcodes (using the device's camera) and get the metadata encoded in them for processing within your application. (Version by convey 4.0.2.4 with enhancements for iOS)",
+  "version": "4.0.2",
+  "description": "You can use the BarcodeScanner plugin to scan different types of barcodes (using the device's camera) and get the metadata encoded in them for processing within your application.",
   "cordova": {
     "id": "phonegap-plugin-barcodescanner",
     "platforms": [
