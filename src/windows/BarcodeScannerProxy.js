@@ -118,9 +118,6 @@ module.exports = {
                             }
 
                             capturePreview.src = URL.createObjectURL(capture);
-                            capturePreview.onloadeddata = function () {
-                                updatePreviewForRotation();
-                            };
                             capturePreview.play();
 
                             // Insert preview frame and controls into page
