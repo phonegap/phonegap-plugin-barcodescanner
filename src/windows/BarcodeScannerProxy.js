@@ -22,8 +22,11 @@ module.exports = {
             capturePreviewAlignmentMark,
             captureCancelButton,
             capture,
-            reader;
+            reader,
+            prevRotDegree;
         
+        var rotateVideoOnOrientationChange = true;
+        var reverseVideoRotation = false;
         /**
          * Creates a preview frame and necessary objects
          */
@@ -44,6 +47,76 @@ module.exports = {
 
             capture = new Windows.Media.Capture.MediaCapture();
         }
+
+        function videoPreviewRotationLookup(displayOrientation, counterclockwise) {
+            var degreesToRotate;
+
+            switch (displayOrientation) {
+                case Windows.Graphics.Display.DisplayOrientations.landscape:
+                    degreesToRotate = 0;
+                    break;
+                case Windows.Graphics.Display.DisplayOrientations.portrait:
+                    if (counterclockwise) {
+                        degreesToRotate = 270;
+                    } else {
+                        degreesToRotate = 90;
+                    }
+                    break;
+                case Windows.Graphics.Display.DisplayOrientations.landscapeFlipped:
+                    degreesToRotate = 180;
+                    break;
+                case Windows.Graphics.Display.DisplayOrientations.portraitFlipped:
+                    if (counterclockwise) {
+                        degreesToRotate = 90;
+                    } else {
+                        degreesToRotate = 270;
+                    }
+                    break;
+                default:
+                    degreesToRotate = 0;
+                    break;
+            }
+
+            return degreesToRotate;
+        }
+
+        function updatePreviewForRotation() {
+            if (!capture) {
+                return;
+            }
+            var rotDegree;
+            var videoEncodingProperties = capture.videoDeviceController.getMediaStreamProperties(Windows.Media.Capture.MediaStreamType.VideoPreview);
+
+            var previewMirroring = capture.getPreviewMirroring();
+            var counterclockwiseRotation = (previewMirroring && !reverseVideoRotation) ||
+                (!previewMirroring && reverseVideoRotation);
+
+            //Set the video subtype
+            var rotGUID = "{0xC380465D, 0x2271, 0x428C, {0x9B, 0x83, 0xEC, 0xEA, 0x3B, 0x4A, 0x85, 0xC1}}";
+
+
+            if (rotateVideoOnOrientationChange) {
+                // Lookup up the rotation degrees.  
+                rotDegree = videoPreviewRotationLookup(Windows.Graphics.Display.DisplayInformation.getForCurrentView().currentOrientation, counterclockwiseRotation);
+                if (typeof prevRotDegree === "undefined" || prevRotDegree !== rotDegree) {
+                    // rotate the preview video
+                    if (videoEncodingProperties.properties.hasKey(rotGUID)) {
+                        videoEncodingProperties.properties.remove(rotGUID);
+                    }
+                    videoEncodingProperties.properties.insert(rotGUID, rotDegree);
+                    capture.setEncodingPropertiesAsync(Windows.Media.Capture.MediaStreamType.VideoPreview, videoEncodingProperties, null);
+                    prevRotDegree = rotDegree;
+                }
+                // since "orientationchange" event might not work, poll for changes...
+                window.setTimeout(updatePreviewForRotation, 500);
+            } else {
+                if (typeof prevRotDegree === "undefined") {
+                    capture.setPreviewRotation(Windows.Media.Capture.VideoRotation.none);
+                    prevRotDegree = 0;
+                }
+            }
+        }
+
 
         /**
          * Starts stream transmission to preview frame and then run barcode search
@@ -111,13 +184,15 @@ module.exports = {
                         var maxResProps = deviceProps[0];
 
                         controller.setMediaStreamPropertiesAsync(Windows.Media.Capture.MediaStreamType.videoRecord, maxResProps).done(function () {
-                            // handle portrait orientation
-                            if (Windows.Graphics.Display.DisplayProperties.nativeOrientation == Windows.Graphics.Display.DisplayOrientations.portrait) {
-                                capture.setPreviewRotation(Windows.Media.Capture.VideoRotation.clockwise90Degrees);
-                                capturePreview.msZoom = true;
-                            }
-
                             capturePreview.src = URL.createObjectURL(capture);
+                            // handle orientation change
+                            rotateVideoOnOrientationChange = true;
+                            capturePreview.onloadeddata = function () {
+                                updatePreviewForRotation();
+                            };
+                            // add event handler - will not work anyway
+                            window.addEventListener("orientationchange", updatePreviewForRotation, false);
+
                             capturePreview.play();
 
                             // Insert preview frame and controls into page
@@ -153,6 +228,10 @@ module.exports = {
          * Removes preview frame and corresponding objects from window
          */
         function destroyPreview() {
+            // un-handle orientation change
+            rotateVideoOnOrientationChange = false;
+            // remove event handler
+            window.removeEventListener("orientationchange", updatePreviewForRotation);
 
             capturePreview.pause();
             capturePreview.src = null;
