@@ -149,7 +149,7 @@ module.exports = {
                         startBarcodeSearch(maxResProps.width, maxResProps.height);
                     });
                 });
-            }
+            });
         }
 
         /**
