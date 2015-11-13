@@ -23,7 +23,7 @@ module.exports = {
             captureCancelButton,
             capture,
             reader;
-            
+        
         /**
         * @param {Function<Object>} callback
         */
@@ -62,7 +62,7 @@ module.exports = {
                 // error happened
             });
         }
-        
+
         /**
          * Creates a preview frame and necessary objects
          */
@@ -78,7 +78,7 @@ module.exports = {
             // Create cancel button
             captureCancelButton = document.createElement("button");
             captureCancelButton.innerText = "Cancel";
-            captureCancelButton.style.cssText = "position: absolute; right: 0; bottom: 0; display: block; margin: 20px";
+            captureCancelButton.style.cssText = "position: absolute; right: 0; bottom: 0; display: block; padding: 20px; margin: 20px";
             captureCancelButton.addEventListener('click', cancelPreview, false);
 
             capture = new Windows.Media.Capture.MediaCapture();
@@ -90,66 +90,73 @@ module.exports = {
         function startPreview() {
             findCamera(function(id){
                 var captureSettings = new Windows.Media.Capture.MediaCaptureInitializationSettings();
-                captureSettings.streamingCaptureMode = Windows.Media.Capture.StreamingCaptureMode.video;
-                captureSettings.photoCaptureSource = Windows.Media.Capture.PhotoCaptureSource.videoPreview;
-                captureSettings.videoDeviceId = id;
-                
-                capture.initializeAsync(captureSettings).done(function () {
+            captureSettings.streamingCaptureMode = Windows.Media.Capture.StreamingCaptureMode.video;
+            captureSettings.photoCaptureSource = Windows.Media.Capture.PhotoCaptureSource.videoPreview;
+            captureSettings.videoDeviceId = id;
 
-                    //trying to set focus mode
-                    var controller = capture.videoDeviceController;
+            capture.initializeAsync(captureSettings).done(function () {
 
-                    if (controller.focusControl && controller.focusControl.supported) {
-                        if (controller.focusControl.configure) {
-                            var focusConfig = new Windows.Media.Devices.FocusSettings();
-                            focusConfig.autoFocusRange = Windows.Media.Devices.AutoFocusRange.macro;
+                //trying to set focus mode
+                var controller = capture.videoDeviceController;
 
-                            var supportContinuousFocus = controller.focusControl.supportedFocusModes.indexOf(Windows.Media.Devices.FocusMode.continuous).returnValue;
-                            var supportAutoFocus = controller.focusControl.supportedFocusModes.indexOf(Windows.Media.Devices.FocusMode.auto).returnValue;
+                if (controller.focusControl && controller.focusControl.supported) {
+                    if (controller.focusControl.configure) {
+                        var focusConfig = new Windows.Media.Devices.FocusSettings();
+                        focusConfig.autoFocusRange = Windows.Media.Devices.AutoFocusRange.macro;
 
-                            if (supportContinuousFocus) {
-                                focusConfig.mode = Windows.Media.Devices.FocusMode.continuous;
-                            } else if (supportAutoFocus) {                        
-                                focusConfig.mode = Windows.Media.Devices.FocusMode.auto;
-                            }
+                        var supportContinuousFocus = controller.focusControl.supportedFocusModes.indexOf(Windows.Media.Devices.FocusMode.continuous).returnValue;
+                        var supportAutoFocus = controller.focusControl.supportedFocusModes.indexOf(Windows.Media.Devices.FocusMode.auto).returnValue;
 
-                            controller.focusControl.configure(focusConfig);
-                            controller.focusControl.focusAsync();
+                        if (supportContinuousFocus) {
+                            focusConfig.mode = Windows.Media.Devices.FocusMode.continuous;
+                        } else if (supportAutoFocus) {                        
+                            focusConfig.mode = Windows.Media.Devices.FocusMode.auto;
                         }
+
+                        controller.focusControl.configure(focusConfig);
+                        controller.focusControl.focusAsync();
+                    }
+                }
+
+                //trying to disable flash
+
+                if(controller.flashControl && controller.flashControl.supported){
+                    controller.flashControl.enabled = false;
+                }
+
+                var deviceProps = controller.getAvailableMediaStreamProperties(Windows.Media.Capture.MediaStreamType.videoRecord);
+
+                deviceProps = Array.prototype.slice.call(deviceProps);
+                deviceProps = deviceProps.filter(function (prop) {
+                    // filter out streams with "unknown" subtype - causes errors on some devices
+                    return prop.subtype !== "Unknown";
+                }).sort(function (propA, propB) {
+                    // sort properties by resolution
+                    return propB.width - propA.width;
+                });
+
+                var maxResProps = deviceProps[0];
+
+                controller.setMediaStreamPropertiesAsync(Windows.Media.Capture.MediaStreamType.videoRecord, maxResProps).done(function () {
+                    // handle portrait orientation
+                    if (Windows.Graphics.Display.DisplayProperties.nativeOrientation == Windows.Graphics.Display.DisplayOrientations.portrait) {
+                        capture.setPreviewRotation(Windows.Media.Capture.VideoRotation.clockwise90Degrees);
+                        capturePreview.msZoom = true;
                     }
 
-                    var deviceProps = controller.getAvailableMediaStreamProperties(Windows.Media.Capture.MediaStreamType.videoRecord);
+                    capturePreview.src = URL.createObjectURL(capture);
+                    capturePreview.play();
 
-                    deviceProps = Array.prototype.slice.call(deviceProps);
-                    deviceProps = deviceProps.filter(function (prop) {
-                        // filter out streams with "unknown" subtype - causes errors on some devices
-                        return prop.subtype !== "Unknown";
-                    }).sort(function (propA, propB) {
-                        // sort properties by resolution
-                        return propB.width - propA.width;
-                    });
+                    // Insert preview frame and controls into page
+                    document.body.appendChild(capturePreview);
+                    document.body.appendChild(capturePreviewAlignmentMark);
+                    document.body.appendChild(captureCancelButton);
 
-                    var maxResProps = deviceProps[0];
-
-                    controller.setMediaStreamPropertiesAsync(Windows.Media.Capture.MediaStreamType.videoRecord, maxResProps).done(function () {
-                        // handle portrait orientation
-                        if (Windows.Graphics.Display.DisplayProperties.nativeOrientation == Windows.Graphics.Display.DisplayOrientations.portrait) {
-                            capture.setPreviewRotation(Windows.Media.Capture.VideoRotation.clockwise90Degrees);
-                            capturePreview.msZoom = true;
-                        }
-
-                        capturePreview.src = URL.createObjectURL(capture);
-                        capturePreview.play();
-
-                        // Insert preview frame and controls into page
-                        document.body.appendChild(capturePreview);
-                        document.body.appendChild(capturePreviewAlignmentMark);
-                        document.body.appendChild(captureCancelButton);
-
-                        startBarcodeSearch(maxResProps.width, maxResProps.height);
-                    });
+                    startBarcodeSearch(maxResProps.width, maxResProps.height);
                 });
             });
+            });
+            
         }
 
         /**
@@ -193,6 +200,7 @@ module.exports = {
          * See https://github.com/phonegap-build/BarcodeScanner#using-the-plugin
          */
         function cancelPreview() {
+            destroyPreview();
             reader && reader.stop();
         }
         
