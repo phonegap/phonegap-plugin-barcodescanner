@@ -119,6 +119,7 @@ module.exports = {
             captureCancelButton.innerText = "Cancel";
             captureCancelButton.style.cssText = "z-index:1000;position: absolute; right: 0; bottom: 0; display: block; padding: 20px; margin: 20px";
             captureCancelButton.addEventListener('click', cancelPreview, false);
+            document.getElementsByClassName("qrcodeScanBackButton")[0].addEventListener('click', cancelPreview, false);
         }
 
         /**
@@ -231,7 +232,7 @@ module.exports = {
          * See https://github.com/phonegap-build/BarcodeScanner#using-the-plugin
          */
         function cancelPreview() {
-            destroyPreview();
+            reader && reader.stop();
         }
         
         try {
