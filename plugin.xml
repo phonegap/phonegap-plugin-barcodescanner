@@ -299,7 +299,8 @@
             <DeviceCapability Name="webcam" />
         </config-file>
 
-        <framework src="src/windows/lib/WinRTBarcodeReader.csproj" custom="true" type="projectReference"/>
+        <framework src="src/windows/lib/WinRTBarcodeReader.csproj" custom="true" type="projectReference" versions="<=8.1"/>
+        <framework src="src/windows/lib.UW/WinRTBarcodeReader.UW.csproj" custom="true" type="projectReference" versions=">8.1"/>
     </platform>
 
     <platform name="windows">
@@ -311,7 +312,8 @@
             <DeviceCapability Name="webcam" />
         </config-file>
 
-        <framework src="src/windows/lib/WinRTBarcodeReader.csproj" custom="true" type="projectReference"/>
+        <framework src="src/windows/lib/WinRTBarcodeReader.csproj" custom="true" type="projectReference" versions="<=8.1"/>
+        <framework src="src/windows/lib.UW/WinRTBarcodeReader.UW.csproj" custom="true" type="projectReference" versions=">8.1"/>
     </platform>
 
     <!-- Windows Phone 8 -->
