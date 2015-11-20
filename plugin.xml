@@ -299,7 +299,8 @@
             <DeviceCapability Name="webcam" />
         </config-file>
 
-        <framework src="src/windows/lib/WinRTBarcodeReader.csproj" custom="true" type="projectReference"/>
+        <framework src="src/windows/lib/WinRTBarcodeReader.csproj" custom="true" type="projectReference" versions="<=8.1"/>
+        <framework src="src/windows/lib.UW/WinRTBarcodeReader.UW.csproj" custom="true" type="projectReference" versions=">8.1"/>
         <asset src="src/windows/assets/plugin-barcodeScanner.css" target="css/plugin-barcodeScanner.css" />
     </platform>
 
@@ -312,7 +313,8 @@
             <DeviceCapability Name="webcam" />
         </config-file>
 
-        <framework src="src/windows/lib/WinRTBarcodeReader.csproj" custom="true" type="projectReference"/>
+        <framework src="src/windows/lib/WinRTBarcodeReader.csproj" custom="true" type="projectReference" versions="<=8.1"/>
+        <framework src="src/windows/lib.UW/WinRTBarcodeReader.UW.csproj" custom="true" type="projectReference" versions=">8.1"/>
         <asset src="src/windows/assets/plugin-barcodeScanner.css" target="css/plugin-barcodeScanner.css" />
     </platform>
 
@@ -350,7 +352,7 @@
             <runs />
         </js-module>
     </platform>
-    
+
     <!-- BlackBerry 10 -->
     <platform name="blackberry10">
         <source-file src="src/blackberry10/index.js" target-dir="BarcodeScanner" />
