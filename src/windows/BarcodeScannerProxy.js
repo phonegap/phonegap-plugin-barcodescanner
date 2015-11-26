@@ -49,63 +49,70 @@ module.exports = {
          * Starts stream transmission to preview frame and then run barcode search
          */
         function startPreview() {
-            var captureSettings = new Windows.Media.Capture.MediaCaptureInitializationSettings();
-            captureSettings.streamingCaptureMode = Windows.Media.Capture.StreamingCaptureMode.video;
-            captureSettings.photoCaptureSource = Windows.Media.Capture.PhotoCaptureSource.videoPreview;
+            Windows.Devices.Enumeration.DeviceInformation.findAllAsync(Windows.Devices.Enumeration.DeviceClass.videoCapture).done(function(devices) {
+                devices.forEach(function(device) {
+                    if (device.enclosureLocation.panel === Windows.Devices.Enumeration.Panel.back) {
+                        var captureSettings = new Windows.Media.Capture.MediaCaptureInitializationSettings();
+                        captureSettings.videoDeviceId = device.id;
+                        captureSettings.streamingCaptureMode = Windows.Media.Capture.StreamingCaptureMode.video;
+                        captureSettings.photoCaptureSource = Windows.Media.Capture.PhotoCaptureSource.videoPreview;
 
-            capture.initializeAsync(captureSettings).done(function () {
+                        capture.initializeAsync(captureSettings).done(function() {
 
-                //trying to set focus mode
-                var controller = capture.videoDeviceController;
+                            //trying to set focus mode
+                            var controller = capture.videoDeviceController;
 
-                if (controller.focusControl && controller.focusControl.supported) {
-                    if (controller.focusControl.configure) {
-                        var focusConfig = new Windows.Media.Devices.FocusSettings();
-                        focusConfig.autoFocusRange = Windows.Media.Devices.AutoFocusRange.macro;
+                            if (controller.focusControl && controller.focusControl.supported) {
+                                if (controller.focusControl.configure) {
+                                    var focusConfig = new Windows.Media.Devices.FocusSettings();
+                                    focusConfig.autoFocusRange = Windows.Media.Devices.AutoFocusRange.macro;
 
-                        var supportContinuousFocus = controller.focusControl.supportedFocusModes.indexOf(Windows.Media.Devices.FocusMode.continuous).returnValue;
-                        var supportAutoFocus = controller.focusControl.supportedFocusModes.indexOf(Windows.Media.Devices.FocusMode.auto).returnValue;
+                                    var supportContinuousFocus = controller.focusControl.supportedFocusModes.indexOf(Windows.Media.Devices.FocusMode.continuous).returnValue;
+                                    var supportAutoFocus = controller.focusControl.supportedFocusModes.indexOf(Windows.Media.Devices.FocusMode.auto).returnValue;
 
-                        if (supportContinuousFocus) {
-                            focusConfig.mode = Windows.Media.Devices.FocusMode.continuous;
-                        } else if (supportAutoFocus) {                        
-                            focusConfig.mode = Windows.Media.Devices.FocusMode.auto;
-                        }
+                                    if (supportContinuousFocus) {
+                                        focusConfig.mode = Windows.Media.Devices.FocusMode.continuous;
+                                    } else if (supportAutoFocus) {
+                                        focusConfig.mode = Windows.Media.Devices.FocusMode.auto;
+                                    }
 
-                        controller.focusControl.configure(focusConfig);
-                        controller.focusControl.focusAsync();
+                                    controller.focusControl.configure(focusConfig);
+                                    controller.focusControl.focusAsync();
+                                }
+                            }
+
+                            var deviceProps = controller.getAvailableMediaStreamProperties(Windows.Media.Capture.MediaStreamType.videoRecord);
+
+                            deviceProps = Array.prototype.slice.call(deviceProps);
+                            deviceProps = deviceProps.filter(function(prop) {
+                                // filter out streams with "unknown" subtype - causes errors on some devices
+                                return prop.subtype !== "Unknown";
+                            }).sort(function(propA, propB) {
+                                // sort properties by resolution
+                                return propB.width - propA.width;
+                            });
+
+                            var maxResProps = deviceProps[0];
+
+                            controller.setMediaStreamPropertiesAsync(Windows.Media.Capture.MediaStreamType.videoRecord, maxResProps).done(function() {
+                                // handle portrait orientation
+                                if (Windows.Graphics.Display.DisplayProperties.nativeOrientation == Windows.Graphics.Display.DisplayOrientations.portrait) {
+                                    capture.setPreviewRotation(Windows.Media.Capture.VideoRotation.clockwise90Degrees);
+                                    capturePreview.msZoom = true;
+                                }
+
+                                capturePreview.src = URL.createObjectURL(capture);
+                                capturePreview.play();
+
+                                // Insert preview frame and controls into page
+                                document.body.appendChild(capturePreview);
+                                document.body.appendChild(capturePreviewAlignmentMark);
+                                document.body.appendChild(captureCancelButton);
+
+                                startBarcodeSearch(maxResProps.width, maxResProps.height);
+                            });
+                        });
                     }
-                }
-
-                var deviceProps = controller.getAvailableMediaStreamProperties(Windows.Media.Capture.MediaStreamType.videoRecord);
-
-                deviceProps = Array.prototype.slice.call(deviceProps);
-                deviceProps = deviceProps.filter(function (prop) {
-                    // filter out streams with "unknown" subtype - causes errors on some devices
-                    return prop.subtype !== "Unknown";
-                }).sort(function (propA, propB) {
-                    // sort properties by resolution
-                    return propB.width - propA.width;
-                });
-
-                var maxResProps = deviceProps[0];
-
-                controller.setMediaStreamPropertiesAsync(Windows.Media.Capture.MediaStreamType.videoRecord, maxResProps).done(function () {
-                    // handle portrait orientation
-                    if (Windows.Graphics.Display.DisplayProperties.nativeOrientation == Windows.Graphics.Display.DisplayOrientations.portrait) {
-                        capture.setPreviewRotation(Windows.Media.Capture.VideoRotation.clockwise90Degrees);
-                        capturePreview.msZoom = true;
-                    }
-
-                    capturePreview.src = URL.createObjectURL(capture);
-                    capturePreview.play();
-
-                    // Insert preview frame and controls into page
-                    document.body.appendChild(capturePreview);
-                    document.body.appendChild(capturePreviewAlignmentMark);
-                    document.body.appendChild(captureCancelButton);
-
-                    startBarcodeSearch(maxResProps.width, maxResProps.height);
                 });
             });
         }
