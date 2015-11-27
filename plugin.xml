@@ -351,6 +351,7 @@
     <!-- BlackBerry 10 -->
     <platform name="blackberry10">
         <source-file src="src/blackberry10/index.js" target-dir="BarcodeScanner" />
+        <source-file src="src/blackberry10/qrcode.js" target-dir="BarcodeScanner" />
         <lib-file src="src/blackberry10/native/device/libBarcodeScanner.so" arch="device"/>
         <lib-file src="src/blackberry10/native/simulator/libBarcodeScanner.so" arch="simulator"/>
         <config-file target="www/config.xml" parent="/widget">

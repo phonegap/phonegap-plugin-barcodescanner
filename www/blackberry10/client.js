@@ -91,6 +91,22 @@ var stopRead = function stopRead (succ, fail) {
 	exec(success, failure, _ID, "stopRead", null, false)
 };
 
+var encode = function(type, data, succ, fail) {
+	var value = null,
+        success = function (data, response) {
+			value = data;
+			console.log("Hello");
+			succ(data["image"]);
+	    },
+	    failure = function (data, response) {
+		    fail(data)
+	    };
+	exec(success, failure, _ID, "encode",null,[type,data]);
+};
+
+
+
+
 	_self.scan = function (succ, fail) {
 		gotCode = false;
 

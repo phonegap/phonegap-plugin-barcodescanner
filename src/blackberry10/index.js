@@ -17,6 +17,10 @@ var barcodescanner,
 	resultObjs = {},
 	readCallback,
 	_utils = require("../../lib/utils");
+var	qr = require('plugin/BarcodeScanner/qrcode.js'); 
+
+//var	_qr = require('qrcode'); 
+
 
 module.exports = {
 
@@ -47,6 +51,40 @@ module.exports = {
 
 	encode: function (success, fail, args, env) {
 		
+		var result = new PluginResult(args, env);
+		//resultObjs[result.callbackId] = result;
+		//readCallback = result.callbackId;
+		//console.log(args);
+		values = decodeURIComponent(args[0]);
+		values = JSON.parse(values);
+		//console.log(values);
+		data = values["data"];
+		type = values["type"];
+		console.log("Type: "+type + " Data: " + data);
+		var bdiv = document.createElement('div');
+		//maybe add try catch 
+		var options = {
+	    	text: data,
+	   		width: 128,
+	    	height: 128,
+	    	colorDark : "#000000",
+	    	colorLight : "#ffffff",
+		};
+		qr.makeQRcode(bdiv, options);
+
+		//console.log(bdiv);
+		var barcode = bdiv.childNodes[1];
+		console.log(String(barcode.src));
+		var image = encodeURI(barcode.src);
+		try{
+			//result.callbackOk({image: barcode}, true);
+			//result.ok(bdiv,true);
+			result.ok(barcode,false);
+			//success(bdiv);
+		}catch(e){
+			result.error("Failed to encode barcode", false);
+		}
+
 	}
 };
 
