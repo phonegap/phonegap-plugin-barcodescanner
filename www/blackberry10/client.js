@@ -95,7 +95,6 @@ var encode = function(type, data, succ, fail) {
 	var value = null,
         success = function (data, response) {
 			value = data;
-			console.log("Hello");
 			succ(data["image"]);
 	    },
 	    failure = function (data, response) {

@@ -16,10 +16,10 @@
 var barcodescanner,
 	resultObjs = {},
 	readCallback,
-	_utils = require("../../lib/utils");
-var	qr = require('plugin/BarcodeScanner/qrcode.js'); 
+	_utils = require("../../lib/utils"),
+	qr = require('plugin/BarcodeScanner/qrcode.js'); 
 
-//var	_qr = require('qrcode'); 
+
 
 
 module.exports = {
@@ -56,9 +56,20 @@ module.exports = {
 		values = JSON.parse(values);
 		data = values["data"];
 		type = values["type"];
+	
+		if(data == "" || data == undefined || data.length == 0){
+			result.error("Data was not specified", false);
+			return;
+		}
+		if(type == "" || type == undefined){
+			type = "TEXT_TYPE";
+		}
+
 		console.log("Type: "+type + " Data: " + data);
 
-		var bdiv = document.createElement('div'); //need div to make QRcode
+		//Make QRcode using javascript library 
+		var bdiv = document.createElement('div');
+		var tdiv = document.createElement('div'); 
 		var options = {
 	    	text: data,
 	   		width: 128,
@@ -67,13 +78,14 @@ module.exports = {
 	    	colorLight : "#ffffff",
 		};
 		var qrcode = qr.makeQRcode(bdiv, options);
+		
 		var imageURI = qrcode._oDrawing._elCanvas.toDataURL();
+
 		try{
 			result.ok(imageURI,false);
 		}catch(e){
 			result.error("Failed to encode barcode", false);
 		}
-
 	}
 };
 
