@@ -507,7 +507,7 @@ parentViewController:(UIViewController*)parentViewController
      }
      ];
     
-    //         [self dumpImage: [[self getImageFromSample:sampleBuffer] autorelease]];
+    //         [self dumpImage: [self getImageFromSample:sampleBuffer]];
 #endif
     
     
@@ -534,7 +534,7 @@ parentViewController:(UIViewController*)parentViewController
         
         // here's the meat of the decode process
         Ref<LuminanceSource>   luminanceSource   ([self getLuminanceSourceFromSample: sampleBuffer imageBytes:&imageBytes]);
-        //            [self dumpImage: [[self getImageFromLuminanceSource:luminanceSource] autorelease]];
+        //            [self dumpImage: [self getImageFromLuminanceSource:luminanceSource]];
         Ref<Binarizer>         binarizer         (new HybridBinarizer(luminanceSource));
         Ref<BinaryBitmap>      bitmap            (new BinaryBitmap(binarizer));
         Ref<MultiFormatReader> reader            (new MultiFormatReader());
@@ -555,11 +555,11 @@ parentViewController:(UIViewController*)parentViewController
         
     }
     catch (zxing::ReaderException &rex) {
-        //            NSString *message = [[[NSString alloc] initWithCString:rex.what() encoding:NSUTF8StringEncoding] autorelease];
+        //            NSString *message = [[NSString alloc] initWithCString:rex.what() encoding:NSUTF8StringEncoding];
         //            NSLog(@"decoding: ReaderException: %@", message);
     }
     catch (zxing::IllegalArgumentException &iex) {
-        //            NSString *message = [[[NSString alloc] initWithCString:iex.what() encoding:NSUTF8StringEncoding] autorelease];
+        //            NSString *message = [[NSString alloc] initWithCString:iex.what() encoding:NSUTF8StringEncoding];
         //            NSLog(@"decoding: IllegalArgumentException: %@", message);
     }
     catch (...) {
