@@ -55,6 +55,10 @@ module.exports = {
 		}
 	},
 
+	/*
+	Method for barcode encoding. Returns base 64 image URI 
+	Currently only creates QRcodes
+	*/
 	encode: function (success, fail, args, env) {
 		
 		var result = new PluginResult(args, env);
