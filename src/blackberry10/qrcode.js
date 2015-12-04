@@ -616,7 +616,7 @@ var QRCode;
 	module.exports = {
 		makeQRcode : function(el, vOption){
 			var qrcode = new QRCode(el, vOption);
-			return qrcode
+			return qrcode._oDrawing._elCanvas.toDataURL();
 		}
 	}
 })();

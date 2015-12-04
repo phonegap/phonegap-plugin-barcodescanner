@@ -17,10 +17,16 @@ var barcodescanner,
 	resultObjs = {},
 	readCallback,
 	_utils = require("../../lib/utils"),
-	qr = require('plugin/BarcodeScanner/qrcode.js'); 
+	_qr = require('plugin/BarcodeScanner/qrcode.js');
 
-
-
+const SMS_URI_ONE = "smsto:",
+	  SMS_URI_TWO = "sms:",
+	  EMAIL_URI = "mailto:",
+	  PHONE_URI = "tel:+1",
+	  SMS_TYPE = "SMS_TYPE",
+	  PHONE_TYPE = "PHONE_TYPE",
+	  EMAIL_TYPE = "EMAIL_TYPE",
+	  TEXT_TYPE = "TEXT_TYPE";
 
 module.exports = {
 
@@ -57,29 +63,45 @@ module.exports = {
 		data = values["data"];
 		type = values["type"];
 	
-		if(data == "" || data == undefined || data.length == 0){
-			result.error("Data was not specified", false);
+		if(data == "" || data == undefined){
+			result.error("Data to be encoded was not specified", false);
 			return;
 		}
 		if(type == "" || type == undefined){
-			type = "TEXT_TYPE";
+			type = TEXT_TYPE;
+		}
+
+		if(type == SMS_TYPE){
+			var check_one = data.substring(0,6).toLowerCase();
+			var check_two = data.substring(0,4).toLowerCase();
+			if(!(check_one == SMS_URI_ONE || check_two == SMS_URI_TWO)){
+				data = SMS_URI_ONE+data;
+			} 
+		}else if(type == EMAIL_TYPE){
+			var check = data.substring(0,7).toLowerCase();
+			if(check != EMAIL_URI){
+				data = EMAIL_URI+data;
+			} 
+		}else if(type == PHONE_TYPE){
+			var check = data.substring(0,4).toLowerCase();
+			if(check != PHONE_URI){
+				data = PHONE_URI+data;
+			} 
 		}
 
 		console.log("Type: "+type + " Data: " + data);
 
-		//Make QRcode using javascript library 
+		//Make QRcode using qrcode.js 
 		var bdiv = document.createElement('div');
-		var tdiv = document.createElement('div'); 
 		var options = {
 	    	text: data,
-	   		width: 128,
-	    	height: 128,
+	   		width: 256,
+	    	height: 256,
 	    	colorDark : "#000000",
 	    	colorLight : "#ffffff",
 		};
-		var qrcode = qr.makeQRcode(bdiv, options);
-		
-		var imageURI = qrcode._oDrawing._elCanvas.toDataURL();
+
+		var imageURI = _qr.makeQRcode(bdiv, options);
 
 		try{
 			result.ok(imageURI,false);

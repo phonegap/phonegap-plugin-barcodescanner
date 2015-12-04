@@ -94,11 +94,10 @@ var stopRead = function stopRead (succ, fail) {
 var encode = function(type, data, succ, fail) {
 	var value = null,
         success = function (data, response) {
-			value = data;
-			succ(data["image"]);
+			succ(data);
 	    },
 	    failure = function (data, response) {
-		    fail(data)
+		    fail(data);
 	    };
 	exec(success, failure, _ID, "encode",null,[type,data]);
 };
