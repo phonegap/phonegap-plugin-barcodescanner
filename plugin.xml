@@ -30,10 +30,20 @@
 
         <resource-file src="src/ios/scannerOverlay.xib" />
         <resource-file src="src/ios/CDVBarcodeScanner.bundle" />
+        <resource-file src="src/ios/icons8_buttons/icons8_free_license.pdf" />
+        <resource-file src="src/ios/icons8_buttons/icons8SwitchCamera.png" />
+        <resource-file src="src/ios/icons8_buttons/icons8SwitchCamera@2x.png" />
+        <resource-file src="src/ios/icons8_buttons/icons8SwitchCamera@3x.png" />
+        <resource-file src="src/ios/icons8_buttons/icons8FlashOff.png" />
+        <resource-file src="src/ios/icons8_buttons/icons8FlashOff@2x.png" />
+        <resource-file src="src/ios/icons8_buttons/icons8FlashOff@3x.png" />
+        <resource-file src="src/ios/icons8_buttons/icons8FlashOn.png" />
+        <resource-file src="src/ios/icons8_buttons/icons8FlashOn@2x.png" />
+        <resource-file src="src/ios/icons8_buttons/icons8FlashOn@3x.png" />
 
         <header-file src="src/ios/zxing-all-in-one.h" />
 
-        <source-file src="src/ios/CDVBarcodeScanner.mm" compiler-flags="-fno-objc-arc" />
+        <source-file src="src/ios/CDVBarcodeScanner.mm" />
         <source-file src="src/ios/zxing-all-in-one.cpp" />
 
         <framework src="libiconv.dylib" />

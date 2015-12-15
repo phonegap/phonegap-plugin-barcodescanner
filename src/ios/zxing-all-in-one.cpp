@@ -1929,9 +1929,9 @@ Ref<Binarizer> GlobalHistogramBinarizer::createBinarizer(Ref<LuminanceSource> so
 namespace zxing {
 
 GreyscaleLuminanceSource::GreyscaleLuminanceSource(unsigned char* greyData, int dataWidth,
-    int dataHeight, int left, int top, int width, int height) : greyData_(greyData),
+    int dataHeight, int left, int top, int width, int height, bool inverse) : greyData_(greyData),
     dataWidth_(dataWidth), dataHeight_(dataHeight), left_(left), top_(top), width_(width),
-    height_(height) {
+    height_(height), inverse_(inverse) {
 
   if (left + width > dataWidth || top + height > dataHeight || top < 0 || left < 0) {
     throw IllegalArgumentException("Crop rectangle does not fit within image data.");
@@ -1962,6 +1962,13 @@ unsigned char* GreyscaleLuminanceSource::getMatrix() {
       memcpy(result + row * width_, greyData_ + (top_ + row) * dataWidth_ + left_, width_);
     }
   }
+
+  if (inverse_) {
+    for (int i = 0; i < size; i++) {
+     result[i] = static_cast<unsigned char>(255 - result[i]);;
+    }
+  }
+
   return result;
 }
 
@@ -7940,7 +7947,7 @@ namespace zxing {
 
     Ref<Result> OneDReader::decode(Ref<BinaryBitmap> image, DecodeHints hints) {
       Ref<Result> result = doDecode(image, hints);
-      if (result.empty() && hints.getTryHarder() && image->isRotateSupported()) {
+      if (result.empty()) {
         Ref<BinaryBitmap> rotatedImage(image->rotateCounterClockwise());
         result = doDecode(rotatedImage, hints);
         if (!result.empty()) {
