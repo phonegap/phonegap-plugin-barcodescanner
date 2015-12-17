@@ -300,6 +300,7 @@
         </config-file>
 
         <framework src="src/windows/lib/WinRTBarcodeReader.csproj" custom="true" type="projectReference"/>
+        <asset src="src/windows/assets/plugin-barcodeScanner.css" target="css/plugin-barcodeScanner.css" />
     </platform>
 
     <platform name="windows">
@@ -312,6 +313,7 @@
         </config-file>
 
         <framework src="src/windows/lib/WinRTBarcodeReader.csproj" custom="true" type="projectReference"/>
+        <asset src="src/windows/assets/plugin-barcodeScanner.css" target="css/plugin-barcodeScanner.css" />
     </platform>
 
     <!-- Windows Phone 8 -->
