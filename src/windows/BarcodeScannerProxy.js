@@ -8,6 +8,8 @@
  * Unless required by applicable law or agreed to in writing, software distributed under the License is distributed on an "AS IS" BASIS, WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied. See the License for the specific language governing permissions and limitations under the License.
  */
 
+var urlutil = require('cordova/urlutil');
+
 module.exports = {
 
     /**
@@ -21,6 +23,8 @@ module.exports = {
         var capturePreview,
             capturePreviewAlignmentMark,
             captureCancelButton,
+            navigationButtonsDiv,
+            closeButton,
             capture,
             reader;
         
@@ -30,20 +34,42 @@ module.exports = {
         function createPreview() {
 
             // Create fullscreen preview
+            var capturePreviewFrameStyle = document.createElement('link');
+            capturePreviewFrameStyle.rel = "stylesheet";
+            capturePreviewFrameStyle.type = "text/css";
+            capturePreviewFrameStyle.href = urlutil.makeAbsolute("/www/css/plugin-barcodeScanner.css");
+
+            document.head.appendChild(capturePreviewFrameStyle);
+
+            capturePreviewFrame = document.createElement('div');
+            capturePreviewFrame.className = "barcode-scanner-wrap";
+
             capturePreview = document.createElement("video");
-            capturePreview.style.cssText = "position: absolute; left: 0; top: 0; width: 100%; height: 100%; background: black";
+            capturePreview.className = "barcode-scanner-preview";
             capturePreview.addEventListener('click', function () {
                 focus();
             });
 
             capturePreviewAlignmentMark = document.createElement('div');
-            capturePreviewAlignmentMark.style.cssText = "position: absolute; left: 0; top: 50%; width: 100%; height: 3px; background: red";
+            capturePreviewAlignmentMark.className = "barcode-scanner-mark";
 
-            // Create cancel button
-            captureCancelButton = document.createElement("button");
-            captureCancelButton.innerText = "Cancel";
-            captureCancelButton.style.cssText = "position: absolute; right: 0; bottom: 0; display: block; margin: 20px";
-            captureCancelButton.addEventListener('click', cancelPreview, false);
+            navigationButtonsDiv = document.createElement("div");
+            navigationButtonsDiv.className = "barcode-scanner-app-bar";
+            navigationButtonsDiv.onclick = function (e) {
+                e.cancelBubble = true;
+            };
+
+            closeButton = document.createElement("div");
+            closeButton.innerText = "close";
+            closeButton.className = "app-bar-action action-close";
+            navigationButtonsDiv.appendChild(closeButton);
+
+            closeButton.addEventListener("click", cancelPreview, false);
+            document.addEventListener('backbutton', cancelPreview, false);
+
+            [capturePreview, capturePreviewAlignmentMark, navigationButtonsDiv].forEach(function (element) {
+                capturePreviewFrame.appendChild(element);
+            });
 
             capture = new Windows.Media.Capture.MediaCapture();
         }
@@ -140,9 +166,7 @@ module.exports = {
                     capturePreview.play();
 
                     // Insert preview frame and controls into page
-                    document.body.appendChild(capturePreview);
-                    document.body.appendChild(capturePreviewAlignmentMark);
-                    document.body.appendChild(captureCancelButton);
+                    document.body.appendChild(capturePreviewFrame);
 
                     setupFocus(controller.focusControl)
                     .then(function () {
@@ -177,15 +201,17 @@ module.exports = {
             capturePreview.pause();
             capturePreview.src = null;
 
-            [capturePreview, capturePreviewAlignmentMark, captureCancelButton].forEach(function (elem) {
-                elem && document.body.removeChild(elem);
-            });
-            
+            if (capturePreviewFrame) {
+                document.body.removeChild(capturePreviewFrame);
+            }
+
             reader && reader.stop();
             reader = null;
 
             capture && capture.stopRecordAsync();
             capture = null;
+
+            document.removeEventListener('backbutton', cancelPreview);
         }
 
         /**
