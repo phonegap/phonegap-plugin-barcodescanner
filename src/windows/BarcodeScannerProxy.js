@@ -32,6 +32,9 @@ module.exports = {
             // Create fullscreen preview
             capturePreview = document.createElement("video");
             capturePreview.style.cssText = "position: absolute; left: 0; top: 0; width: 100%; height: 100%; background: black";
+            capturePreview.addEventListener('click', function () {
+                focus();
+            });
 
             capturePreviewAlignmentMark = document.createElement('div');
             capturePreviewAlignmentMark.style.cssText = "position: absolute; left: 0; top: 50%; width: 100%; height: 3px; background: red";
@@ -45,6 +48,63 @@ module.exports = {
             capture = new Windows.Media.Capture.MediaCapture();
         }
 
+        function focus(controller) {
+
+            var result = WinJS.Promise.wrap();
+
+            if (!capturePreview || capturePreview.paused) {
+                // If the preview is not yet palying, there is no sense in running focus
+                return result;
+            }
+
+            if (!controller) {
+                try {
+                    controller = capture && capture.videoDeviceController
+                } catch (err) {
+                    console.log('Failed to access focus control for current camera: ' + err);
+                    return result;
+                }
+            }
+
+            if (!controller.focusControl || !controller.focusControl.supported) {
+                console.log('Focus control for current camera is not supported')
+                return result;
+            }
+
+            return controller.focusControl.focusAsync();
+        }
+
+        function setupFocus(focusControl) {
+
+            function supportsFocusMode(mode) {
+                return focusControl.supportedFocusModes.indexOf(mode).returnValue;
+            }
+
+            if (!focusControl || !focusControl.supported || !focusControl.configure) {
+                return WinJS.Promise.wrap();
+            }
+
+            var FocusMode = Windows.Media.Devices.FocusMode;
+            var focusConfig = new Windows.Media.Devices.FocusSettings();
+            focusConfig.autoFocusRange = Windows.Media.Devices.AutoFocusRange.normal;
+
+            if (supportsFocusMode(FocusMode.continuous)) {
+                console.log("Device supports continuous focus mode");
+                focusConfig.mode = FocusMode.continuous;
+            } else if (supportsFocusMode(FocusMode.auto)) {
+                console.log("Device doesn\'t support continuous focus mode, switching to autofocus mode");
+                focusConfig.mode = FocusMode.auto;
+            }
+
+            focusControl.configure(focusConfig);
+            // Need to wrap this in setTimeout since continuous focus should start only after preview has started. See
+            // 'Remarks' at https://msdn.microsoft.com/en-us/library/windows/apps/windows.media.devices.focuscontrol.configure.aspx
+            return WinJS.Promise.timeout(200)
+            .then(function () {
+                return focusControl.focusAsync();
+            });
+        }
+
         /**
          * Starts stream transmission to preview frame and then run barcode search
          */
@@ -55,28 +115,7 @@ module.exports = {
 
             capture.initializeAsync(captureSettings).done(function () {
 
-                //trying to set focus mode
                 var controller = capture.videoDeviceController;
-
-                if (controller.focusControl && controller.focusControl.supported) {
-                    if (controller.focusControl.configure) {
-                        var focusConfig = new Windows.Media.Devices.FocusSettings();
-                        focusConfig.autoFocusRange = Windows.Media.Devices.AutoFocusRange.macro;
-
-                        var supportContinuousFocus = controller.focusControl.supportedFocusModes.indexOf(Windows.Media.Devices.FocusMode.continuous).returnValue;
-                        var supportAutoFocus = controller.focusControl.supportedFocusModes.indexOf(Windows.Media.Devices.FocusMode.auto).returnValue;
-
-                        if (supportContinuousFocus) {
-                            focusConfig.mode = Windows.Media.Devices.FocusMode.continuous;
-                        } else if (supportAutoFocus) {                        
-                            focusConfig.mode = Windows.Media.Devices.FocusMode.auto;
-                        }
-
-                        controller.focusControl.configure(focusConfig);
-                        controller.focusControl.focusAsync();
-                    }
-                }
-
                 var deviceProps = controller.getAvailableMediaStreamProperties(Windows.Media.Capture.MediaStreamType.videoRecord);
 
                 deviceProps = Array.prototype.slice.call(deviceProps);
@@ -105,7 +144,10 @@ module.exports = {
                     document.body.appendChild(capturePreviewAlignmentMark);
                     document.body.appendChild(captureCancelButton);
 
-                    startBarcodeSearch(maxResProps.width, maxResProps.height);
+                    setupFocus(controller.focusControl)
+                    .then(function () {
+                        startBarcodeSearch(maxResProps.width, maxResProps.height);
+                    });
                 });
             });
         }
