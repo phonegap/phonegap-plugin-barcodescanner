@@ -10,6 +10,35 @@
 
 var urlutil = require('cordova/urlutil');
 
+/**
+ * List of supported barcode formats from ZXing library. Used to return format
+ *   name instead of number code as per plugin spec.
+ *
+ * @enum {String}
+ */
+var BARCODE_FORMAT = {
+    1: 'AZTEC',
+    2: 'CODABAR',
+    4: 'CODE_39',
+    8: 'CODE_93',
+    16: 'CODE_128',
+    32: 'DATA_MATRIX',
+    64: 'EAN_8',
+    128: 'EAN_13',
+    256: 'ITF',
+    512: 'MAXICODE',
+    1024: 'PDF_417',
+    2048: 'QR_CODE',
+    4096: 'RSS_14',
+    8192: 'RSS_EXPANDED',
+    16384: 'UPC_A',
+    32768: 'UPC_E',
+    61918: 'All_1D',
+    65536: 'UPC_EAN_EXTENSION',
+    131072: 'MSI',
+    262144: 'PLESSEY'
+};
+
 module.exports = {
 
     /**
@@ -174,7 +203,11 @@ module.exports = {
                     })
                     .done(function (result) {
                         destroyPreview();
-                        success({ text: result && result.text, format: result && result.barcodeFormat, cancelled: !result });
+                        success({
+                            text: result && result.text,
+                            format: result && BARCODE_FORMAT[result.barcodeFormat],
+                            cancelled: !result
+                        });
                     }, function (error) {
                         destroyPreview();
                         fail(error);
