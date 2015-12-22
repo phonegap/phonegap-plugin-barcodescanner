@@ -27,7 +27,7 @@ module.exports = {
             closeButton,
             capture,
             reader;
-        
+
         /**
          * Creates a preview frame and necessary objects
          */
@@ -85,7 +85,7 @@ module.exports = {
 
             if (!controller) {
                 try {
-                    controller = capture && capture.videoDeviceController
+                    controller = capture && capture.videoDeviceController;
                 } catch (err) {
                     console.log('Failed to access focus control for current camera: ' + err);
                     return result;
@@ -93,7 +93,7 @@ module.exports = {
             }
 
             if (!controller.focusControl || !controller.focusControl.supported) {
-                console.log('Focus control for current camera is not supported')
+                console.log('Focus control for current camera is not supported');
                 return result;
             }
 
@@ -170,7 +170,14 @@ module.exports = {
 
                     setupFocus(controller.focusControl)
                     .then(function () {
-                        startBarcodeSearch(maxResProps.width, maxResProps.height);
+                        return startBarcodeSearch(maxResProps.width, maxResProps.height);
+                    })
+                    .done(function (result) {
+                        destroyPreview();
+                        success({ text: result && result.text, format: result && result.barcodeFormat, cancelled: !result });
+                    }, function (error) {
+                        destroyPreview();
+                        fail(error);
                     });
                 });
             });
@@ -182,14 +189,71 @@ module.exports = {
          */
         function startBarcodeSearch(width, height) {
 
-            reader = new WinRTBarcodeReader.Reader();
-            reader.init(capture, width, height);
-            reader.readCode().done(function (result) {
-                destroyPreview();
-                success({ text: result && result.text, format: result && result.barcodeFormat, cancelled: !result });
-            }, function (err) {
-                destroyPreview();
-                fail(err);
+            if (!capture.getPreviewFrameAsync || !ZXing.BarcodeReader) {
+                // If there is no corresponding API (Win8/8.1/Phone8.1) use old approach with WinMD library
+                reader = new WinRTBarcodeReader.Reader();
+                reader.init(capture, width, height);
+                return reader.readCode();
+            }
+
+            reader = {
+                _promise: null,
+                _cancelled: false,
+                _zxingReader: new ZXing.BarcodeReader(),
+
+                readCode: function () {
+
+                    var self = this;
+                    return scanBarcodeAsync(capture, this._zxingReader, width, height)
+                    .then(function (result) {
+                        if (self._cancelled)
+                            return null;
+
+                        return result || (self._promise = self.readCode());
+                    });
+                },
+
+                stop: function () {
+                    this._cancelled = true;
+                }
+            };
+
+            // Add a small timeout before capturing first frame otherwise
+            // we would get an 'Invalid state' error from 'getPreviewFrameAsync'
+            return WinJS.Promise.timeout(200)
+            .then(function () {
+                return reader.readCode();
+            });
+        }
+
+        /**
+         * Grabs a frame from preview stream uning Win10-only API and tries to
+         *   get a barcode using zxing reader provided. If there is no barcode
+         *   found, returns null.
+         */
+        function scanBarcodeAsync(mediaCapture, zxingReader, frameWidth, frameHeight) {
+            // Shortcuts for namespaces
+            var Imaging = Windows.Graphics.Imaging;
+            var Streams = Windows.Storage.Streams;
+
+            var frame = new Windows.Media.VideoFrame(Imaging.BitmapPixelFormat.bgra8, frameWidth, frameHeight);
+            return mediaCapture.getPreviewFrameAsync(frame)
+            .then(function (capturedFrame) {
+
+                // Copy captured frame to buffer for further deserialization
+                var bitmap = capturedFrame.softwareBitmap;
+                var rawBuffer = new Streams.Buffer(bitmap.pixelWidth * bitmap.pixelHeight * 4);
+                capturedFrame.softwareBitmap.copyToBuffer(rawBuffer);
+                capturedFrame.close();
+
+                // Get raw pixel data from buffer
+                var data = new Uint8Array(rawBuffer.length);
+                var dataReader = Streams.DataReader.fromBuffer(rawBuffer);
+                dataReader.readBytes(data);
+                dataReader.close();
+
+                var result = zxingReader.decode(data, frameWidth, frameHeight, ZXing.BitmapFormat.bgra32);
+                return WinJS.Promise.wrap(result);
             });
         }
 
@@ -221,7 +285,7 @@ module.exports = {
         function cancelPreview() {
             reader && reader.stop();
         }
-        
+
         try {
             createPreview();
             startPreview();
