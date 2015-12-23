@@ -66,6 +66,36 @@ function findCamera() {
     });
 }
 
+/**
+ * @param {Windows.Graphics.Display.DisplayOrientations} displayOrientation
+ * @return {Number}
+ */
+function videoPreviewRotationLookup(displayOrientation, isMirrored) {
+    var degreesToRotate;
+
+    switch (displayOrientation) {
+        case Windows.Graphics.Display.DisplayOrientations.portrait:
+            degreesToRotate = 90;
+            break;
+        case Windows.Graphics.Display.DisplayOrientations.landscapeFlipped:
+            degreesToRotate = 180;
+            break;
+        case Windows.Graphics.Display.DisplayOrientations.portraitFlipped:
+            degreesToRotate = 270;
+            break;
+        case Windows.Graphics.Display.DisplayOrientations.landscape:
+        default:
+            degreesToRotate = 0;
+            break;
+    }
+
+    if (isMirrored) {
+        degreesToRotate = (360 - degreesToRotate) % 360
+    }
+
+    return degreesToRotate;
+}
+
 module.exports = {
 
     /**
@@ -79,9 +109,29 @@ module.exports = {
             capturePreviewAlignmentMark,
             captureCancelButton,
             navigationButtonsDiv,
+            previewMirroring,
             closeButton,
             capture,
             reader;
+
+        function updatePreviewForRotation(evt) {
+            if (!capture) {
+                return;
+            }
+
+            var ROTATION_KEY = "C380465D-2271-428C-9B83-ECEA3B4A85C1";
+
+            var displayInformation = (evt && evt.target) || Windows.Graphics.Display.DisplayInformation.getForCurrentView();
+            var currentOrientation = displayInformation.currentOrientation;
+
+            previewMirroring = previewMirroring || capture.getPreviewMirroring();
+            var rotDegree = videoPreviewRotationLookup(currentOrientation, previewMirroring);
+
+            // rotate the preview video
+            var videoEncodingProperties = capture.videoDeviceController.getMediaStreamProperties(Windows.Media.Capture.MediaStreamType.VideoPreview);
+            videoEncodingProperties.properties.insert(ROTATION_KEY, rotDegree);
+            return capture.setEncodingPropertiesAsync(Windows.Media.Capture.MediaStreamType.VideoPreview, videoEncodingProperties, null);
+        }
 
         /**
          * Creates a preview frame and necessary objects
@@ -188,7 +238,8 @@ module.exports = {
          * Starts stream transmission to preview frame and then run barcode search
          */
         function startPreview() {
-            findCamera(function(id) {
+            findCamera()
+            .then(function (id) {
                 var captureSettings = new Windows.Media.Capture.MediaCaptureInitializationSettings();
                 captureSettings.streamingCaptureMode = Windows.Media.Capture.StreamingCaptureMode.video;
                 captureSettings.photoCaptureSource = Windows.Media.Capture.PhotoCaptureSource.videoPreview;
@@ -212,11 +263,6 @@ module.exports = {
                     var maxResProps = deviceProps[0];
 
                     controller.setMediaStreamPropertiesAsync(Windows.Media.Capture.MediaStreamType.videoRecord, maxResProps).done(function () {
-                        // handle portrait orientation
-                        if (Windows.Graphics.Display.DisplayProperties.nativeOrientation == Windows.Graphics.Display.DisplayOrientations.portrait) {
-                            capture.setPreviewRotation(Windows.Media.Capture.VideoRotation.clockwise90Degrees);
-                            capturePreview.msZoom = true;
-                        }
 
                         capturePreview.src = URL.createObjectURL(capture);
                         capturePreview.play();
@@ -225,6 +271,10 @@ module.exports = {
                         document.body.appendChild(capturePreviewFrame);
 
                         setupFocus(controller.focusControl)
+                        .then(function () {
+                            Windows.Graphics.Display.DisplayInformation.getForCurrentView().addEventListener("orientationchanged", updatePreviewForRotation, false);
+                            return updatePreviewForRotation();
+                        })
                         .then(function () {
                             return startBarcodeSearch(maxResProps.width, maxResProps.height);
                         })
@@ -323,6 +373,9 @@ module.exports = {
          */
         function destroyPreview() {
 
+            Windows.Graphics.Display.DisplayInformation.getForCurrentView().removeEventListener("orientationchanged", updatePreviewForRotation, false);
+            document.removeEventListener('backbutton', cancelPreview);
+
             capturePreview.pause();
             capturePreview.src = null;
 
@@ -335,8 +388,6 @@ module.exports = {
 
             capture && capture.stopRecordAsync();
             capture = null;
-
-            document.removeEventListener('backbutton', cancelPreview);
         }
 
         /**

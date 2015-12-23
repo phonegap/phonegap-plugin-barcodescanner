@@ -24,7 +24,7 @@
     top: 50%;
     width: 100%;
     height: 3px;
-    background: red
+    background: red;
     z-index: 9999999;
 }
 
