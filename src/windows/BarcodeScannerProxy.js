@@ -84,17 +84,123 @@ function videoPreviewRotationLookup(displayOrientation, isMirrored) {
             degreesToRotate = 270;
             break;
         case Windows.Graphics.Display.DisplayOrientations.landscape:
+            /* falls through */
         default:
             degreesToRotate = 0;
             break;
     }
 
     if (isMirrored) {
-        degreesToRotate = (360 - degreesToRotate) % 360
+        degreesToRotate = (360 - degreesToRotate) % 360;
     }
 
     return degreesToRotate;
 }
+
+/**
+ * The pure JS implementation of barcode reader from WinRTBarcodeReader.winmd.
+ *   Works only on Windows 10 devices and more efficient than original one.
+ *
+ * @class {BarcodeReader}
+ */
+function BarcodeReader () {
+    this._promise = null;
+    this._cancelled = false;
+}
+
+/**
+ * Returns an instance of Barcode reader, depending on capabilities of Media
+ *   Capture API
+ *
+ * @static
+ * @constructs {BarcodeReader}
+ *
+ * @param   {MediaCapture}   mediaCaptureInstance  Instance of
+ *   Windows.Media.Capture.MediaCapture class
+ *
+ * @return  {BarcodeReader}  BarcodeReader instance that could be used for
+ *   scanning
+ */
+BarcodeReader.get = function (mediaCaptureInstance) {
+    if (mediaCaptureInstance.getPreviewFrameAsync && ZXing.BarcodeReader) {
+        return new BarcodeReader();
+    }
+
+    // If there is no corresponding API (Win8/8.1/Phone8.1) use old approach with WinMD library
+    return new WinRTBarcodeReader.Reader();
+
+};
+
+/**
+ * Initializes instance of reader.
+ *
+ * @param   {MediaCapture}  capture  Instance of
+ *   Windows.Media.Capture.MediaCapture class, used for acquiring images/ video
+ *   stream for barcode scanner.
+ * @param   {Number}  width    Video/image frame width
+ * @param   {Number}  height   Video/image frame height
+ */
+BarcodeReader.prototype.init = function (capture, width, height) {
+    this._capture = capture;
+    this._width = width;
+    this._height = height;
+    this._zxingReader = new ZXing.BarcodeReader();
+};
+
+/**
+ * Starts barcode search routines asyncronously.
+ *
+ * @return  {Promise<ScanResult>}  barcode scan result or null if search
+ *   cancelled.
+ */
+BarcodeReader.prototype.readCode = function () {
+
+    /**
+     * Grabs a frame from preview stream uning Win10-only API and tries to
+     *   get a barcode using zxing reader provided. If there is no barcode
+     *   found, returns null.
+     */
+    function scanBarcodeAsync(mediaCapture, zxingReader, frameWidth, frameHeight) {
+        // Shortcuts for namespaces
+        var Imaging = Windows.Graphics.Imaging;
+        var Streams = Windows.Storage.Streams;
+
+        var frame = new Windows.Media.VideoFrame(Imaging.BitmapPixelFormat.bgra8, frameWidth, frameHeight);
+        return mediaCapture.getPreviewFrameAsync(frame)
+        .then(function (capturedFrame) {
+
+            // Copy captured frame to buffer for further deserialization
+            var bitmap = capturedFrame.softwareBitmap;
+            var rawBuffer = new Streams.Buffer(bitmap.pixelWidth * bitmap.pixelHeight * 4);
+            capturedFrame.softwareBitmap.copyToBuffer(rawBuffer);
+            capturedFrame.close();
+
+            // Get raw pixel data from buffer
+            var data = new Uint8Array(rawBuffer.length);
+            var dataReader = Streams.DataReader.fromBuffer(rawBuffer);
+            dataReader.readBytes(data);
+            dataReader.close();
+
+            return zxingReader.decode(data, frameWidth, frameHeight, ZXing.BitmapFormat.bgra32);
+        });
+    }
+
+    var self = this;
+    return scanBarcodeAsync(this._capture, this._zxingReader, this._width, this._height)
+    .then(function (result) {
+        if (self._cancelled)
+            return null;
+
+        return result || (self._promise = self.readCode());
+    });
+};
+
+/**
+ * Stops barcode search
+ */
+BarcodeReader.prototype.stop = function () {
+    this._cancelled = true;
+};
 
 module.exports = {
 
@@ -128,9 +234,9 @@ module.exports = {
             var rotDegree = videoPreviewRotationLookup(currentOrientation, previewMirroring);
 
             // rotate the preview video
-            var videoEncodingProperties = capture.videoDeviceController.getMediaStreamProperties(Windows.Media.Capture.MediaStreamType.VideoPreview);
+            var videoEncodingProperties = capture.videoDeviceController.getMediaStreamProperties(Windows.Media.Capture.MediaStreamType.videoPreview);
             videoEncodingProperties.properties.insert(ROTATION_KEY, rotDegree);
-            return capture.setEncodingPropertiesAsync(Windows.Media.Capture.MediaStreamType.VideoPreview, videoEncodingProperties, null);
+            return capture.videoDeviceController.setMediaStreamPropertiesAsync(Windows.Media.Capture.MediaStreamType.videoPreview, videoEncodingProperties);
         }
 
         /**
@@ -182,7 +288,7 @@ module.exports = {
             var result = WinJS.Promise.wrap();
 
             if (!capturePreview || capturePreview.paused) {
-                // If the preview is not yet palying, there is no sense in running focus
+                // If the preview is not yet playing, there is no sense in running focus
                 return result;
             }
 
@@ -238,7 +344,7 @@ module.exports = {
          * Starts stream transmission to preview frame and then run barcode search
          */
         function startPreview() {
-            findCamera()
+            return findCamera()
             .then(function (id) {
                 var captureSettings = new Windows.Media.Capture.MediaCaptureInitializationSettings();
                 captureSettings.streamingCaptureMode = Windows.Media.Capture.StreamingCaptureMode.video;
@@ -246,125 +352,49 @@ module.exports = {
                 captureSettings.videoDeviceId = id;
 
                 capture = new Windows.Media.Capture.MediaCapture();
-                capture.initializeAsync(captureSettings).done(function () {
-
-                    var controller = capture.videoDeviceController;
-                    var deviceProps = controller.getAvailableMediaStreamProperties(Windows.Media.Capture.MediaStreamType.videoRecord);
-
-                    deviceProps = Array.prototype.slice.call(deviceProps);
-                    deviceProps = deviceProps.filter(function (prop) {
-                        // filter out streams with "unknown" subtype - causes errors on some devices
-                        return prop.subtype !== "Unknown";
-                    }).sort(function (propA, propB) {
-                        // sort properties by resolution
-                        return propB.width - propA.width;
-                    });
-
-                    var maxResProps = deviceProps[0];
-
-                    controller.setMediaStreamPropertiesAsync(Windows.Media.Capture.MediaStreamType.videoRecord, maxResProps).done(function () {
-
-                        capturePreview.src = URL.createObjectURL(capture);
-                        capturePreview.play();
-
-                        // Insert preview frame and controls into page
-                        document.body.appendChild(capturePreviewFrame);
-
-                        setupFocus(controller.focusControl)
-                        .then(function () {
-                            Windows.Graphics.Display.DisplayInformation.getForCurrentView().addEventListener("orientationchanged", updatePreviewForRotation, false);
-                            return updatePreviewForRotation();
-                        })
-                        .then(function () {
-                            return startBarcodeSearch(maxResProps.width, maxResProps.height);
-                        })
-                        .done(function (result) {
-                            destroyPreview();
-                            success({
-                                text: result && result.text,
-                                format: result && BARCODE_FORMAT[result.barcodeFormat],
-                                cancelled: !result
-                            });
-                        }, function (error) {
-                            destroyPreview();
-                            fail(error);
-                        });
-                    });
-                });
-            });
-        }
-
-        /**
-         * Starts barcode search process, implemented in WinRTBarcodeReader.winmd library
-         * Calls success callback, when barcode found.
-         */
-        function startBarcodeSearch(width, height) {
-
-            if (!capture.getPreviewFrameAsync || !ZXing.BarcodeReader) {
-                // If there is no corresponding API (Win8/8.1/Phone8.1) use old approach with WinMD library
-                reader = new WinRTBarcodeReader.Reader();
-                reader.init(capture, width, height);
-                return reader.readCode();
-            }
-
-            reader = {
-                _promise: null,
-                _cancelled: false,
-                _zxingReader: new ZXing.BarcodeReader(),
-
-                readCode: function () {
-
-                    var self = this;
-                    return scanBarcodeAsync(capture, this._zxingReader, width, height)
-                    .then(function (result) {
-                        if (self._cancelled)
-                            return null;
-
-                        return result || (self._promise = self.readCode());
-                    });
-                },
-
-                stop: function () {
-                    this._cancelled = true;
-                }
-            };
-
-            // Add a small timeout before capturing first frame otherwise
-            // we would get an 'Invalid state' error from 'getPreviewFrameAsync'
-            return WinJS.Promise.timeout(200)
+                return capture.initializeAsync(captureSettings);
+            })
             .then(function () {
-                return reader.readCode();
-            });
-        }
 
-        /**
-         * Grabs a frame from preview stream uning Win10-only API and tries to
-         *   get a barcode using zxing reader provided. If there is no barcode
-         *   found, returns null.
-         */
-        function scanBarcodeAsync(mediaCapture, zxingReader, frameWidth, frameHeight) {
-            // Shortcuts for namespaces
-            var Imaging = Windows.Graphics.Imaging;
-            var Streams = Windows.Storage.Streams;
+                var controller = capture.videoDeviceController;
+                var deviceProps = controller.getAvailableMediaStreamProperties(Windows.Media.Capture.MediaStreamType.videoRecord);
 
-            var frame = new Windows.Media.VideoFrame(Imaging.BitmapPixelFormat.bgra8, frameWidth, frameHeight);
-            return mediaCapture.getPreviewFrameAsync(frame)
-            .then(function (capturedFrame) {
+                deviceProps = Array.prototype.slice.call(deviceProps);
+                deviceProps = deviceProps.filter(function (prop) {
+                    // filter out streams with "unknown" subtype - causes errors on some devices
+                    return prop.subtype !== "Unknown";
+                }).sort(function (propA, propB) {
+                    // sort properties by resolution
+                    return propB.width - propA.width;
+                });
 
-                // Copy captured frame to buffer for further deserialization
-                var bitmap = capturedFrame.softwareBitmap;
-                var rawBuffer = new Streams.Buffer(bitmap.pixelWidth * bitmap.pixelHeight * 4);
-                capturedFrame.softwareBitmap.copyToBuffer(rawBuffer);
-                capturedFrame.close();
+                var maxResProps = deviceProps[0];
+                return controller.setMediaStreamPropertiesAsync(Windows.Media.Capture.MediaStreamType.videoRecord, maxResProps)
+                .then(function () {
+                    return {
+                        capture: capture,
+                        width: maxResProps.width,
+                        height: maxResProps.height
+                    };
+                });
+            })
+            .then(function (captureSettings) {
 
-                // Get raw pixel data from buffer
-                var data = new Uint8Array(rawBuffer.length);
-                var dataReader = Streams.DataReader.fromBuffer(rawBuffer);
-                dataReader.readBytes(data);
-                dataReader.close();
+                capturePreview.msZoom = true;
+                capturePreview.src = URL.createObjectURL(capture);
+                capturePreview.play();
 
-                var result = zxingReader.decode(data, frameWidth, frameHeight, ZXing.BitmapFormat.bgra32);
-                return WinJS.Promise.wrap(result);
+                // Insert preview frame and controls into page
+                document.body.appendChild(capturePreviewFrame);
+
+                return setupFocus(captureSettings.capture.videoDeviceController.focusControl)
+                .then(function () {
+                    Windows.Graphics.Display.DisplayInformation.getForCurrentView().addEventListener("orientationchanged", updatePreviewForRotation, false);
+                    return updatePreviewForRotation();
+                })
+                .then(function () {
+                    return captureSettings;
+                });
             });
         }
 
@@ -398,12 +428,32 @@ module.exports = {
             reader && reader.stop();
         }
 
-        try {
-            createPreview();
-            startPreview();
-        } catch (ex) {
-            fail(ex);
-        }
+        WinJS.Promise.wrap(createPreview())
+        .then(function () {
+            return startPreview();
+        })
+        .then(function (captureSettings) {
+            reader = BarcodeReader.get(captureSettings.capture);
+            reader.init(captureSettings.capture, captureSettings.width, captureSettings.height);
+
+            // Add a small timeout before capturing first frame otherwise
+            // we would get an 'Invalid state' error from 'getPreviewFrameAsync'
+            return WinJS.Promise.timeout(200)
+            .then(function () {
+                return reader.readCode();
+            });
+        })
+        .done(function (result) {
+            destroyPreview();
+            success({
+                text: result && result.text,
+                format: result && BARCODE_FORMAT[result.barcodeFormat],
+                cancelled: !result
+            });
+        }, function (error) {
+            destroyPreview();
+            fail(error);
+        });
     },
 
     /**
