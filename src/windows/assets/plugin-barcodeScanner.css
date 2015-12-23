@@ -25,6 +25,7 @@
     width: 100%;
     height: 3px;
     background: red
+    z-index: 9999999;
 }
 
 .barcode-scanner-app-bar {

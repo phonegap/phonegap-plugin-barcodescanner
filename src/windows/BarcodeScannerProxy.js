@@ -40,69 +40,30 @@ var BARCODE_FORMAT = {
 };
 
 /**
- * @param {Function<Object>} callback
+ * Detects the first appropriate camera located at the back panel of device. If
+ *   there is no back cameras, returns the first available.
+ *
+ * @returns {Promise<String>} Camera id
  */
-function findCamera(callback) {
+function findCamera() {
+    var Devices = Windows.Devices.Enumeration;
+
     // Enumerate cameras and add them to the list
-    var deviceInfo = Windows.Devices.Enumeration.DeviceInformation;
-    deviceInfo.findAllAsync(Windows.Devices.Enumeration.DeviceClass.videoCapture).done(function (cameras) {
-        var camerasConfigs = cameras.map(function(camera) {
-            var cameraConfig = {
-                id: camera.id,
-                isFrontLocation: false,
-                isBackLocation: false
-            };
+    return Devices.DeviceInformation.findAllAsync(Devices.DeviceClass.videoCapture)
+    .then(function (cameras) {
 
-            if (camera.enclosureLocation !== null) {
-                cameraConfig.isFrontLocation = camera.enclosureLocation.panel === Windows.Devices.Enumeration.Panel.front;
-                cameraConfig.isBackLocation = camera.enclosureLocation.panel === Windows.Devices.Enumeration.Panel.back;
-            }
-
-            return cameraConfig;
-        });
-
-        var selectedCameraConfig = null;
-        camerasConfigs.forEach(function(cameraConfig) {
-            if (cameraConfig.isBackLocation) {
-                selectedCameraConfig = cameraConfig;
-            }
-        });
-
-        if (selectedCameraConfig === null) {
-            selectedCameraConfig = camerasConfigs[0];
+        if (!cameras || cameras.length === 0) {
+            throw new Error("No cameras found");
         }
 
-        callback(selectedCameraConfig.id)
-    }, function() {
-        // error happened
+        var backCameras = cameras.filter(function (camera) {
+            return camera.enclosureLocation.panel === Devices.Panel.back;
+        });
+
+        // If there is back cameras, return the id of the first,
+        // otherwise take the first available device's id
+        return (backCameras[0] || cameras[0]).id;
     });
-}
-
-/**
- * @param {Windows.Graphics.Display.DisplayOrientations} displayOrientation
- * @return {Number}
- */
-function videoPreviewRotationLookup(displayOrientation) {
-    var degreesToRotate;
-
-    switch (displayOrientation) {
-        case Windows.Graphics.Display.DisplayOrientations.landscape: 
-            degreesToRotate = 0;
-            break;           
-        case Windows.Graphics.Display.DisplayOrientations.portrait:
-            degreesToRotate = 90;
-            break;
-        case Windows.Graphics.Display.DisplayOrientations.landscapeFlipped: 
-            degreesToRotate = 180;
-            break;
-        case Windows.Graphics.Display.DisplayOrientations.portraitFlipped: 
-            degreesToRotate = 270;
-            break;
-        default:
-            degreesToRotate = 0;
-            break;
-    }
-    return degreesToRotate;
 }
 
 module.exports = {
@@ -126,7 +87,6 @@ module.exports = {
          * Creates a preview frame and necessary objects
          */
         function createPreview() {
-            Windows.Graphics.Display.DisplayInformation.getForCurrentView().addEventListener("orientationchanged", updatePreviewForRotation, false);
 
             // Create fullscreen preview
             var capturePreviewFrameStyle = document.createElement('link');
@@ -165,8 +125,6 @@ module.exports = {
             [capturePreview, capturePreviewAlignmentMark, navigationButtonsDiv].forEach(function (element) {
                 capturePreviewFrame.appendChild(element);
             });
-
-            capture = new Windows.Media.Capture.MediaCapture();
         }
 
         function focus(controller) {
@@ -254,37 +212,33 @@ module.exports = {
                     var maxResProps = deviceProps[0];
 
                     controller.setMediaStreamPropertiesAsync(Windows.Media.Capture.MediaStreamType.videoRecord, maxResProps).done(function () {
-                    // handle portrait orientation
-                    if (Windows.Graphics.Display.DisplayProperties.nativeOrientation == Windows.Graphics.Display.DisplayOrientations.portrait) {
-                        capture.setPreviewRotation(Windows.Media.Capture.VideoRotation.clockwise90Degrees);
-                        capturePreview.msZoom = true;
-                    }
+                        // handle portrait orientation
+                        if (Windows.Graphics.Display.DisplayProperties.nativeOrientation == Windows.Graphics.Display.DisplayOrientations.portrait) {
+                            capture.setPreviewRotation(Windows.Media.Capture.VideoRotation.clockwise90Degrees);
+                            capturePreview.msZoom = true;
+                        }
 
                         capturePreview.src = URL.createObjectURL(capture);
                         capturePreview.play();
 
                         // Insert preview frame and controls into page
-                        document.body.appendChild(capturePreview);
-                        document.body.appendChild(capturePreviewAlignmentMark);
-                        document.body.appendChild(captureCancelButton);
+                        document.body.appendChild(capturePreviewFrame);
 
-                    // Insert preview frame and controls into page
-                    document.body.appendChild(capturePreviewFrame);
-
-                    setupFocus(controller.focusControl)
-                    .then(function () {
-                        return startBarcodeSearch(maxResProps.width, maxResProps.height);
-                    })
-                    .done(function (result) {
-                        destroyPreview();
-                        success({
-                            text: result && result.text,
-                            format: result && BARCODE_FORMAT[result.barcodeFormat],
-                            cancelled: !result
+                        setupFocus(controller.focusControl)
+                        .then(function () {
+                            return startBarcodeSearch(maxResProps.width, maxResProps.height);
+                        })
+                        .done(function (result) {
+                            destroyPreview();
+                            success({
+                                text: result && result.text,
+                                format: result && BARCODE_FORMAT[result.barcodeFormat],
+                                cancelled: !result
+                            });
+                        }, function (error) {
+                            destroyPreview();
+                            fail(error);
                         });
-                    }, function (error) {
-                        destroyPreview();
-                        fail(error);
                     });
                 });
             });
