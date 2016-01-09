@@ -43,7 +43,7 @@ The process may vary depending on version of Zxing project, but base steps shoul
 
 1. Update plugin.xml with any needed resources (you can use ```plugin.xml.generate.php``` to generate some stuff for Android).
 
-## Building with plugman ##
+## Building with plugman ## 
 
 [Plugman](https://github.com/apache/cordova-plugman) is a Node.js tool used by PG Build.
 
