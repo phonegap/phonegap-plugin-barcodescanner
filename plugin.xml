@@ -48,7 +48,6 @@
 
     <!-- android -->
     <platform name="android">
-
         <source-file src="src/android/com/phonegap/plugins/barcodescanner/BarcodeScanner.java" target-dir="src/com/phonegap/plugins/barcodescanner" />
         <source-file src="src/android/com/phonegap/plugins/barcodescanner/IntentIntegrator.java" target-dir="src/com/phonegap/plugins/barcodescanner" />
         <source-file src="src/android/com/phonegap/plugins/barcodescanner/IntentResult.java" target-dir="src/android/com/phonegap/plugins/barcodescanner/" />
@@ -57,20 +56,6 @@
             <feature name="BarcodeScanner">
                 <param name="android-package" value="com.phonegap.plugins.barcodescanner.BarcodeScanner" />
             </feature>
-        </config-file>
-
-        <config-file target="AndroidManifest.xml" parent="/manifest/application">
-        </config-file>
-
-        <config-file target="AndroidManifest.xml" parent="/manifest">
-            <uses-permission android:name="android.permission.CAMERA" />
-            <uses-permission android:name="android.permission.FLASHLIGHT" />
-            <!-- Not required to allow users to work around this -->
-            <uses-feature android:name="android.hardware.camera" android:required="false" />
-        </config-file>
-
-        <!-- plugman cannot merge - prepare manual merge -->
-        <config-file target="res/values/strings.xml" parent="/resources">
         </config-file>
     </platform>
 
