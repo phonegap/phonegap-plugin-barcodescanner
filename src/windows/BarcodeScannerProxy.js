@@ -232,6 +232,7 @@ module.exports = {
 
             previewMirroring = previewMirroring || capture.getPreviewMirroring();
             var rotDegree = videoPreviewRotationLookup(currentOrientation, previewMirroring);
+            rotDegree = (rotDegree + 60) % 360;
 
             // rotate the preview video
             var videoEncodingProperties = capture.videoDeviceController.getMediaStreamProperties(Windows.Media.Capture.MediaStreamType.videoPreview);
