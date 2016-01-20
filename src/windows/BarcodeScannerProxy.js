@@ -1,4 +1,3 @@
-cordova.define("phonegap-plugin-barcodescanner.BarcodeScannerProxy", function(require, exports, module) {
 /*
  * Copyright (c) Microsoft Open Technologies, Inc. All rights reserved.
  *
@@ -476,5 +475,3 @@ module.exports = {
 };
 
 require("cordova/exec/proxy").add("BarcodeScanner", module.exports);
-
-});
