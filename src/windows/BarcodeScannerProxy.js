@@ -74,24 +74,29 @@ function videoPreviewRotationLookup(displayOrientation, isMirrored) {
     var degreesToRotate;
 
     switch (displayOrientation) {
+        case Windows.Graphics.Display.DisplayOrientations.landscape:
+            degreesToRotate = 0;
+            break;
         case Windows.Graphics.Display.DisplayOrientations.portrait:
-            degreesToRotate = 90;
+            if (isMirrored) {
+                degreesToRotate = 270;
+            } else {
+                degreesToRotate = 90;
+            }
             break;
         case Windows.Graphics.Display.DisplayOrientations.landscapeFlipped:
             degreesToRotate = 180;
             break;
         case Windows.Graphics.Display.DisplayOrientations.portraitFlipped:
-            degreesToRotate = 270;
+            if (isMirrored) {
+                degreesToRotate = 90;
+            } else {
+                degreesToRotate = 270;
+            }
             break;
-        case Windows.Graphics.Display.DisplayOrientations.landscape:
-            /* falls through */
         default:
             degreesToRotate = 0;
             break;
-    }
-
-    if (isMirrored) {
-        degreesToRotate = (360 - degreesToRotate) % 360;
     }
 
     return degreesToRotate;
@@ -225,18 +230,20 @@ module.exports = {
                 return;
             }
 
-            var ROTATION_KEY = "C380465D-2271-428C-9B83-ECEA3B4A85C1";
+            var rotGUID = "{0xC380465D, 0x2271, 0x428C, {0x9B, 0x83, 0xEC, 0xEA, 0x3B, 0x4A, 0x85, 0xC1}}";
 
             var displayInformation = (evt && evt.target) || Windows.Graphics.Display.DisplayInformation.getForCurrentView();
             var currentOrientation = displayInformation.currentOrientation;
 
-            previewMirroring = previewMirroring || capture.getPreviewMirroring();
+            previewMirroring = capture.getPreviewMirroring();
+
+            // Lookup up the rotation degrees.   
             var rotDegree = videoPreviewRotationLookup(currentOrientation, previewMirroring);
 
             // rotate the preview video
-            var videoEncodingProperties = capture.videoDeviceController.getMediaStreamProperties(Windows.Media.Capture.MediaStreamType.videoPreview);
-            videoEncodingProperties.properties.insert(ROTATION_KEY, rotDegree);
-            return capture.videoDeviceController.setMediaStreamPropertiesAsync(Windows.Media.Capture.MediaStreamType.videoPreview, videoEncodingProperties);
+            var videoEncodingProperties = capture.videoDeviceController.getMediaStreamProperties(Windows.Media.Capture.MediaStreamType.VideoPreview);
+            videoEncodingProperties.properties.insert(rotGUID, rotDegree);
+            capture.setEncodingPropertiesAsync(Windows.Media.Capture.MediaStreamType.VideoPreview, videoEncodingProperties, null);
         }
 
         /**
