@@ -21,7 +21,8 @@
 .barcode-scanner-mark {
     position: absolute;
     left: 0;
-    top: 50%;
+    top: calc(50% - 35px);
+	transform: translateY(-50%);
     width: 100%;
     height: 3px;
     background: red;
@@ -29,8 +30,11 @@
 }
 
 .barcode-scanner-app-bar {
+	position: absolute;
+    bottom: 0;
+	width: 100%;
     height: 70px;
-    width: 100%;
+	background-color: black;
     padding-top: 10px;
     z-index: 9999999;
     text-align: center;

@@ -2,5 +2,8 @@
 bin/
 .classpath
 .project
+.vs/
+src/windows/lib/Backup/
+src/windows/lib/obj/Debug/
 *.iml
 local.properties

@@ -67,37 +67,6 @@ function findCamera() {
 }
 
 /**
- * @param {Windows.Graphics.Display.DisplayOrientations} displayOrientation
- * @return {Number}
- */
-function videoPreviewRotationLookup(displayOrientation, isMirrored) {
-    var degreesToRotate;
-
-    switch (displayOrientation) {
-        case Windows.Graphics.Display.DisplayOrientations.portrait:
-            degreesToRotate = 90;
-            break;
-        case Windows.Graphics.Display.DisplayOrientations.landscapeFlipped:
-            degreesToRotate = 180;
-            break;
-        case Windows.Graphics.Display.DisplayOrientations.portraitFlipped:
-            degreesToRotate = 270;
-            break;
-        case Windows.Graphics.Display.DisplayOrientations.landscape:
-            /* falls through */
-        default:
-            degreesToRotate = 0;
-            break;
-    }
-
-    if (isMirrored) {
-        degreesToRotate = (360 - degreesToRotate) % 360;
-    }
-
-    return degreesToRotate;
-}
-
-/**
  * The pure JS implementation of barcode reader from WinRTBarcodeReader.winmd.
  *   Works only on Windows 10 devices and more efficient than original one.
  *
@@ -215,28 +184,37 @@ module.exports = {
             capturePreviewAlignmentMark,
             captureCancelButton,
             navigationButtonsDiv,
-            previewMirroring,
             closeButton,
             capture,
             reader;
 
-        function updatePreviewForRotation(evt) {
+        function updatePreviewForRotation() {
             if (!capture) {
                 return;
             }
 
-            var ROTATION_KEY = "C380465D-2271-428C-9B83-ECEA3B4A85C1";
+            var displayInformation = Windows.Graphics.Display.DisplayInformation.getForCurrentView();
+            capture.setPreviewRotation(previewVideoRotation(displayInformation.currentOrientation));
+        }
 
-            var displayInformation = (evt && evt.target) || Windows.Graphics.Display.DisplayInformation.getForCurrentView();
-            var currentOrientation = displayInformation.currentOrientation;
+        /**
+         * @param {Windows.Graphics.Display.DisplayOrientations} displayOrientation
+         * @return {Windows.Media.Capture.VideoRotation}
+         */
+        function previewVideoRotation(displayOrientation) {
+            switch (displayOrientation) {
+                case Windows.Graphics.Display.DisplayOrientations.portrait:
+                    return Windows.Media.Capture.VideoRotation.clockwise90Degrees;
 
-            previewMirroring = previewMirroring || capture.getPreviewMirroring();
-            var rotDegree = videoPreviewRotationLookup(currentOrientation, previewMirroring);
+                case Windows.Graphics.Display.DisplayOrientations.landscapeFlipped:
+                    return Windows.Media.Capture.VideoRotation.clockwise180Degrees;
 
-            // rotate the preview video
-            var videoEncodingProperties = capture.videoDeviceController.getMediaStreamProperties(Windows.Media.Capture.MediaStreamType.videoPreview);
-            videoEncodingProperties.properties.insert(ROTATION_KEY, rotDegree);
-            return capture.videoDeviceController.setMediaStreamPropertiesAsync(Windows.Media.Capture.MediaStreamType.videoPreview, videoEncodingProperties);
+                case Windows.Graphics.Display.DisplayOrientations.portraitFlipped:
+                    return Windows.Media.Capture.VideoRotation.clockwise270Degrees;
+
+                default:
+                    return Windows.Media.Capture.VideoRotation.none;
+            }
         }
 
         /**
@@ -358,7 +336,6 @@ module.exports = {
 
                 var controller = capture.videoDeviceController;
                 var deviceProps = controller.getAvailableMediaStreamProperties(Windows.Media.Capture.MediaStreamType.videoRecord);
-
                 deviceProps = Array.prototype.slice.call(deviceProps);
                 deviceProps = deviceProps.filter(function (prop) {
                     // filter out streams with "unknown" subtype - causes errors on some devices
@@ -461,7 +438,7 @@ module.exports = {
      * @param  {function} success Success callback
      * @param  {function} fail    Error callback
      * @param  {array} args       Arguments array
-     */
+     */ 
     encode: function (success, fail, args) {
         fail("Not implemented yet");
     }
