@@ -44,6 +44,7 @@
 // plugin class
 //------------------------------------------------------------------------------
 @interface CDVBarcodeScanner : CDVPlugin {}
+@property (nonatomic, assign) CDVbcsProcessor* processor;
 - (NSString*)isScanNotPossible;
 - (void)scan:(CDVInvokedUrlCommand*)command;
 - (void)encode:(CDVInvokedUrlCommand*)command;
@@ -138,7 +139,7 @@
 
 //--------------------------------------------------------------------------
 - (void)scan:(CDVInvokedUrlCommand*)command {
-    CDVbcsProcessor* processor;
+//    CDVbcsProcessor* processor;
     NSString*       callback;
     NSString*       capabilityError;
     
@@ -157,14 +158,14 @@
         return;
     }
     
-    processor = [[CDVbcsProcessor alloc]
+    self.processor = [[CDVbcsProcessor alloc]
                  initWithPlugin:self
                  callback:callback
                  parentViewController:self.viewController
                  alterateOverlayXib:overlayXib
                  ];
     // queue [processor scanBarcode] to run on the event loop
-    [processor performSelector:@selector(scanBarcode) withObject:nil afterDelay:0];
+    [self.processor performSelector:@selector(scanBarcode) withObject:nil afterDelay:0];
 }
 
 //--------------------------------------------------------------------------
@@ -187,6 +188,11 @@
     [processor retain];
     // queue [processor generateImage] to run on the event loop
     [processor performSelector:@selector(generateImage) withObject:nil afterDelay:0];
+}
+
+
+- (void)cancel:(CDVInvokedUrlCommand*)command {
+    [self.processor barcodeScanCancelled];
 }
 
 - (void)returnImage:(NSString*)filePath format:(NSString*)format callback:(NSString*)callback{
@@ -313,17 +319,20 @@ parentViewController:(UIViewController*)parentViewController
 
 //--------------------------------------------------------------------------
 - (void)openDialog {
-    [self.parentViewController
-     presentViewController:self.viewController
-     animated:YES completion:nil
-     ];
+//    [self.parentViewController
+//     presentViewController:self.viewController
+//     animated:YES completion:nil
+//     ];
+    
+    [self.parentViewController.view insertSubview:self.viewController.view atIndex:0];
 }
 
 //--------------------------------------------------------------------------
 - (void)barcodeScanDone {
     self.capturing = NO;
     [self.captureSession stopRunning];
-    [self.parentViewController dismissViewControllerAnimated:YES completion:nil];
+//    [self.parentViewController dismissViewControllerAnimated:YES completion:nil];
+    [self.viewController.view removeFromSuperview];
     
     // viewcontroller holding onto a reference to us, release them so they
     // will release us
