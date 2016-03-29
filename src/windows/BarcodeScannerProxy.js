@@ -1,4 +1,4 @@
-/*
+cordova.define("phonegap-plugin-barcodescanner.BarcodeScannerProxy", function(require, exports, module) { /*
  * Copyright (c) Microsoft Open Technologies, Inc. All rights reserved.
  *
  * Licensed under the Apache License, Version 2.0 (the "License"); you may not use this file except in compliance with the License. You may obtain a copy of the License at
@@ -31,29 +31,49 @@ module.exports = {
 
             // Create fullscreen preview
             capturePreview = document.createElement("video");
-            capturePreview.style.cssText = "position: absolute; left: 0; top: 0; width: 100%; height: 100%; background: black";
+            capturePreview.style.cssText = "position: absolute; left: 0; top: 0; width: 100%; height: 100%; background: black;  z-index: 10000!important;";
 
             capturePreviewAlignmentMark = document.createElement('div');
-            capturePreviewAlignmentMark.style.cssText = "position: absolute; left: 0; top: 50%; width: 100%; height: 3px; background: red";
+            capturePreviewAlignmentMark.style.cssText = "position: absolute; left: 0; top: 50%; width: 100%; height: 3px; background: red;  z-index: 10000!important;";
 
             // Create cancel button
             captureCancelButton = document.createElement("button");
             captureCancelButton.innerText = "Cancel";
-            captureCancelButton.style.cssText = "position: absolute; right: 0; bottom: 0; display: block; margin: 20px";
+            captureCancelButton.style.cssText = "position: absolute; right: 0; bottom: 0; display: block; margin: 20px;  z-index: 10000!important;";
             captureCancelButton.addEventListener('click', cancelPreview, false);
 
             capture = new Windows.Media.Capture.MediaCapture();
         }
 
+        function findCamera() {
+            var Devices = Windows.Devices.Enumeration;
+
+            // Enumerate cameras and add them to the list
+            return Devices.DeviceInformation.findAllAsync(Devices.DeviceClass.videoCapture)
+            .then(function (cameras) {
+
+                var backCameras = cameras.filter(function (camera) {
+                    return camera.enclosureLocation.panel === Devices.Panel.back;
+                });
+
+                // If there is back cameras, return the id of the first,
+                // otherwise take the first available device's id
+                return (backCameras[0] || cameras[0]).id;
+            });
+        } 
+         
         /**
          * Starts stream transmission to preview frame and then run barcode search
          */
         function startPreview() {
-            var captureSettings = new Windows.Media.Capture.MediaCaptureInitializationSettings();
-            captureSettings.streamingCaptureMode = Windows.Media.Capture.StreamingCaptureMode.video;
-            captureSettings.photoCaptureSource = Windows.Media.Capture.PhotoCaptureSource.videoPreview;
-
-            capture.initializeAsync(captureSettings).done(function () {
+            var captureSettings;
+            findCamera().then(function (id) {
+                captureSettings = new Windows.Media.Capture.MediaCaptureInitializationSettings();
+                captureSettings.streamingCaptureMode = Windows.Media.Capture.StreamingCaptureMode.video;
+                captureSettings.photoCaptureSource = Windows.Media.Capture.PhotoCaptureSource.videoPreview;
+                captureSettings.videoDeviceId = id;
+                return capture.initializeAsync(captureSettings);
+            }).done(function () {
 
                 //trying to set focus mode
                 var controller = capture.videoDeviceController;
@@ -174,3 +194,5 @@ module.exports = {
 };
 
 require("cordova/exec/proxy").add("BarcodeScanner", module.exports);
+
+});
