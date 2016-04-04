@@ -882,6 +882,7 @@ parentViewController:(UIViewController*)parentViewController
 {
     [[NSBundle mainBundle] loadNibNamed:self.alternateXib owner:self options:NULL];
     
+    self.overlayView.frame = self.view.bounds;
     if ( self.overlayView == nil )
     {
         NSLog(@"%@", @"An error occurred loading the overlay xib.  It appears that the overlayView outlet is not set.");
