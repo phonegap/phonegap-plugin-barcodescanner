@@ -373,12 +373,14 @@ parentViewController:(UIViewController*)parentViewController
     
     [output setSampleBufferDelegate:self queue:dispatch_get_global_queue(DISPATCH_QUEUE_PRIORITY_LOW, 0)];
     
-    if (![captureSession canSetSessionPreset:AVCaptureSessionPresetMedium]) {
-        return @"unable to preset medium quality video capture";
+    if ([captureSession canSetSessionPreset:AVCaptureSessionPresetHigh]) {
+      captureSession.sessionPreset = AVCaptureSessionPresetHigh;
+    } else if ([captureSession canSetSessionPreset:AVCaptureSessionPresetMedium]) {
+      captureSession.sessionPreset = AVCaptureSessionPresetMedium;
+    } else {
+      return @"unable to preset high nor medium quality video capture";
     }
-    
-    captureSession.sessionPreset = AVCaptureSessionPresetMedium;
-    
+
     if ([captureSession canAddInput:input]) {
         [captureSession addInput:input];
     }
