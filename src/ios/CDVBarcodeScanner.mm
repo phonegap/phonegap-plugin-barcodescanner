@@ -65,6 +65,7 @@
 @property (nonatomic, retain) AVCaptureSession*           captureSession;
 @property (nonatomic, retain) AVCaptureVideoPreviewLayer* previewLayer;
 @property (nonatomic, retain) NSString*                   alternateXib;
+@property (nonatomic, retain) NSString*                   formats;
 @property (nonatomic)         BOOL                        is1D;
 @property (nonatomic)         BOOL                        is2D;
 @property (nonatomic)         BOOL                        capturing;
@@ -147,8 +148,8 @@
     if ([options isKindOfClass:[NSNull class]]) {
       options = [NSDictionary dictionary];
     }
-    BOOL preferFrontCamera = [[options objectForKey:@"preferFrontCamera"] boolValue];
-    BOOL showFlipCameraButton = [[options objectForKey:@"showFlipCameraButton"] boolValue];
+    BOOL preferFrontCamera = [options[@"preferFrontCamera"] boolValue];
+    BOOL showFlipCameraButton = [options[@"showFlipCameraButton"] boolValue];
     // We allow the user to define an alternate xib file for loading the overlay.
     NSString *overlayXib = [options objectForKey:@"overlayXib"];
 
@@ -173,6 +174,8 @@
     if (showFlipCameraButton) {
       processor.isShowFlipCameraButton = true;
     }
+
+    processor.formats = options[@"formats"];
 
     [processor performSelector:@selector(scanBarcode) withObject:nil afterDelay:0];
 }
@@ -443,17 +446,37 @@ parentViewController:(UIViewController*)parentViewController
     //        NSTimeInterval timeStart = [NSDate timeIntervalSinceReferenceDate];
     
     try {
+        NSArray *supportedFormats = nil;
+        if (self.formats != nil) {
+            supportedFormats = [self.formats componentsSeparatedByString:@","];
+        }
         DecodeHints decodeHints;
-        decodeHints.addFormat(BarcodeFormat_QR_CODE);
-        decodeHints.addFormat(BarcodeFormat_DATA_MATRIX);
-        decodeHints.addFormat(BarcodeFormat_UPC_E);
-        decodeHints.addFormat(BarcodeFormat_UPC_A);
-        decodeHints.addFormat(BarcodeFormat_EAN_8);
-        decodeHints.addFormat(BarcodeFormat_EAN_13);
-        decodeHints.addFormat(BarcodeFormat_CODE_128);
-        decodeHints.addFormat(BarcodeFormat_CODE_39);
-        //            decodeHints.addFormat(BarcodeFormat_ITF);   causing crashes
-        
+        if (supportedFormats == nil || [supportedFormats containsObject:[self formatStringFrom:BarcodeFormat_QR_CODE]]) {
+            decodeHints.addFormat(BarcodeFormat_QR_CODE);
+        }
+        if (supportedFormats == nil || [supportedFormats containsObject:[self formatStringFrom:BarcodeFormat_CODE_128]]) {
+            decodeHints.addFormat(BarcodeFormat_CODE_128);
+        }
+        if (supportedFormats == nil || [supportedFormats containsObject:[self formatStringFrom:BarcodeFormat_CODE_39]]) {
+            decodeHints.addFormat(BarcodeFormat_CODE_39);
+        }
+        if (supportedFormats == nil || [supportedFormats containsObject:[self formatStringFrom:BarcodeFormat_DATA_MATRIX]]) {
+            decodeHints.addFormat(BarcodeFormat_DATA_MATRIX);
+        }
+        if (supportedFormats == nil || [supportedFormats containsObject:[self formatStringFrom:BarcodeFormat_UPC_E]]) {
+            decodeHints.addFormat(BarcodeFormat_UPC_E);
+        }
+        if (supportedFormats == nil || [supportedFormats containsObject:[self formatStringFrom:BarcodeFormat_UPC_A]]) {
+            decodeHints.addFormat(BarcodeFormat_UPC_A);
+        }
+        if (supportedFormats == nil || [supportedFormats containsObject:[self formatStringFrom:BarcodeFormat_EAN_8]]) {
+            decodeHints.addFormat(BarcodeFormat_EAN_8);
+        }
+        if (supportedFormats == nil || [supportedFormats containsObject:[self formatStringFrom:BarcodeFormat_EAN_13]]) {
+            decodeHints.addFormat(BarcodeFormat_EAN_13);
+        }
+//        decodeHints.addFormat(BarcodeFormat_ITF);   causing crashes
+      
         // here's the meat of the decode process
         Ref<LuminanceSource>   luminanceSource   ([self getLuminanceSourceFromSample: sampleBuffer imageBytes:&imageBytes]);
         //            [self dumpImage: [[self getImageFromLuminanceSource:luminanceSource] autorelease]];
