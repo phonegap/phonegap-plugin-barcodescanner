@@ -57,7 +57,7 @@ function findCamera() {
         }
 
         var backCameras = cameras.filter(function (camera) {
-            return camera.enclosureLocation.panel === Devices.Panel.back;
+            return camera.enclosureLocation && camera.enclosureLocation.panel === Devices.Panel.back;
         });
 
         // If there is back cameras, return the id of the first,
@@ -230,20 +230,20 @@ module.exports = {
                 return;
             }
 
-            var rotGUID = "{0xC380465D, 0x2271, 0x428C, {0x9B, 0x83, 0xEC, 0xEA, 0x3B, 0x4A, 0x85, 0xC1}}";
+            var ROTATION_KEY = "C380465D-2271-428C-9B83-ECEA3B4A85C1";
 
             var displayInformation = (evt && evt.target) || Windows.Graphics.Display.DisplayInformation.getForCurrentView();
             var currentOrientation = displayInformation.currentOrientation;
 
             previewMirroring = capture.getPreviewMirroring();
 
-            // Lookup up the rotation degrees.   
+            // Lookup up the rotation degrees.
             var rotDegree = videoPreviewRotationLookup(currentOrientation, previewMirroring);
 
             // rotate the preview video
-            var videoEncodingProperties = capture.videoDeviceController.getMediaStreamProperties(Windows.Media.Capture.MediaStreamType.VideoPreview);
-            videoEncodingProperties.properties.insert(rotGUID, rotDegree);
-            capture.setEncodingPropertiesAsync(Windows.Media.Capture.MediaStreamType.VideoPreview, videoEncodingProperties, null);
+            var videoEncodingProperties = capture.videoDeviceController.getMediaStreamProperties(Windows.Media.Capture.MediaStreamType.videoPreview);
+            videoEncodingProperties.properties.insert(ROTATION_KEY, rotDegree);
+            return capture.videoDeviceController.setMediaStreamPropertiesAsync(Windows.Media.Capture.MediaStreamType.videoPreview, videoEncodingProperties);
         }
 
         /**
