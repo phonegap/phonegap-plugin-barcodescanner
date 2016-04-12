@@ -7940,7 +7940,7 @@ namespace zxing {
 
     Ref<Result> OneDReader::decode(Ref<BinaryBitmap> image, DecodeHints hints) {
       Ref<Result> result = doDecode(image, hints);
-      if (result.empty() && hints.getTryHarder() && image->isRotateSupported()) {
+      if (result.empty()) {
         Ref<BinaryBitmap> rotatedImage(image->rotateCounterClockwise());
         result = doDecode(rotatedImage, hints);
         if (!result.empty()) {
@@ -11979,4 +11979,3 @@ Point QREdgeDetector::endOfReverseBlackWhiteBlackRun(const BitMatrix& image, Poi
 
 } // namespace qrcode
 } // namespace zxing
-
