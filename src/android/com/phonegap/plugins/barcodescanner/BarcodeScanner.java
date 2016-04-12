@@ -20,15 +20,12 @@ import org.apache.cordova.CordovaPlugin;
 import org.apache.cordova.CallbackContext;
 import org.apache.cordova.PluginResult;
 
-import android.util.Log;
-
 /**
  * This calls out to the ZXing barcode reader and returns the result.
  *
  * @sa https://github.com/apache/cordova-android/blob/master/framework/src/org/apache/cordova/CordovaPlugin.java
  */
 public class BarcodeScanner extends CordovaPlugin {
-    public static final int REQUEST_CODE = 0x0ba7c0de;
 
     private static final String SCAN = "scan";
     private static final String ENCODE = "encode";
@@ -37,10 +34,8 @@ public class BarcodeScanner extends CordovaPlugin {
     private static final String TEXT = "text";
     private static final String DATA = "data";
     private static final String TYPE = "type";
-    private static final String SCAN_INTENT = "com.google.zxing.client.android.SCAN";
     private static final String ENCODE_DATA = "ENCODE_DATA";
     private static final String ENCODE_TYPE = "ENCODE_TYPE";
-    private static final String ENCODE_INTENT = "com.phonegap.plugins.barcodescanner.ENCODE";
     private static final String TEXT_TYPE = "TEXT_TYPE";
     private static final String EMAIL_TYPE = "EMAIL_TYPE";
     private static final String PHONE_TYPE = "PHONE_TYPE";
@@ -109,8 +104,8 @@ public class BarcodeScanner extends CordovaPlugin {
      * Starts an intent to scan and decode a barcode.
      */
     public void scan(JSONArray args) {
-        Intent intentScan = new Intent(SCAN_INTENT);
-        intentScan.addCategory(Intent.CATEGORY_DEFAULT);
+
+        IntentIntegrator integrator = new IntentIntegrator(this);
 
         // add config as intent extras
         if(args.length() > 0) {
@@ -136,9 +131,9 @@ public class BarcodeScanner extends CordovaPlugin {
                         value = obj.get(key);
 
                         if(value instanceof Integer) {
-                            intentScan.putExtra(key, (Integer)value);
+                            integrator.addExtra(key, (Integer)value);
                         } else if(value instanceof String) {
-                            intentScan.putExtra(key, (String)value);
+                            integrator.addExtra(key, (String)value);
                         }
 
                     } catch(JSONException e) {
@@ -150,10 +145,7 @@ public class BarcodeScanner extends CordovaPlugin {
 
         }
 
-        // avoid calling other phonegap apps
-        intentScan.setPackage(this.cordova.getActivity().getApplicationContext().getPackageName());
-
-        this.cordova.startActivityForResult((CordovaPlugin) this, intentScan, REQUEST_CODE);
+        integrator.initiateScan();
     }
 
     /**
@@ -166,33 +158,32 @@ public class BarcodeScanner extends CordovaPlugin {
      */
     @Override
     public void onActivityResult(int requestCode, int resultCode, Intent intent) {
-        if (requestCode == REQUEST_CODE) {
-            if (resultCode == Activity.RESULT_OK) {
-                JSONObject obj = new JSONObject();
-                try {
-                    obj.put(TEXT, intent.getStringExtra("SCAN_RESULT"));
-                    obj.put(FORMAT, intent.getStringExtra("SCAN_RESULT_FORMAT"));
-                    obj.put(CANCELLED, false);
-                } catch (JSONException e) {
-                    Log.d(LOG_TAG, "This should never happen");
-                }
-                //this.success(new PluginResult(PluginResult.Status.OK, obj), this.callback);
+        IntentResult result = IntentIntegrator.parseActivityResult(requestCode, resultCode, intent);
+        if(result == null)
+            return;
+
+        JSONObject obj = new JSONObject();
+
+        if (resultCode == Activity.RESULT_CANCELED) {
+            try {
+                obj.put(TEXT, "");
+                obj.put(FORMAT, "");
+                obj.put(CANCELLED, true);
                 this.callbackContext.success(obj);
-            } else if (resultCode == Activity.RESULT_CANCELED) {
-                JSONObject obj = new JSONObject();
-                try {
-                    obj.put(TEXT, "");
-                    obj.put(FORMAT, "");
-                    obj.put(CANCELLED, true);
-                } catch (JSONException e) {
-                    Log.d(LOG_TAG, "This should never happen");
-                }
-                //this.success(new PluginResult(PluginResult.Status.OK, obj), this.callback);
-                this.callbackContext.success(obj);
-            } else {
-                //this.error(new PluginResult(PluginResult.Status.ERROR), this.callback);
-                this.callbackContext.error("Unexpected error");
+            } catch (JSONException e) {
+                Log.d(LOG_TAG, "This should never happen");
             }
+        } else if(resultCode == Activity.RESULT_OK) {
+            try {
+                obj.put(TEXT, result.getContents());
+                obj.put(FORMAT, result.getFormatName());
+                obj.put(CANCELLED, false);
+                this.callbackContext.success(obj);
+            } catch (JSONException e) {
+                Log.d(LOG_TAG, "This should never happen");
+            }
+        } else {
+            this.callbackContext.error("Unexpected error");
         }
     }
 
@@ -203,12 +194,9 @@ public class BarcodeScanner extends CordovaPlugin {
      * @param data The data to encode in the bar code.
      */
     public void encode(String type, String data) {
-        Intent intentEncode = new Intent(ENCODE_INTENT);
-        intentEncode.putExtra(ENCODE_TYPE, type);
-        intentEncode.putExtra(ENCODE_DATA, data);
-        // avoid calling other phonegap apps
-        intentEncode.setPackage(this.cordova.getActivity().getApplicationContext().getPackageName());
-
-        this.cordova.getActivity().startActivity(intentEncode);
+        IntentIntegrator integrator = new IntentIntegrator(this);
+        integrator.shareText(data, type);
     }
+
+
 }
