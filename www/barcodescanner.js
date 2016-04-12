@@ -121,5 +121,11 @@ BarcodeScanner.prototype.encode = function (type, data, successCallback, errorCa
     ]);
 };
 
+BarcodeScanner.prototype.cancel = function (successCallback, errorCallback) {
+    exec(successCallback, errorCallback, 'BarcodeScanner', 'cancel', [
+        {}
+    ]);
+}
+
 var barcodeScanner = new BarcodeScanner();
 module.exports = barcodeScanner;
