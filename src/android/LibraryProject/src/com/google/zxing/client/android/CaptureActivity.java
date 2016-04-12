@@ -571,12 +571,12 @@ public final class CaptureActivity extends Activity implements SurfaceHolder.Cal
       }
     }
 
-    if (copyToClipboard && !resultHandler.areContentsSecure()) {
-      ClipboardManager clipboard = (ClipboardManager) getSystemService(CLIPBOARD_SERVICE);
-      if (displayContents != null) {
-        clipboard.setText(displayContents);
-      }
-    }
+//    if (copyToClipboard && !resultHandler.areContentsSecure()) {
+//      ClipboardManager clipboard = (ClipboardManager) getSystemService(CLIPBOARD_SERVICE);
+//      if (displayContents != null) {
+//        clipboard.setText(displayContents);
+//      }
+//    }
   }
 
   // Briefly show the contents of the barcode, then handle the result outside Barcode Scanner.
@@ -600,13 +600,13 @@ public final class CaptureActivity extends Activity implements SurfaceHolder.Cal
       statusView.setText(getString(resultHandler.getDisplayTitle()));
     }
 
-    if (copyToClipboard && !resultHandler.areContentsSecure()) {
-      ClipboardManager clipboard = (ClipboardManager) getSystemService(CLIPBOARD_SERVICE);
-      CharSequence text = resultHandler.getDisplayContents();
-      if (text != null) {
-        clipboard.setText(text);
-      }
-    }
+//    if (copyToClipboard && !resultHandler.areContentsSecure()) {
+//      ClipboardManager clipboard = (ClipboardManager) getSystemService(CLIPBOARD_SERVICE);
+//      CharSequence text = resultHandler.getDisplayContents();
+//      if (text != null) {
+//        clipboard.setText(text);
+//      }
+//    }
 
     if (source == IntentSource.NATIVE_APP_INTENT) {
       
