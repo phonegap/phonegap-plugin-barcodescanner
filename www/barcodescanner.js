@@ -9,6 +9,8 @@
 
 var exec = require("cordova/exec");
 
+var scanInProgress = false;
+
 /**
  * Constructor.
  *
@@ -95,8 +97,27 @@ BarcodeScanner.prototype.scan = function (successCallback, errorCallback, config
         console.log("BarcodeScanner.scan failure: success callback parameter must be a function");
         return;
     }
+    
+    if (scanInProgress) {
+        errorCallback('scan already in progress');
+        return;
+    }
+    
+    scanInProgress = true;
 
-    exec(successCallback, errorCallback, 'BarcodeScanner', 'scan', config);
+    exec(
+        function(result) {
+            scanInProgress = false;
+            successCallback(result);
+        }, 
+        function(error) {
+            scanInProgress = false;
+            errorCallback(error);
+        }, 
+        'BarcodeScanner', 
+        'scan', 
+        config
+    );
 };
 
 //-------------------------------------------------------------------
