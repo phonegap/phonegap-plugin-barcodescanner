@@ -68,7 +68,7 @@
   <string name="msg_default_format">Formato</string>
   <string name="msg_default_meta">Metadata</string>
   <string name="msg_default_mms_subject">Olá</string>
-  <string name="msg_default_status">Alinhar código de barras com o exemplo para ser lido.</string>
+  <string name="msg_default_status">Coloque um código de barras dentro do retângulo do visor para ser lido.</string>
   <string name="msg_default_time">Tempo</string>
   <string name="msg_default_type">Tipo</string>
   <string name="msg_encode_contents_failed">Não foi possível codificar o código de barradas apartir dos dados fornecidos.</string>
