@@ -10,11 +10,6 @@ Cross-platform BarcodeScanner for Cordova / PhoneGap.
 
 Follows the [Cordova Plugin spec](https://github.com/apache/cordova-plugman/blob/master/plugin_spec.md), so that it works with [Plugman](https://github.com/apache/cordova-plugman).
 
-Note: the Android source for this project includes an Android Library Project.
-plugman currently doesn't support Library Project refs, so its been
-prebuilt as a jar library. Any updates to the Library Project should be
-committed with an updated jar.
-
 ## Using the plugin ##
 The plugin creates the object `cordova/plugin/BarcodeScanner` with the method `scan(success, fail)`. 
 
@@ -60,6 +55,7 @@ On iOS and Android you can pass in options (ignored on WP8):
 And on Android you can also pass in these:
 * `prompt` default: Place a barcode inside the viewfinder rectangle to scan it.
 * `formats` default: all but PDF_417 and RSS_EXPANDED
+* `orientation` lock the orientation to "portrait" or "landscape". By default the scan view rotates with the device orientation.
 
 
 A full example could be:
@@ -78,7 +74,8 @@ A full example could be:
           "preferFrontCamera" : true,
           "showFlipCameraButton" : true,
           "prompt" : "Place a barcode inside the scan area", // supported on Android only
-          "formats" : "QR_CODE,PDF_417" // default: all but PDF_417 and RSS_EXPANDED
+          "formats" : "QR_CODE,PDF_417", // default: all but PDF_417 and RSS_EXPANDED
+          "orientation" : "landscape"
       }
    );
 ```
