@@ -33,10 +33,11 @@ The following barcode types are currently supported:
 * CODABAR
 * ITF
 * RSS14
+* RSS_EXPANDED
 
 Not by default, but supported if you pass in the "formats" option:
 * PDF417
-* RSS_EXPANDED
+* AZTEC
 
 ### iOS
 

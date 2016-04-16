@@ -1,0 +1,20 @@
+ext.cdvMinSdkVersion = 15
+
+repositories{
+    jcenter()
+    flatDir{
+        dirs 'libs'
+    }
+}
+
+dependencies {
+    compile 'com.android.support:support-v4:+'
+    compile(name:'barcodescanner', ext:'aar')
+}
+
+android {
+    packagingOptions {
+        exclude 'META-INF/NOTICE'
+        exclude 'META-INF/LICENSE'
+    }
+}

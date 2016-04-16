@@ -20,7 +20,6 @@ import android.app.Activity;
 import android.content.Intent;
 import android.content.pm.PackageManager;
 import android.os.Build;
-import android.support.annotation.NonNull;
 import android.support.v4.app.ActivityCompat;
 import android.support.v4.content.ContextCompat;
 import android.util.Log;
@@ -46,6 +45,7 @@ public class BarcodeScanner extends CordovaPlugin {
     private static final String DATA = "data";
     private static final String TYPE = "type";
     private static final String PREFER_FRONTCAMERA = "preferFrontCamera";
+    private static final String ORIENTATION = "orientation";
     private static final String SHOW_FLIP_CAMERA_BUTTON = "showFlipCameraButton";
     private static final String FORMATS = "formats";
     private static final String PROMPT = "prompt";
@@ -160,13 +160,16 @@ public class BarcodeScanner extends CordovaPlugin {
         intentScan.setPackage(this.cordova.getActivity().getApplicationContext().getPackageName());
 
         if (obj != null) {
-            intentScan.putExtra(Intents.Scan.PREFER_FRONTCAMERA, obj.optBoolean(PREFER_FRONTCAMERA, false));
+            intentScan.putExtra(Intents.Scan.CAMERA_ID, obj.optBoolean(PREFER_FRONTCAMERA, false) ? 1 : 0);
             intentScan.putExtra(Intents.Scan.SHOW_FLIP_CAMERA_BUTTON, obj.optBoolean(SHOW_FLIP_CAMERA_BUTTON, false));
             if (obj.has(FORMATS)) {
                 intentScan.putExtra(Intents.Scan.FORMATS, obj.optString(FORMATS));
             }
             if (obj.has(PROMPT)) {
                 intentScan.putExtra(Intents.Scan.PROMPT_MESSAGE, obj.optString(PROMPT));
+            }
+            if (obj.has(ORIENTATION)) {
+                intentScan.putExtra(Intents.Scan.ORIENTATION_LOCK, obj.optString(ORIENTATION));
             }
         }
 
