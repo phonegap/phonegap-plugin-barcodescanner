@@ -79,19 +79,19 @@ function videoPreviewRotationLookup(displayOrientation, isMirrored) {
             break;
         case Windows.Graphics.Display.DisplayOrientations.portrait:
             if (isMirrored) {
-                degreesToRotate = Windows.Media.Capture.VideoRotation.Clockwise270Degrees;
+                degreesToRotate = Windows.Media.Capture.VideoRotation.clockwise270Degrees;
             } else {
-                degreesToRotate = Windows.Media.Capture.VideoRotation.Clockwise90Degrees;
+                degreesToRotate = Windows.Media.Capture.VideoRotation.clockwise90Degrees;
             }
             break;
         case Windows.Graphics.Display.DisplayOrientations.landscapeFlipped:
-            degreesToRotate = Windows.Media.Capture.VideoRotation.Clockwise180Degrees;
+            degreesToRotate = Windows.Media.Capture.VideoRotation.clockwise180Degrees;
             break;
         case Windows.Graphics.Display.DisplayOrientations.portraitFlipped:
             if (isMirrored) {
-                degreesToRotate = Windows.Media.Capture.VideoRotation.Clockwise90Degrees;
+                degreesToRotate = Windows.Media.Capture.VideoRotation.clockwise90Degrees;
             } else {
-                degreesToRotate = Windows.Media.Capture.VideoRotation.Clockwise270Degrees;
+                degreesToRotate = Windows.Media.Capture.VideoRotation.clockwise270Degrees;
             }
             break;
         default:
