@@ -75,27 +75,27 @@ function videoPreviewRotationLookup(displayOrientation, isMirrored) {
 
     switch (displayOrientation) {
         case Windows.Graphics.Display.DisplayOrientations.landscape:
-            degreesToRotate = 0;
+            degreesToRotate =  Windows.Media.Capture.VideoRotation.none;
             break;
         case Windows.Graphics.Display.DisplayOrientations.portrait:
             if (isMirrored) {
-                degreesToRotate = 270;
+                degreesToRotate = Windows.Media.Capture.VideoRotation.Clockwise270Degrees;
             } else {
-                degreesToRotate = 90;
+                degreesToRotate = Windows.Media.Capture.VideoRotation.Clockwise90Degrees;
             }
             break;
         case Windows.Graphics.Display.DisplayOrientations.landscapeFlipped:
-            degreesToRotate = 180;
+            degreesToRotate = Windows.Media.Capture.VideoRotation.Clockwise180Degrees;
             break;
         case Windows.Graphics.Display.DisplayOrientations.portraitFlipped:
             if (isMirrored) {
-                degreesToRotate = 90;
+                degreesToRotate = Windows.Media.Capture.VideoRotation.Clockwise90Degrees;
             } else {
-                degreesToRotate = 270;
+                degreesToRotate = Windows.Media.Capture.VideoRotation.Clockwise270Degrees;
             }
             break;
         default:
-            degreesToRotate = 0;
+            degreesToRotate = Windows.Media.Capture.VideoRotation.none;
             break;
     }
 
@@ -239,11 +239,7 @@ module.exports = {
 
             // Lookup up the rotation degrees.
             var rotDegree = videoPreviewRotationLookup(currentOrientation, previewMirroring);
-
-            // rotate the preview video
-            var videoEncodingProperties = capture.videoDeviceController.getMediaStreamProperties(Windows.Media.Capture.MediaStreamType.videoPreview);
-            videoEncodingProperties.properties.insert(ROTATION_KEY, rotDegree);
-            return capture.videoDeviceController.setMediaStreamPropertiesAsync(Windows.Media.Capture.MediaStreamType.videoPreview, videoEncodingProperties);
+            capture.setPreviewRotation(rotDegree);
         }
 
         /**
