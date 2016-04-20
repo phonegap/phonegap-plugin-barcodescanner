@@ -369,7 +369,7 @@ module.exports = {
                     return propA.width - propB.width;
                 });
                 var minResProps = deviceProps[0];
-                return controller.setMediaStreamPropertiesAsync(Windows.Media.Capture.MediaStreamType.videoRecord, maxResProps)
+                return controller.setMediaStreamPropertiesAsync(Windows.Media.Capture.MediaStreamType.videoRecord, minResProps)
                 .then(function () {
                     return {
                         capture: capture,
