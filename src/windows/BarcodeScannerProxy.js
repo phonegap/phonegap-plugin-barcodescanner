@@ -363,19 +363,18 @@ module.exports = {
                 deviceProps = Array.prototype.slice.call(deviceProps);
                 deviceProps = deviceProps.filter(function (prop) {
                     // filter out streams with "unknown" subtype - causes errors on some devices
-                    return prop.subtype !== "Unknown";
+                    return prop.subtype !== "Unknown" && prop.width > 100;
                 }).sort(function (propA, propB) {
                     // sort properties by resolution
-                    return propB.width - propA.width;
+                    return propA.width - propB.width;
                 });
-
-                var maxResProps = deviceProps[0];
+                var minResProps = deviceProps[0];
                 return controller.setMediaStreamPropertiesAsync(Windows.Media.Capture.MediaStreamType.videoRecord, maxResProps)
                 .then(function () {
                     return {
                         capture: capture,
-                        width: maxResProps.width,
-                        height: maxResProps.height
+                        width: minResProps.width,
+                        height: minResProps.height
                     };
                 });
             })
