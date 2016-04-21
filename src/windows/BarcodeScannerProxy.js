@@ -1,4 +1,4 @@
-/*
+cordova.define("phonegap-plugin-barcodescanner.BarcodeScannerProxy", function(require, exports, module) { /*
  * Copyright (c) Microsoft Open Technologies, Inc. All rights reserved.
  *
  * Licensed under the Apache License, Version 2.0 (the "License"); you may not use this file except in compliance with the License. You may obtain a copy of the License at
@@ -75,23 +75,23 @@ function videoPreviewRotationLookup(displayOrientation, isMirrored) {
 
     switch (displayOrientation) {
         case Windows.Graphics.Display.DisplayOrientations.landscape:
-            degreesToRotate =  Windows.Media.Capture.VideoRotation.none;
+            degreesToRotate =  0;
             break;
         case Windows.Graphics.Display.DisplayOrientations.portrait:
             if (isMirrored) {
-                degreesToRotate = Windows.Media.Capture.VideoRotation.clockwise270Degrees;
+                degreesToRotate = 270;
             } else {
-                degreesToRotate = Windows.Media.Capture.VideoRotation.clockwise90Degrees;
+                degreesToRotate = 90;
             }
             break;
         case Windows.Graphics.Display.DisplayOrientations.landscapeFlipped:
-            degreesToRotate = Windows.Media.Capture.VideoRotation.clockwise180Degrees;
+            degreesToRotate = 180;
             break;
         case Windows.Graphics.Display.DisplayOrientations.portraitFlipped:
             if (isMirrored) {
-                degreesToRotate = Windows.Media.Capture.VideoRotation.clockwise90Degrees;
+                degreesToRotate = 90;
             } else {
-                degreesToRotate = Windows.Media.Capture.VideoRotation.clockwise270Degrees;
+                degreesToRotate = 270;
             }
             break;
         default:
@@ -237,7 +237,10 @@ module.exports = {
 
             // Lookup up the rotation degrees.
             var rotDegree = videoPreviewRotationLookup(currentOrientation, previewMirroring);
-            capture.setPreviewRotation(rotDegree);
+            capturePreview.style.transform = "rotate("+rotDegree+"deg)";
+            
+            
+            //capture.setPreviewRotation(rotDegree);
         }
 
         /**
@@ -363,7 +366,7 @@ module.exports = {
                 deviceProps = Array.prototype.slice.call(deviceProps);
                 deviceProps = deviceProps.filter(function (prop) {
                     // filter out streams with "unknown" subtype - causes errors on some devices
-                    return prop.subtype !== "Unknown" && prop.width > 100;
+                    return prop.subtype !== "Unknown" && prop.width > 500;
                 }).sort(function (propA, propB) {
                     // sort properties by resolution
                     return propA.width - propB.width;
@@ -381,11 +384,13 @@ module.exports = {
             .then(function (captureSettings) {
 
                 capturePreview.msZoom = true;
+                
                 capturePreview.src = URL.createObjectURL(capture);
                 capturePreview.play();
-
+                
                 // Insert preview frame and controls into page
                 document.body.appendChild(capturePreviewFrame);
+                
 
                 return setupFocus(captureSettings.capture.videoDeviceController.focusControl)
                 .then(function () {
@@ -468,3 +473,5 @@ module.exports = {
 };
 
 require("cordova/exec/proxy").add("BarcodeScanner", module.exports);
+
+});
