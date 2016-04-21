@@ -288,6 +288,8 @@
             <string name="wifi_ssid_label">Network Name</string>
             <string name="wifi_type_label">Type</string>
         </config-file>
+
+        <dependency id="cordova-plugin-compat" version="^1.0.0" />
     </platform>
 
     <platform name="windows8">
