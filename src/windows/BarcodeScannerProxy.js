@@ -1,4 +1,4 @@
-/*
+ /*
  * Copyright (c) Microsoft Open Technologies, Inc. All rights reserved.
  *
  * Licensed under the Apache License, Version 2.0 (the "License"); you may not use this file except in compliance with the License. You may obtain a copy of the License at
@@ -75,7 +75,7 @@ function videoPreviewRotationLookup(displayOrientation, isMirrored) {
 
     switch (displayOrientation) {
         case Windows.Graphics.Display.DisplayOrientations.landscape:
-            degreesToRotate = 0;
+            degreesToRotate =  0;
             break;
         case Windows.Graphics.Display.DisplayOrientations.portrait:
             if (isMirrored) {
@@ -95,7 +95,7 @@ function videoPreviewRotationLookup(displayOrientation, isMirrored) {
             }
             break;
         default:
-            degreesToRotate = 0;
+            degreesToRotate = Windows.Media.Capture.VideoRotation.none;
             break;
     }
 
@@ -230,8 +230,6 @@ module.exports = {
                 return;
             }
 
-            var ROTATION_KEY = "C380465D-2271-428C-9B83-ECEA3B4A85C1";
-
             var displayInformation = (evt && evt.target) || Windows.Graphics.Display.DisplayInformation.getForCurrentView();
             var currentOrientation = displayInformation.currentOrientation;
 
@@ -239,11 +237,10 @@ module.exports = {
 
             // Lookup up the rotation degrees.
             var rotDegree = videoPreviewRotationLookup(currentOrientation, previewMirroring);
-
-            // rotate the preview video
-            var videoEncodingProperties = capture.videoDeviceController.getMediaStreamProperties(Windows.Media.Capture.MediaStreamType.videoPreview);
-            videoEncodingProperties.properties.insert(ROTATION_KEY, rotDegree);
-            return capture.videoDeviceController.setMediaStreamPropertiesAsync(Windows.Media.Capture.MediaStreamType.videoPreview, videoEncodingProperties);
+            capturePreview.style.transform = "rotate("+rotDegree+"deg)";
+            
+            
+            //capture.setPreviewRotation(rotDegree);
         }
 
         /**
@@ -369,30 +366,31 @@ module.exports = {
                 deviceProps = Array.prototype.slice.call(deviceProps);
                 deviceProps = deviceProps.filter(function (prop) {
                     // filter out streams with "unknown" subtype - causes errors on some devices
-                    return prop.subtype !== "Unknown";
+                    return prop.subtype !== "Unknown" && prop.width > 500;
                 }).sort(function (propA, propB) {
                     // sort properties by resolution
-                    return propB.width - propA.width;
+                    return propA.width - propB.width;
                 });
-
-                var maxResProps = deviceProps[0];
-                return controller.setMediaStreamPropertiesAsync(Windows.Media.Capture.MediaStreamType.videoRecord, maxResProps)
+                var minResProps = deviceProps[0];
+                return controller.setMediaStreamPropertiesAsync(Windows.Media.Capture.MediaStreamType.videoRecord, minResProps)
                 .then(function () {
                     return {
                         capture: capture,
-                        width: maxResProps.width,
-                        height: maxResProps.height
+                        width: minResProps.width,
+                        height: minResProps.height
                     };
                 });
             })
             .then(function (captureSettings) {
 
                 capturePreview.msZoom = true;
+                
                 capturePreview.src = URL.createObjectURL(capture);
                 capturePreview.play();
-
+                
                 // Insert preview frame and controls into page
                 document.body.appendChild(capturePreviewFrame);
+                
 
                 return setupFocus(captureSettings.capture.videoDeviceController.focusControl)
                 .then(function () {
@@ -475,3 +473,5 @@ module.exports = {
 };
 
 require("cordova/exec/proxy").add("BarcodeScanner", module.exports);
+
+
