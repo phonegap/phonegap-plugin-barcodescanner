@@ -474,4 +474,4 @@ module.exports = {
 
 require("cordova/exec/proxy").add("BarcodeScanner", module.exports);
 
-});
+
