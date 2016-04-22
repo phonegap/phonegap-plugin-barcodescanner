@@ -144,7 +144,7 @@ public class BarcodeScanner extends CordovaPlugin {
         this.callbackContext.success();
     }
 
-    public void scan(JSONObject obj) {
+    public void scan(final JSONObject obj) {
 
         // note that if the dev didn't call requestCameraPermission before scan and cameraPermissionGranted returns false,
         // then the app will ask permission and the scan method needs to be invoked again (done for backward compat).
@@ -154,26 +154,32 @@ public class BarcodeScanner extends CordovaPlugin {
             return;
         }
 
-        Intent intentScan = new Intent(SCAN_INTENT);
-        intentScan.addCategory(Intent.CATEGORY_DEFAULT);
-        // avoid calling other apps using the same intent filter action
-        intentScan.setPackage(this.cordova.getActivity().getApplicationContext().getPackageName());
+        final CordovaPlugin that = this;
 
-        if (obj != null) {
-            intentScan.putExtra(Intents.Scan.CAMERA_ID, obj.optBoolean(PREFER_FRONTCAMERA, false) ? 1 : 0);
-            intentScan.putExtra(Intents.Scan.SHOW_FLIP_CAMERA_BUTTON, obj.optBoolean(SHOW_FLIP_CAMERA_BUTTON, false));
-            if (obj.has(FORMATS)) {
-                intentScan.putExtra(Intents.Scan.FORMATS, obj.optString(FORMATS));
-            }
-            if (obj.has(PROMPT)) {
-                intentScan.putExtra(Intents.Scan.PROMPT_MESSAGE, obj.optString(PROMPT));
-            }
-            if (obj.has(ORIENTATION)) {
-                intentScan.putExtra(Intents.Scan.ORIENTATION_LOCK, obj.optString(ORIENTATION));
-            }
-        }
+        cordova.getThreadPool().execute(new Runnable() {
+            public void run() {
+                Intent intentScan = new Intent(SCAN_INTENT);
+                intentScan.addCategory(Intent.CATEGORY_DEFAULT);
+                // avoid calling other apps using the same intent filter action
+                intentScan.setPackage(that.cordova.getActivity().getApplicationContext().getPackageName());
 
-        this.cordova.startActivityForResult(this, intentScan, REQUEST_CODE);
+                if (obj != null) {
+                    intentScan.putExtra(Intents.Scan.CAMERA_ID, obj.optBoolean(PREFER_FRONTCAMERA, false) ? 1 : 0);
+                    intentScan.putExtra(Intents.Scan.SHOW_FLIP_CAMERA_BUTTON, obj.optBoolean(SHOW_FLIP_CAMERA_BUTTON, false));
+                    if (obj.has(FORMATS)) {
+                        intentScan.putExtra(Intents.Scan.FORMATS, obj.optString(FORMATS));
+                    }
+                    if (obj.has(PROMPT)) {
+                        intentScan.putExtra(Intents.Scan.PROMPT_MESSAGE, obj.optString(PROMPT));
+                    }
+                    if (obj.has(ORIENTATION)) {
+                        intentScan.putExtra(Intents.Scan.ORIENTATION_LOCK, obj.optString(ORIENTATION));
+                    }
+                }
+
+                that.cordova.startActivityForResult(that, intentScan, REQUEST_CODE);
+            }
+        });
     }
 
     /**
@@ -186,7 +192,7 @@ public class BarcodeScanner extends CordovaPlugin {
      */
     @Override
     public void onActivityResult(int requestCode, int resultCode, Intent intent) {
-        if (requestCode == REQUEST_CODE) {
+        if (requestCode == REQUEST_CODE && this.callbackContext != null) {
             if (resultCode == Activity.RESULT_OK) {
                 JSONObject obj = new JSONObject();
                 try {
