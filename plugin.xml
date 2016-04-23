@@ -1,7 +1,7 @@
 <?xml version="1.0" encoding="UTF-8"?><plugin xmlns="http://www.phonegap.com/ns/plugins/1.0"
                                               xmlns:android="http://schemas.android.com/apk/res/android"
                                               id="com.phonegap.plugins.barcodescanner"
-                                              version="2.1.1">
+                                              version="2.1.2">
 
     <name>BarcodeScanner</name>
     <description>You can use the BarcodeScanner plugin to scan different types of barcodes (using the device's camera) and get the metadata encoded in them for processing within your application.</description>
@@ -103,6 +103,6 @@
         </config-file>
 
         <framework src="src/android/barcodescanner.gradle" custom="true" type="gradleReference"/>
-        <resource-file src="src/android/barcodescanner-release-2.0.0.aar" target="libs/barcodescanner.aar" />
+        <resource-file src="src/android/barcodescanner-release-2.0.1.aar" target="libs/barcodescanner.aar" />
     </platform>
 </plugin>
