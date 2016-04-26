@@ -12,7 +12,7 @@
     <issue>https://github.com/wildabeast/BarcodeScanner/issues</issue>
 
     <engines>
-        <engine name="cordova" version=">=3.0.0" />
+        <engine name="cordova" version="&gt;=3.0.0" />
     </engines>
 
     <js-module src="www/barcodescanner.js" name="BarcodeScanner">
@@ -290,21 +290,6 @@
         </config-file>
     </platform>
 
-    <platform name="windows8">
-        <js-module src="src/windows/BarcodeScannerProxy.js" name="BarcodeScannerProxy">
-            <merges target="" />
-        </js-module>
-
-        <config-file target="package.appxmanifest" parent="/Package/Capabilities">
-            <DeviceCapability Name="webcam" />
-        </config-file>
-
-        <framework src="src/windows/lib/WinRTBarcodeReader.csproj" custom="true" type="projectReference" versions="&lt;=8.1"/>
-        <framework src="src/windows/lib.UW/WinRTBarcodeReader.UW.csproj" custom="true" type="projectReference" versions=">8.1"/>
-
-        <asset src="src/windows/assets/plugin-barcodeScanner.css" target="css/plugin-barcodeScanner.css" />
-    </platform>
-
     <platform name="windows">
         <js-module src="src/windows/BarcodeScannerProxy.js" name="BarcodeScannerProxy">
             <merges target="" />
@@ -314,9 +299,9 @@
             <DeviceCapability Name="webcam" />
         </config-file>
 
-        <framework src="src/windows/lib.UW/x86/ZXing.winmd" target-dir="x86" arch="x86" custom="true" versions=">8.1" />
-        <framework src="src/windows/lib.UW/x64/ZXing.winmd" target-dir="x64" arch="x64" custom="true" versions=">8.1" />
-        <framework src="src/windows/lib.UW/ARM/ZXing.winmd" target-dir="ARM" arch="ARM" custom="true" versions=">8.1" />
+        <framework src="src/windows/lib.UW/x86/ZXing.winmd" target-dir="x86" arch="x86" custom="true" versions="&gt;8.1" />
+        <framework src="src/windows/lib.UW/x64/ZXing.winmd" target-dir="x64" arch="x64" custom="true" versions="&gt;8.1" />
+        <framework src="src/windows/lib.UW/ARM/ZXing.winmd" target-dir="ARM" arch="ARM" custom="true" versions="&gt;8.1" />
         <framework src="src/windows/lib/WinRTBarcodeReader.csproj" custom="true" type="projectReference" versions="&lt;=8.1"/>
 
         <asset src="src/windows/assets/plugin-barcodeScanner.css" target="css/plugin-barcodeScanner.css" />
