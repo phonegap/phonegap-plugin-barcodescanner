@@ -1,14 +1,46 @@
-BarcodeScanner
-==============
+# PhoneGap Plugin BarcodeScanner
+================================
 
-Added version that runs with windows mobile devices.
-To run on those devices, the zxing.net library must be added to the project (Install as nuget packet - more information on http://www.nuget.org/packages/ZXing.Net)
-
-Windows Phone currently only supports Scaning for codes, feel free to extend it that it can also encode.
+[![Build Status](https://travis-ci.org/phonegap/phonegap-plugin-barcodescanner.svg)](https://travis-ci.org/phonegap/phonegap-plugin-barcodescanner)
 
 Cross-platform BarcodeScanner for Cordova / PhoneGap.
 
-Follows the [Cordova Plugin spec](https://github.com/apache/cordova-plugman/blob/master/plugin_spec.md), so that it works with [Plugman](https://github.com/apache/cordova-plugman).
+Follows the [Cordova Plugin spec](http://cordova.apache.org/docs/en/5.0.0/plugin_ref_spec.md), so that it works with [Plugman](https://github.com/apache/cordova-plugman).
+
+## Installation
+
+    
+This requires phonegap 5.0+ ( current stable v3.0.0 )
+
+    phonegap plugin add phonegap-plugin-barcodescanner
+
+Older versions of phonegap can still install via the __deprecated__ id ( stale v2.0.1 )
+
+    phonegap plugin add com.phonegap.plugins.barcodescanner
+
+It is also possible to install via repo url directly ( unstable )
+
+    phonegap plugin add https://github.com/phonegap/phonegap-plugin-barcodescanner.git
+
+### Supported Platforms
+
+- Android
+- iOS
+- Windows (Windows/Windows Phone 8.1 and Windows 10)
+- Windows Phone 8
+- BlackBerry 10
+- Browser
+
+Note: the Android source for this project includes an Android Library Project.
+plugman currently doesn't support Library Project refs, so its been
+prebuilt as a jar library. Any updates to the Library Project should be
+committed with an updated jar.
+
+Note: Windows 10 applications can not be build for `AnyCPU` architecture, which is default for Windows platform. If you want to build/run Windows 10 app, you should specify target architecture explicitly, for example (Cordova CLI):
+
+```
+cordova run windows -- --archs=x86
+```
 
 ## Using the plugin ##
 The plugin creates the object `cordova/plugin/BarcodeScanner` with the method `scan(success, fail)`. 
@@ -46,17 +78,54 @@ Not by default, but supported if you pass in the "formats" option:
 * CODE_39
 * ITF
 
+### Windows
+
+* UPC_A
+* UPC_E
+* EAN_8
+* EAN_13
+* CODE_39
+* CODE_93
+* CODE_128
+* ITF
+* CODABAR
+* MSI
+* RSS14
+* QR_CODE
+* DATA_MATRIX
+* AZTEC
+* PDF417
+
+### Windows Phone 8
+
+* UPC_A
+* UPC_E
+* EAN_8
+* EAN_13
+* CODE_39
+* CODE_93
+* CODE_128
+* ITF
+* CODABAR
+* MSI
+* RSS14
+* QR_CODE
+* DATA_MATRIX
+* AZTEC
+* PDF417
+
+### BlackBerry 10
+* UPC_A
+* UPC_E
+* EAN_8
+* EAN_13
+* CODE_39
+* CODE_128
+* ITF
+* DATA_MATRIX
+* AZTEC
+
 `success` and `fail` are callback functions. Success is passed an object with data, type and cancelled properties. Data is the text representation of the barcode data, type is the type of barcode detected and cancelled is whether or not the user cancelled the scan.
-
-On iOS and Android you can pass in options (ignored on WP8):
-* `preferFrontCamera` default false: prefer starting the scanner with the front camera (if multiple cameras are available).
-* `showFlipCameraButton` default false: show a button on the scan UI to toggle the back/front camera (if multiple cameras are available).
-
-And on Android you can also pass in these:
-* `prompt` default: Place a barcode inside the viewfinder rectangle to scan it.
-* `formats` default: all but PDF_417 and RSS_EXPANDED
-* `orientation` lock the orientation to "portrait" or "landscape". By default the scan view rotates with the device orientation.
-
 
 A full example could be:
 ```js
@@ -71,8 +140,8 @@ A full example could be:
           alert("Scanning failed: " + error);
       },
       {
-          "preferFrontCamera" : true,
-          "showFlipCameraButton" : true,
+          "preferFrontCamera" : true, // iOS and Android
+          "showFlipCameraButton" : true, // iOS and Android
           "prompt" : "Place a barcode inside the scan area", // supported on Android only
           "formats" : "QR_CODE,PDF_417", // default: all but PDF_417 and RSS_EXPANDED
           "orientation" : "landscape"
@@ -80,38 +149,10 @@ A full example could be:
    );
 ```
 
-## Checking permission
-On Android 6 you need to request permission to use the camera at runtime when targeting API level 23+.
-Even if the `uses-permission` tag for the Camera is present in `AndroidManifest.xml`.
-
-Note that `hasCameraPermission` will return true when:
-* You're running this on iOS, or
-* You're targeting an API level lower than 23, or
-* You're using Android < 6, or
-* You've already granted permission.
-
-```js
-  function hasCameraPermission() {
-    cordova.plugins.barcodeScanner.hasCameraPermission(
-      function(result) {
-        // if this is 'false' you probably want to call 'requestCameraPermission' now
-        alert(result);
-      }
-    )
-  }
-
-  function requestCameraPermission() {
-    // no callbacks required as this opens a popup which returns async
-    cordova.plugins.barcodeScanner.requestCameraPermission();
-  }
-```
-
-Note that backward compatibility was added by checking for permission in the `scan` function.
-If permission is needed the `scan` method will now show the permission request popup.
-The user will then need to allow camera access and launch the scanner again.
-
 ## Encoding a Barcode ##
+
 The plugin creates the object `cordova.plugins.barcodeScanner` with the method `encode(type, data, success, fail)`. 
+
 Supported encoding types:
 
 * TEXT_TYPE
@@ -119,20 +160,31 @@ Supported encoding types:
 * PHONE_TYPE
 * SMS_TYPE
 
-A full example could be:
-```JS
-   cordova.plugins.barcodeScanner.encode(BarcodeScanner.Encode.TEXT_TYPE, "http://www.nytimes.com", function(success) {
-  	        alert("encode success: " + success);
-  	      }, function(fail) {
-  	        alert("encoding failed: " + fail);
-  	      }
-  	    );
 ```
+A full example could be:
+
+   cordova.plugins.barcodeScanner.encode(cordova.plugins.barcodeScanner.Encode.TEXT_TYPE, "http://www.nytimes.com", function(success) {
+            alert("encode success: " + success);
+          }, function(fail) {
+            alert("encoding failed: " + fail);
+          }
+        );
+```
+
+## Windows quirks ##
+Windows implementation currently doesn't support encode functionality.
+
+## Windows Phone 8 quirks ##
+Windows Phone 8 implementation currently doesn't support encode functionality.
+
+## BlackBerry 10 quirks
+BlackBerry 10 implementation currently doesn't support encode functionality.
+Cancelling a scan on BlackBerry 10 is done by touching the screen.
 
 ## Thanks on Github ##
 
-So many -- check out the original [iOS](https://github.com/phonegap/phonegap-plugins/tree/master/iOS/BarcodeScanner) and [Android](https://github.com/phonegap/phonegap-plugins/tree/master/Android/BarcodeScanner) repos.
-
+So many -- check out the original [iOS](https://github.com/phonegap/phonegap-plugins/tree/DEPRECATED/iOS/BarcodeScanner),  [Android](https://github.com/phonegap/phonegap-plugins/tree/DEPRECATED/Android/BarcodeScanner) and 
+[BlackBerry 10](https://github.com/blackberry/WebWorks-Community-APIs/tree/master/BB10-Cordova/BarcodeScanner) repos.
 
 ## Licence ##
 

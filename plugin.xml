@@ -1,11 +1,15 @@
 <?xml version="1.0" encoding="UTF-8"?><plugin xmlns="http://www.phonegap.com/ns/plugins/1.0"
-                                              xmlns:android="http://schemas.android.com/apk/res/android"
-                                              id="com.phonegap.plugins.barcodescanner"
-                                              version="2.1.2">
+    xmlns:android="http://schemas.android.com/apk/res/android"
+    xmlns:rim="http://www.blackberry.com/ns/widgets"
+    id="com.phonegap.plugins.barcodescanner"
+    version="4.1.0.1">
 
     <name>BarcodeScanner</name>
     <description>You can use the BarcodeScanner plugin to scan different types of barcodes (using the device's camera) and get the metadata encoded in them for processing within your application.</description>
     <license>MIT</license>
+
+    <repo>https://github.com/phonegap/phonegap-plugin-barcodescanner</repo>
+    <issue>https://github.com/phonegap/phonegap-plugin-barcodescanner/issues</issue>
 
     <engines>
         <engine name="cordova" version=">=3.0.0" />
@@ -36,25 +40,6 @@
         <framework src="AssetsLibrary.framework" />
         <framework src="CoreVideo.framework" />
         <framework src="QuartzCore.framework" />
-    </platform>
-
-    <!-- wp8 -->
-    <platform name="wp8">
-        <config-file target="config.xml" parent="/*">
-            <feature name="BarcodeScanner">
-                <param name="wp-package" value="BarcodeScanner"/>
-            </feature>
-        </config-file>
-
-        <config-file target="Properties/WMAppManifest.xml" parent="/Deployment/App/Capabilities">
-            <Capability Name="ID_CAP_ISV_CAMERA" />
-        </config-file>
-
-        <source-file src="src/wp8/BarcodeScanner.cs" />
-        <source-file src="src/wp8/BarcodeScannerResult.cs" />
-        <source-file src="src/wp8/Scan.xaml" />
-        <source-file src="src/wp8/Scan.xaml.cs" />
-        <framework src="src/wp8/zxing.wp8.0.dll" custom="true" />
     </platform>
 
     <!-- android -->
@@ -104,5 +89,89 @@
 
         <framework src="src/android/barcodescanner.gradle" custom="true" type="gradleReference"/>
         <resource-file src="src/android/barcodescanner-release-2.0.1.aar" target="libs/barcodescanner.aar" />
+    </platform>
+
+    <platform name="windows8">
+        <js-module src="src/windows/BarcodeScannerProxy.js" name="BarcodeScannerProxy">
+            <merges target="" />
+        </js-module>
+
+        <config-file target="package.appxmanifest" parent="/Package/Capabilities">
+            <DeviceCapability Name="webcam" />
+        </config-file>
+
+        <framework src="src/windows/lib/WinRTBarcodeReader.csproj" custom="true" type="projectReference" versions="&lt;=8.1"/>
+        <framework src="src/windows/lib.UW/WinRTBarcodeReader.UW.csproj" custom="true" type="projectReference" versions=">8.1"/>
+
+        <asset src="src/windows/assets/plugin-barcodeScanner.css" target="css/plugin-barcodeScanner.css" />
+    </platform>
+
+    <platform name="windows">
+        <js-module src="src/windows/BarcodeScannerProxy.js" name="BarcodeScannerProxy">
+            <merges target="" />
+        </js-module>
+
+        <config-file target="package.appxmanifest" parent="/Package/Capabilities">
+            <DeviceCapability Name="webcam" />
+        </config-file>
+
+        <framework src="src/windows/lib.UW/x86/ZXing.winmd" target-dir="x86" arch="x86" custom="true" versions=">8.1" />
+        <framework src="src/windows/lib.UW/x64/ZXing.winmd" target-dir="x64" arch="x64" custom="true" versions=">8.1" />
+        <framework src="src/windows/lib.UW/ARM/ZXing.winmd" target-dir="ARM" arch="ARM" custom="true" versions=">8.1" />
+        <framework src="src/windows/lib/WinRTBarcodeReader.csproj" custom="true" type="projectReference" versions="&lt;=8.1"/>
+
+        <asset src="src/windows/assets/plugin-barcodeScanner.css" target="css/plugin-barcodeScanner.css" />
+    </platform>
+
+    <!-- Windows Phone 8 -->
+    <platform name="wp8">
+        <config-file target="config.xml" parent="/*">
+            <feature name="BarcodeScanner">
+                <param name="wp-package" value="BarcodeScanner"/>
+            </feature>
+        </config-file>
+
+        <config-file target="Properties/WMAppManifest.xml" parent="/Deployment/App/Capabilities">
+            <Capability Name="ID_CAP_ISV_CAMERA" />
+        </config-file>
+
+        <framework src="src/wp8/lib/zxing.wp8.0.dll" custom="true" />
+
+        <asset src="src/wp8/assets/cancel.png" target="Images/appbar.cancel.png" />
+
+        <source-file src="src/wp8/BarcodeScanner.cs" />
+        <source-file src="src/wp8/BarcodeScannerTask.cs" />
+        <source-file src="src/wp8/BarcodeScannerUI.xaml" />
+        <source-file src="src/wp8/BarcodeScannerUI.xaml.cs" />
+    </platform>
+
+    <!-- browser -->
+    <platform name="browser">
+        <config-file target="config.xml" parent="/*">
+            <feature name="BarcodeScanner">
+                <param name="browser-package" value="BarcodeScanner" />
+            </feature>
+        </config-file>
+
+        <js-module src="src/browser/BarcodeScannerProxy.js" name="BarcodeScannerProxy">
+            <runs />
+        </js-module>
+    </platform>
+
+    <!-- BlackBerry 10 -->
+    <platform name="blackberry10">
+        <source-file src="src/blackberry10/index.js" target-dir="BarcodeScanner" />
+        <source-file src="src/blackberry10/qrcode.js" target-dir="BarcodeScanner" />
+        <lib-file src="src/blackberry10/native/device/libBarcodeScanner.so" arch="device"/>
+        <lib-file src="src/blackberry10/native/simulator/libBarcodeScanner.so" arch="simulator"/>
+        <config-file target="www/config.xml" parent="/widget">
+            <feature name="BarcodeScanner">
+		<param name="blackberry-package" value="phonegap-plugin-barcodescanner" />
+	    </feature>
+        </config-file>
+        <config-file target="www/config.xml" parent="/widget/rim:permissions">
+            <rim:permit>use_camera</rim:permit>
+        </config-file>
+        <dependency id="cordova-plugin-bb-app" />
     </platform>
 </plugin>
