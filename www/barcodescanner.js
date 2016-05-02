@@ -29,15 +29,35 @@
                 //  CONTACT_TYPE: "CONTACT_TYPE",  // TODO:  not implemented, requires passing a Bundle class from Javascript to Java
                 //  LOCATION_TYPE: "LOCATION_TYPE" // TODO:  not implemented, requires passing a Bundle class from Javascript to Java
             };
-        }
 
-        BarcodeScanner.prototype.hasCameraPermission = function (callback) {
-            exec(callback, null, 'BarcodeScanner', 'hasCameraPermission', []);
+    /**
+     * Barcode format constants, defined in ZXing library.
+     *
+     * @type Object
+     */
+    this.format = {
+        "all_1D": 61918,
+        "aztec": 1,
+        "codabar": 2,
+        "code_128": 16,
+        "code_39": 4,
+        "code_93": 8,
+        "data_MATRIX": 32,
+        "ean_13": 128,
+        "ean_8": 64,
+        "itf": 256,
+        "maxicode": 512,
+        "msi": 131072,
+        "pdf_417": 1024,
+        "plessey": 262144,
+        "qr_CODE": 2048,
+        "rss_14": 4096,
+        "rss_EXPANDED": 8192,
+        "upc_A": 16384,
+        "upc_E": 32768,
+        "upc_EAN_EXTENSION": 65536
         };
-
-        BarcodeScanner.prototype.requestCameraPermission = function (callback) {
-            exec(callback, null, 'BarcodeScanner', 'requestCameraPermission', []);
-        };
+  }
 
   /**
    * Read code from scanner.
@@ -48,9 +68,19 @@
          *        cancelled : true/false, // Was canceled.
          *    }
    * @param {Function} errorCallback
-   * @param options
    */
-        BarcodeScanner.prototype.scan = function (successCallback, errorCallback, options) {
+BarcodeScanner.prototype.scan = function (successCallback, errorCallback, config) {
+
+    if(config instanceof Array) {
+        // do nothing
+    } else {
+        if(typeof(config) === 'object') {
+            config = [ config ];
+        } else {
+            config = [];
+        }
+    }
+
             if (errorCallback == null) {
                 errorCallback = function () {
                 };
@@ -66,7 +96,7 @@
                 return;
             }
 
-            exec(successCallback, errorCallback, 'BarcodeScanner', 'scan', [options]);
+    exec(successCallback, errorCallback, 'BarcodeScanner', 'scan', config);
         };
 
         //-------------------------------------------------------------------
@@ -93,4 +123,3 @@
 
         var barcodeScanner = new BarcodeScanner();
         module.exports = barcodeScanner;
-
