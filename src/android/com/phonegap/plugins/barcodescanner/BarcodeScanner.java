@@ -12,6 +12,7 @@ import org.json.JSONArray;
 import org.json.JSONException;
 import org.json.JSONObject;
 
+import android.Manifest;
 import android.app.Activity;
 import android.content.Intent;
 import android.util.Log;
@@ -22,7 +23,7 @@ import org.apache.cordova.CallbackContext;
 import org.apache.cordova.PluginResult;
 import org.apache.cordova.PermissionHelper;
 
-import android.util.Log;
+import com.google.zxing.client.android.Intents;
 
 /**
  * This calls out to the ZXing barcode reader and returns the result.
@@ -125,7 +126,7 @@ public class BarcodeScanner extends CordovaPlugin {
     /**
      * Starts an intent to scan and decode a barcode.
      */
-    public void scan(JSONArray args) {
+    public void scan(final JSONArray args) {
 
         final CordovaPlugin that = this;
 
@@ -166,7 +167,6 @@ public class BarcodeScanner extends CordovaPlugin {
 
                             } catch (JSONException e) {
                                 Log.i("CordovaLog", e.getLocalizedMessage());
-                                continue;
                             }
                         }
 
@@ -186,9 +186,9 @@ public class BarcodeScanner extends CordovaPlugin {
                 }
 
                 // avoid calling other phonegap apps
-                intentScan.setPackage(this.cordova.getActivity().getApplicationContext().getPackageName());
+                intentScan.setPackage(that.cordova.getActivity().getApplicationContext().getPackageName());
 
-                this.cordova.startActivityForResult((CordovaPlugin) this, intentScan, REQUEST_CODE);
+                that.cordova.startActivityForResult(that, intentScan, REQUEST_CODE);
             }
         });
     }
