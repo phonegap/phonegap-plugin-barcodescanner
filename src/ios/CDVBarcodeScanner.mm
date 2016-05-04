@@ -146,7 +146,8 @@
 
     callback = command.callbackId;
 
-    NSDictionary* options = [command.arguments objectAtIndex:0];
+    NSDictionary* options = command.arguments.count == 0 ? [NSNull null] : [command.arguments objectAtIndex:0];
+
     if ([options isKindOfClass:[NSNull class]]) {
       options = [NSDictionary dictionary];
     }

@@ -59,27 +59,28 @@
         };
   }
 
-  /**
-   * Read code from scanner.
-   *
-   * @param {Function} successCallback This function will recieve a result object: {
+/**
+ * Read code from scanner.
+ *
+ * @param {Function} successCallback This function will recieve a result object: {
          *        text : '12345-mock',    // The code that was scanned.
          *        format : 'FORMAT_NAME', // Code format.
          *        cancelled : true/false, // Was canceled.
          *    }
-   * @param {Function} errorCallback
-   */
+ * @param {Function} errorCallback
+ * @param config
+ */
 BarcodeScanner.prototype.scan = function (successCallback, errorCallback, config) {
 
-    if(config instanceof Array) {
-        // do nothing
-    } else {
-        if(typeof(config) === 'object') {
-            config = [ config ];
-        } else {
-            config = [];
-        }
-    }
+            if (config instanceof Array) {
+                // do nothing
+            } else {
+                if (typeof(config) === 'object') {
+                    config = [ config ];
+                } else {
+                    config = [];
+                }
+            }
 
             if (errorCallback == null) {
                 errorCallback = function () {
