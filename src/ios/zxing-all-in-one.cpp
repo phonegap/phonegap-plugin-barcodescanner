@@ -888,7 +888,7 @@ namespace zxing {
 
 
 size_t BitArray::wordsForBits(size_t bits) {
-  int arraySize = (int)((bits + bitsPerWord_ - 1) >> logBits_);
+  int arraySize = (bits + bitsPerWord_ - 1) >> logBits_;
   return arraySize;
 }
 
@@ -1030,7 +1030,7 @@ namespace {
                       unsigned int bitsPerWord,
                       unsigned int logBits) {
     size_t bits = width * height;
-    int arraySize = (int)((bits + bitsPerWord - 1) >> logBits);
+    int arraySize = (bits + bitsPerWord - 1) >> logBits;
     return arraySize;
   }
 }
@@ -1076,7 +1076,7 @@ void BitMatrix::setRegion(size_t left, size_t top, size_t width, size_t height) 
     throw IllegalArgumentException("top + height and left + width must be <= matrix dimension");
   }
   for (size_t y = top; y < bottom; y++) {
-    int yOffset = (int)(width_ * y);
+    int yOffset = width_ * y;
     for (size_t x = left; x < right; x++) {
       size_t offset = x + yOffset;
       bits_[offset >> logBits] |= 1 << (offset & bitsMask);
@@ -1224,7 +1224,7 @@ int BitSource::readBits(int numBits) {
 }
 
 int BitSource::available() {
-  return (int)(8 * (bytes_.size() - byteOffset_) - bitOffset_);
+  return 8 * (bytes_.size() - byteOffset_) - bitOffset_;
 }
 }
 
@@ -1612,7 +1612,7 @@ Line findLine(const BitMatrix& image, Line estimate, bool invert, int deviation,
   edges.clear();
   findEdgePoints(edges, image, start, end, invert, skip, deviation);
 
-  int n = (int)edges.size();
+  int n = edges.size();
 
   float xdist = end.x - start.x;
   float ydist = end.y - start.y;
@@ -1829,7 +1829,7 @@ Ref<BitMatrix> GlobalHistogramBinarizer::getBlackMatrix() {
 }
 
 int GlobalHistogramBinarizer::estimate(vector<int> &histogram) {
-  int numBuckets = (int)histogram.size();
+  int numBuckets = histogram.size();
   int maxBucketCount = 0;
 
   // Find tallest peak in histogram
@@ -2082,7 +2082,7 @@ Ref<BitMatrix> GridSampler::sampleGrid(Ref<BitMatrix> image, int dimension, Ref<
   Ref<BitMatrix> bits(new BitMatrix(dimension));
   vector<float> points(dimension << 1, (const float)0.0f);
   for (int y = 0; y < dimension; y++) {
-    int max = (int)points.size();
+    int max = points.size();
     float yValue = (float)y + 0.5f;
     for (int x = 0; x < max; x += 2) {
       points[x] = (float)(x >> 1) + 0.5f;
@@ -2103,7 +2103,7 @@ Ref<BitMatrix> GridSampler::sampleGrid(Ref<BitMatrix> image, int dimensionX, int
   Ref<BitMatrix> bits(new BitMatrix(dimensionX, dimensionY));
   vector<float> points(dimensionX << 1, (const float)0.0f);
   for (int y = 0; y < dimensionY; y++) {
-    int max = (int)points.size();
+    int max = points.size();
     float yValue = (float)y + 0.5f;
     for (int x = 0; x < max; x += 2) {
       points[x] = (float)(x >> 1) + 0.5f;
@@ -2131,8 +2131,8 @@ Ref<BitMatrix> GridSampler::sampleGrid(Ref<BitMatrix> image, int dimension, floa
 }
 
 void GridSampler::checkAndNudgePoints(Ref<BitMatrix> image, vector<float> &points) {
-  int width = (int)image->getWidth();
-  int height = (int)image->getHeight();
+  int width = image->getWidth();
+  int height = image->getHeight();
 
 
   // The Java code assumes that if the start and end points are in bounds, the rest will also be.
@@ -2502,7 +2502,7 @@ Ref<PerspectiveTransform> PerspectiveTransform::times(Ref<PerspectiveTransform> 
 }
 
 void PerspectiveTransform::transformPoints(vector<float> &points) {
-  int max = (int)points.size();
+  int max = points.size();
   for (int i = 0; i < max; i += 2) {
     float x = points[i];
     float y = points[i + 1];
@@ -2770,8 +2770,8 @@ namespace zxing {
 using namespace std;
 
 std::vector<Ref<ResultPoint> > MonochromeRectangleDetector::detect() {
-    int height = (int)image_->getHeight();
-    int width = (int)image_->getWidth();
+    int height = image_->getHeight();
+    int width = image_->getWidth();
     int halfHeight = height >> 1;
     int halfWidth = width >> 1;
     int deltaY = max(1, height / (MAX_MODULES << 3));
@@ -2949,8 +2949,8 @@ int WhiteRectangleDetector::CORR = 1;
 
 
 WhiteRectangleDetector::WhiteRectangleDetector(Ref<BitMatrix> image) : image_(image) {
-  width_ = (int)image->getWidth();
-  height_ = (int)image->getHeight();
+  width_ = image->getWidth();
+  height_ = image->getHeight();
 }
 
 /**
@@ -3403,7 +3403,7 @@ namespace zxing {
 using namespace std;
 
 void GF256Poly::fixCoefficients() {
-  int coefficientsLength = (int)coefficients.size();
+  int coefficientsLength = coefficients.size();
   if (coefficientsLength > 1 && coefficients[0] == 0) {
     // Leading term must be non-zero for anything except
     // the constant polynomial "0"
@@ -3412,7 +3412,7 @@ void GF256Poly::fixCoefficients() {
       firstNonZero++;
     }
     if (firstNonZero == coefficientsLength) {
-      coefficientsLength = (int)(field.getZero()->coefficients.size());
+      coefficientsLength = field.getZero()->coefficients.size();
       coefficients.reset(new Array<int> (coefficientsLength));
       *coefficients = *(field.getZero()->coefficients);
     } else {
@@ -3436,7 +3436,7 @@ GF256Poly::~GF256Poly() {
 }
 
 int GF256Poly::getDegree() {
-  return (int)(coefficients.size() - 1);
+  return coefficients.size() - 1;
 }
 
 bool GF256Poly::isZero() {
@@ -3451,7 +3451,7 @@ int GF256Poly::evaluateAt(int a) {
   if (a == 0) {
     return getCoefficient(0);
   }
-  int size = (int)coefficients.size();
+  int size = coefficients.size();
   if (a == 1) {
     // Just the sum of the coefficients
     int result = 0;
@@ -3488,7 +3488,7 @@ Ref<GF256Poly> GF256Poly::addOrSubtract(Ref<GF256Poly> b) {
 
   ArrayRef<int> sumDiff(new Array<int> (largerCoefficients.size()));
 
-  unsigned lengthDiff = (unsigned)(largerCoefficients.size() - smallerCoefficients.size());
+  unsigned lengthDiff = largerCoefficients.size() - smallerCoefficients.size();
   for (unsigned i = 0; i < lengthDiff; i++) {
     sumDiff[i] = largerCoefficients[i];
   }
@@ -3506,9 +3506,9 @@ Ref<GF256Poly> GF256Poly::multiply(Ref<GF256Poly> b) {
     return field.getZero();
   }
   ArrayRef<int> aCoefficients = coefficients;
-  int aLength = (int)aCoefficients.size();
+  int aLength = aCoefficients.size();
   ArrayRef<int> bCoefficients = b->coefficients;
-  int bLength = (int)bCoefficients.size();
+  int bLength = bCoefficients.size();
   int productLength = aLength + bLength - 1;
   ArrayRef<int> product(new Array<int> (productLength));
   for (int i = 0; i < aLength; i++) {
@@ -3528,7 +3528,7 @@ Ref<GF256Poly> GF256Poly::multiply(int scalar) {
   if (scalar == 1) {
     return Ref<GF256Poly>(this);
   }
-  int size = (int)coefficients.size();
+  int size = coefficients.size();
   ArrayRef<int> product(new Array<int> (size));
   for (int i = 0; i < size; i++) {
     product[i] = field.multiply(coefficients[i], scalar);
@@ -3543,7 +3543,7 @@ Ref<GF256Poly> GF256Poly::multiplyByMonomial(int degree, int coefficient) {
   if (coefficient == 0) {
     return field.getZero();
   }
-  int size = (int)coefficients.size();
+  int size = coefficients.size();
   ArrayRef<int> product(new Array<int> (size + degree));
   for (int i = 0; i < size; i++) {
     product[i] = field.multiply(coefficients[i], coefficient);
@@ -3650,7 +3650,7 @@ void ReedSolomonDecoder::decode(ArrayRef<int> received, int twoS) {
   ArrayRef<int> errorLocations = findErrorLocations(sigmaOmega[0]);
   ArrayRef<int> errorMagitudes = findErrorMagnitudes(sigmaOmega[1], errorLocations, dataMatrix);
   for (unsigned i = 0; i < errorLocations->size(); i++) {
-    int position = (int)(received->size() - 1 - field.log(errorLocations[i]));
+    int position = received->size() - 1 - field.log(errorLocations[i]);
     //TODO: check why the position would be invalid
     if (position < 0 || (size_t)position >= received.size())
       throw IllegalArgumentException("Invalid position (ReedSolomonDecoder)");
@@ -3752,7 +3752,7 @@ ArrayRef<int> ReedSolomonDecoder::findErrorLocations(Ref<GF256Poly> errorLocator
 
 ArrayRef<int> ReedSolomonDecoder::findErrorMagnitudes(Ref<GF256Poly> errorEvaluator, ArrayRef<int> errorLocations, bool dataMatrix) {
   // This is directly applying Forney's Formula
-  int s = (int)errorLocations.size();
+  int s = errorLocations.size();
   ArrayRef<int> result(s);
   for (int i = 0; i < s; i++) {
     int xiInverse = field.inverse(errorLocations[i]);
@@ -4090,7 +4090,7 @@ int Version::buildVersions() {
 					              new ECBlocks(24, new ECB(1, 32)))));
   VERSIONS.push_back(Ref<Version>(new Version(30, 16, 48, 14, 22,
 					              new ECBlocks(28, new ECB(1, 49)))));
-  return (int)VERSIONS.size();
+  return VERSIONS.size();
 }
 }
 }
@@ -4146,8 +4146,8 @@ Ref<Version> BitMatrixParser::readVersion(Ref<BitMatrix> bitMatrix) {
     return parsedVersion_;
   }
 
-  int numRows = (int)bitMatrix->getHeight();//getDimension();
-  int numColumns = (int)bitMatrix->getWidth();//numRows;
+  int numRows = bitMatrix->getHeight();//getDimension();
+  int numColumns = bitMatrix->getWidth();//numRows;
 
   Ref<Version> version = parsedVersion_->getVersionForDimensions(numRows, numColumns);
   if (version != 0) {
@@ -4162,8 +4162,8 @@ ArrayRef<unsigned char> BitMatrixParser::readCodewords() {
     int row = 4;
     int column = 0;
 
-    int numRows = (int)bitMatrix_->getHeight();
-    int numColumns = (int)bitMatrix_->getWidth();
+    int numRows = bitMatrix_->getHeight();
+    int numColumns = bitMatrix_->getWidth();
 
     bool corner1Read = false;
     bool corner2Read = false;
@@ -4529,10 +4529,10 @@ std::vector<Ref<DataBlock> > DataBlock::getDataBlocks(ArrayRef<unsigned char> ra
 
   // All blocks have the same amount of data, except that the last n
   // (where n may be 0) have 1 more byte. Figure out where these start.
-  int shorterBlocksTotalCodewords = (int)result[0]->codewords_.size();
-  int longerBlocksStartAt = (int)(result.size() - 1);
+  int shorterBlocksTotalCodewords = result[0]->codewords_.size();
+  int longerBlocksStartAt = result.size() - 1;
   while (longerBlocksStartAt >= 0) {
-    int numCodewords = (int)result[longerBlocksStartAt]->codewords_.size();
+    int numCodewords = result[longerBlocksStartAt]->codewords_.size();
     if (numCodewords == shorterBlocksTotalCodewords) {
       break;
     }
@@ -4557,7 +4557,7 @@ std::vector<Ref<DataBlock> > DataBlock::getDataBlocks(ArrayRef<unsigned char> ra
     result[j]->codewords_[shorterBlocksNumDataCodewords] = rawCodewords[rawCodewordsOffset++];
   }
   // Now add in error correction blocks
-  int max = (int)result[0]->codewords_.size();
+  int max = result[0]->codewords_.size();
   for (int i = shorterBlocksNumDataCodewords; i < max; i++) {
     for (int j = 0; j < numResultBlocks; j++) {
       int iOffset = j < longerBlocksStartAt ? i : i + 1;
@@ -5036,7 +5036,7 @@ Decoder::Decoder() :
 
 
 void Decoder::correctErrors(ArrayRef<unsigned char> codewordBytes, int numDataCodewords) {
-  int numCodewords = (int)codewordBytes->size();
+  int numCodewords = codewordBytes->size();
   ArrayRef<int> codewordInts(numCodewords);
   for (int i = 0; i < numCodewords; i++) {
     codewordInts[i] = codewordBytes[i] & 0xff;
@@ -5065,7 +5065,7 @@ Ref<DecoderResult> Decoder::decode(Ref<BitMatrix> bits) {
   // Separate into data blocks
   std::vector<Ref<DataBlock> > dataBlocks = DataBlock::getDataBlocks(codewords, version);
 
-  int dataBlocksCount = (int)dataBlocks.size();
+  int dataBlocksCount = dataBlocks.size();
 
   // Count total number of data bytes
   int totalBytes = 0;
@@ -5555,7 +5555,7 @@ Ref<BitMatrix> Detector::sampleGrid(Ref<BitMatrix> image, int dimensionX, int di
 }
 
 void Detector::insertionSort(std::vector<Ref<ResultPointsAndTransitions> > &vector) {
-  int max = (int)vector.size();
+  int max = vector.size();
   bool swapped = true;
   Ref<ResultPointsAndTransitions> value;
   Ref<ResultPointsAndTransitions> valueB;
@@ -5634,8 +5634,8 @@ namespace zxing {
 namespace datamatrix {
 
 std::vector<Ref<CornerPoint> > MonochromeRectangleDetector::detect() {
-    int height = (int)image_->getHeight();
-    int width = (int)image_->getWidth();
+    int height = image_->getHeight();
+    int width = image_->getWidth();
     int halfHeight = height >> 1;
     int halfWidth = width >> 1;
     int deltaY = max(1, height / (MAX_MODULES << 3));
@@ -6176,8 +6176,8 @@ MultiFinderPatternFinder::~MultiFinderPatternFinder(){}
 std::vector<Ref<FinderPatternInfo> > MultiFinderPatternFinder::findMulti(DecodeHints const& hints){
   bool tryHarder = hints.getTryHarder();
   Ref<BitMatrix> image = image_; // Protected member
-  int maxI = (int)image->getHeight();
-  int maxJ = (int)image->getWidth();
+  int maxI = image->getHeight();
+  int maxJ = image->getWidth();
   // We are looking for black/white/black/white/black modules in
   // 1:1:3:1:1 ratio; this tracks the number of such modules seen so far
 
@@ -6258,7 +6258,7 @@ std::vector<Ref<FinderPatternInfo> > MultiFinderPatternFinder::findMulti(DecodeH
 std::vector<std::vector<Ref<FinderPattern> > > MultiFinderPatternFinder::selectBestPatterns(){
   std::vector<Ref<FinderPattern> > possibleCenters = possibleCenters_;
 
-  int size = (int)possibleCenters.size();
+  int size = possibleCenters.size();
 
   if (size < 3) {
     // Couldn't find enough finder patterns
@@ -6505,7 +6505,7 @@ namespace zxing {
 		}
 
 		int* Code128Reader::findStartPattern(Ref<BitArray> row){
-			int width = (int)row->getSize();
+			int width = row->getSize();
 			int rowOffset = 0;
 			while (rowOffset < width) {
 				if (row->get(rowOffset)) {
@@ -6786,7 +6786,7 @@ namespace zxing {
         // Check for ample whitespace following pattern, but, to do this we first need to remember that
         // we fudged decoding CODE_STOP since it actually has 7 bars, not 6. There is a black bar left
         // to read off. Would be slightly better to properly read. Here we just skip it:
-        int width = (int)row->getSize();
+        int width = row->getSize();
         while (nextStart < width && row->get(nextStart)) {
           nextStart++;
         }
@@ -6804,7 +6804,7 @@ namespace zxing {
         }
 
         // Need to pull out the check digits from string
-        int resultLength = (int)tmpResultString.length();
+        int resultLength = tmpResultString.length();
         // Only bother if the result had at least one character, and if the checksum digit happened to
         // be a printable character. If it was just interpreted as a control code, nothing to remove.
         if (resultLength > 0 && lastCharacterWasPrintable) {
@@ -6841,7 +6841,7 @@ namespace zxing {
 		}
 
 		void Code128Reader::append(char* s, char c){
-			int len = (int)strlen(s);
+			int len = strlen(s);
 			s[len] = c;
 			s[len + 1] = '\0';
 		}
@@ -6938,7 +6938,7 @@ namespace oned {
     try {
       start = findAsteriskPattern(row);
       int nextStart = start[1];
-      int end = (int)row->getSize();
+      int end = row->getSize();
 
       // Read off white space
       while (nextStart < end && !row->get(nextStart)) {
@@ -6988,7 +6988,7 @@ namespace oned {
       }
 
       if (usingCheckDigit) {
-        int max = (int)tmpResultString.length() - 1;
+        int max = tmpResultString.length() - 1;
         unsigned int total = 0;
         for (int i = 0; i < max; i++) {
           total += alphabet_string.find_first_of(tmpResultString[i], 0);
@@ -7034,7 +7034,7 @@ namespace oned {
   }
 
   int* Code39Reader::findAsteriskPattern(Ref<BitArray> row){
-    int width = (int)row->getSize();
+    int width = row->getSize();
     int rowOffset = 0;
     while (rowOffset < width) {
       if (row->get(rowOffset)) {
@@ -7143,7 +7143,7 @@ namespace oned {
   }
 
   Ref<String> Code39Reader::decodeExtended(std::string encoded){
-    int length = (int)encoded.length();
+    int length = encoded.length();
     std::string tmpDecoded;
     for (int i = 0; i < length; i++) {
       char c = encoded[i];
@@ -7239,7 +7239,7 @@ namespace zxing {
       const int countersLen = 4;
       int counters[countersLen] = { 0, 0, 0, 0 };
 
-      int end = (int)row->getSize();
+      int end = row->getSize();
       int rowOffset = startGuardEnd;
       int lgPatternFound = 0;
 
@@ -7332,7 +7332,7 @@ namespace zxing {
       const int countersLen = 4;
       int counters[countersLen] = { 0, 0, 0, 0 };
 
-      int end = (int)row->getSize();
+      int end = row->getSize();
       int rowOffset = startGuardEnd;
 
       for (int x = 0; x < 4 && rowOffset < end; x++) {
@@ -7455,7 +7455,7 @@ namespace zxing {
 
         // To avoid false positives with 2D barcodes (and other patterns), make
         // an assumption that the decoded string must be a known length
-        int length = (int)tmpResult.length();
+        int length = tmpResult.length();
         bool lengthOK = false;
         for (int i = 0; i < DEFAULT_ALLOWED_LENGTHS_LEN; i++) {
           if (length == DEFAULT_ALLOWED_LENGTHS[i]) {
@@ -7588,8 +7588,8 @@ namespace zxing {
         // accommodate
         // the reversed nature of the search
         int temp = endPattern[0];
-        endPattern[0] = (int)(row->getSize() - endPattern[1]);
-        endPattern[1] = (int)(row->getSize() - temp);
+        endPattern[0] = row->getSize() - endPattern[1];
+        endPattern[1] = row->getSize() - temp;
 
         row->reverse();
         return endPattern;
@@ -7641,7 +7641,7 @@ namespace zxing {
      * @throws ReaderException Throws exception if no black lines are found in the row
      */
     int ITFReader::skipWhiteSpace(Ref<BitArray> row) {
-      int width = (int)row->getSize();
+      int width = row->getSize();
       int endStart = 0;
       while (endStart < width) {
         if (row->get(endStart)) {
@@ -7673,7 +7673,7 @@ namespace zxing {
       for (int i=0; i<patternLength; i++) {
         counters[i] = 0;
       }
-      int width = (int)row->getSize();
+      int width = row->getSize();
       bool isWhite = false;
 
       int counterPosition = 0;
@@ -7800,7 +7800,7 @@ namespace zxing {
     }
 
     Ref<Result> MultiFormatOneDReader::decodeRow(int rowNumber, Ref<BitArray> row) {
-      int size = (int)readers.size();
+      int size = readers.size();
       for (int i = 0; i < size; i++) {
         OneDReader* reader = readers[i];
         Ref<Result> result = reader->decodeRow(rowNumber, row);
@@ -7869,7 +7869,7 @@ namespace zxing {
 
     Ref<Result> MultiFormatUPCEANReader::decodeRow(int rowNumber, Ref<BitArray> row) {
       // Compute this location once and reuse it on multiple implementations
-      int size = (int)readers.size();
+      int size = readers.size();
       for (int i = 0; i < size; i++) {
         Ref<OneDReader> reader = readers[i];
         Ref<Result> result = reader->decodeRow(rowNumber, row);
@@ -8078,7 +8078,7 @@ namespace zxing {
       for (int i = 0; i < numCounters; i++) {
         counters[i] = 0;
       }
-      int end = (int)row->getSize();
+      int end = row->getSize();
       if (start >= end) {
         return false;
       }
@@ -8383,11 +8383,11 @@ namespace zxing {
         const int pattern[], int patternLen, int* start, int* end) {
       int patternLength = patternLen;
       int counters[patternLength];
-      int countersCount = (int)(sizeof(counters) / sizeof(int));
+      int countersCount = sizeof(counters) / sizeof(int);
       for (int i = 0; i < countersCount; i++) {
         counters[i] = 0;
       }
-      int width = (int)row->getSize();
+      int width = row->getSize();
       bool isWhite = false;
       while (rowOffset < width) {
         isWhite = !row->get(rowOffset);
@@ -8497,7 +8497,7 @@ namespace zxing {
      * @return true iff string of digits passes the UPC/EAN checksum algorithm
      */
     bool UPCEANReader::checkStandardUPCEANChecksum(std::string s) {
-      int length = (int)s.length();
+      int length = s.length();
       if (length == 0) {
         return false;
       }
@@ -8576,7 +8576,7 @@ namespace zxing {
       const int countersLen = 4;
       int counters[countersLen] = { 0, 0, 0, 0 };
 
-      int end = (int)row->getSize();
+      int end = row->getSize();
       int rowOffset = startGuardEnd;
       int lgPatternFound = 0;
 
@@ -9105,7 +9105,7 @@ Version *Version::decodeVersionInformation(unsigned int versionBits) {
   // We can tolerate up to 3 bits of error since no two version info codewords will
   // differ in less than 4 bits.
   if (bestDifference <= 3) {
-    return getVersionForNumber((int)bestVersion);
+    return getVersionForNumber(bestVersion);
   }
   // If we didn't find a close enough match, fail
   return 0;
@@ -9504,7 +9504,7 @@ int Version::buildVersions() {
                                                new ECB(34, 25)),
                                   new ECBlocks(30, new ECB(20, 15),
                                                new ECB(61, 16)))));
-  return (int)VERSIONS.size();
+  return VERSIONS.size();
 }
 }
 }
@@ -9570,7 +9570,7 @@ Ref<FormatInformation> BitMatrixParser::readFormatInformation() {
   }
 
   // Read the top-right/bottom-left pattern
-  int dimension = (int)bitMatrix_->getDimension();
+  int dimension = bitMatrix_->getDimension();
   int formatInfoBits2 = 0;
   int jMin = dimension - 7;
   for (int j = dimension - 1; j >= jMin; j--) {
@@ -9592,7 +9592,7 @@ Version *BitMatrixParser::readVersion() {
     return parsedVersion_;
   }
 
-  int dimension = (int)bitMatrix_->getDimension();
+  int dimension = bitMatrix_->getDimension();
 
   int provisionalVersion = (dimension - 17) >> 2;
   if (provisionalVersion <= 6) {
@@ -9641,7 +9641,7 @@ ArrayRef<unsigned char> BitMatrixParser::readCodewords() {
   // some bits from reading as we wind through the bit matrix.
   DataMask &dataMask = DataMask::forReference((int)formatInfo->getDataMask());
   //	cout << (int)formatInfo->getDataMask() << endl;
-  int dimension = (int)bitMatrix_->getDimension();
+  int dimension = bitMatrix_->getDimension();
   dataMask.unmaskBitMatrix(*bitMatrix_, dimension);
 
 
@@ -9773,10 +9773,10 @@ std::vector<Ref<DataBlock> > DataBlock::getDataBlocks(ArrayRef<unsigned char> ra
 
   // All blocks have the same amount of data, except that the last n
   // (where n may be 0) have 1 more byte. Figure out where these start.
-  int shorterBlocksTotalCodewords = (int)result[0]->codewords_.size();
-  int longerBlocksStartAt = (int)(result.size() - 1);
+  int shorterBlocksTotalCodewords = result[0]->codewords_.size();
+  int longerBlocksStartAt = result.size() - 1;
   while (longerBlocksStartAt >= 0) {
-    int numCodewords = (int)result[longerBlocksStartAt]->codewords_.size();
+    int numCodewords = result[longerBlocksStartAt]->codewords_.size();
     if (numCodewords == shorterBlocksTotalCodewords) {
       break;
     }
@@ -9801,7 +9801,7 @@ std::vector<Ref<DataBlock> > DataBlock::getDataBlocks(ArrayRef<unsigned char> ra
     result[j]->codewords_[shorterBlocksNumDataCodewords] = rawCodewords[rawCodewordsOffset++];
   }
   // Now add in error correction blocks
-  int max = (int)result[0]->codewords_.size();
+  int max = result[0]->codewords_.size();
   for (int i = shorterBlocksNumDataCodewords; i < max; i++) {
     for (int j = 0; j < numResultBlocks; j++) {
       int iOffset = j < longerBlocksStartAt ? i : i + 1;
@@ -9975,7 +9975,7 @@ int DataMask::buildDataMasks() {
   DATA_MASKS.push_back(Ref<DataMask> (new DataMask101()));
   DATA_MASKS.push_back(Ref<DataMask> (new DataMask110()));
   DATA_MASKS.push_back(Ref<DataMask> (new DataMask111()));
-  return (int)DATA_MASKS.size();
+  return DATA_MASKS.size();
 }
 
 }
@@ -10058,7 +10058,7 @@ void DecodedBitStreamParser::append(std::string &result,
     return;
   }
 
-  const int maxOut = (int)(4 * nIn + 1);
+  const int maxOut = 4 * nIn + 1;
   unsigned char* bufOut = new unsigned char[maxOut];
 
   ICONV_CONST char *fromPtr = (ICONV_CONST char *)bufIn;
@@ -10076,7 +10076,7 @@ void DecodedBitStreamParser::append(std::string &result,
   }
   iconv_close(cd);
 
-  int nResult = (int)(maxOut - nTo);
+  int nResult = maxOut - nTo;
   bufOut[nResult] = '\0';
   result.append((const char *)bufOut);
   delete[] bufOut;
@@ -10427,7 +10427,7 @@ Decoder::Decoder() :
 }
 
 void Decoder::correctErrors(ArrayRef<unsigned char> codewordBytes, int numDataCodewords) {
-  int numCodewords = (int)codewordBytes->size();
+  int numCodewords = codewordBytes->size();
   ArrayRef<int> codewordInts(numCodewords);
   for (int i = 0; i < numCodewords; i++) {
     codewordInts[i] = codewordBytes[i] & 0xff;
@@ -10685,12 +10685,12 @@ bool AlignmentPatternFinder::foundPatternCross(vector<int> &stateCount) {
 
 float AlignmentPatternFinder::crossCheckVertical(size_t startI, size_t centerJ, int maxCount,
     int originalStateCountTotal) {
-  int maxI = (int)image_->getHeight();
+  int maxI = image_->getHeight();
   vector<int> stateCount(3, 0);
 
 
   // Start counting up from center
-  int i = (int)startI;
+  int i = startI;
   while (i >= 0 && image_->get(centerJ, i) && stateCount[1] <= maxCount) {
     stateCount[1]++;
     i--;
@@ -10708,7 +10708,7 @@ float AlignmentPatternFinder::crossCheckVertical(size_t startI, size_t centerJ, 
   }
 
   // Now also count down from center
-  i = (int)(startI + 1);
+  i = startI + 1;
   while (i < maxI && image_->get(centerJ, i) && stateCount[1] <= maxCount) {
     stateCount[1]++;
     i++;
@@ -10734,11 +10734,11 @@ float AlignmentPatternFinder::crossCheckVertical(size_t startI, size_t centerJ, 
 
 Ref<AlignmentPattern> AlignmentPatternFinder::handlePossibleCenter(vector<int> &stateCount, size_t i, size_t j) {
   int stateCountTotal = stateCount[0] + stateCount[1] + stateCount[2];
-  float centerJ = centerFromEnd(stateCount, (int)j);
+  float centerJ = centerFromEnd(stateCount, j);
   float centerI = crossCheckVertical(i, (int)centerJ, 2 * stateCount[1], stateCountTotal);
   if (!isnan(centerI)) {
     float estimatedModuleSize = (float)(stateCount[0] + stateCount[1] + stateCount[2]) / 3.0f;
-    int max = (int)possibleCenters_->size();
+    int max = possibleCenters_->size();
     for (int index = 0; index < max; index++) {
       Ref<AlignmentPattern> center((*possibleCenters_)[index]);
       // Look for about the same center and module size:
@@ -11045,7 +11045,7 @@ float Detector::sizeOfBlackWhiteBlackRunBothWays(int fromX, int fromY, int toX, 
       otherToX = 0;
     } else if (otherToX >= (int)image_->getWidth()) {
       scale = (float) (image_->getWidth() - 1 - fromX) / (float) (otherToX - fromX);
-      otherToX = (int)(image_->getWidth() - 1);
+      otherToX = image_->getWidth() - 1;
     }
     int otherToY = (int) (fromY - (toY - fromY) * scale);
 
@@ -11055,7 +11055,7 @@ float Detector::sizeOfBlackWhiteBlackRunBothWays(int fromX, int fromY, int toX, 
       otherToY = 0;
     } else if (otherToY >= (int)image_->getHeight()) {
       scale = (float) (image_->getHeight() - 1 - fromY) / (float) (otherToY - fromY);
-      otherToY = (int)(image_->getHeight() - 1);
+      otherToY = image_->getHeight() - 1;
     }
     otherToX = (int) (fromX + (otherToX - fromX) * scale);
 
@@ -11318,14 +11318,14 @@ bool FinderPatternFinder::foundPatternCross(int* stateCount) {
 
 float FinderPatternFinder::crossCheckVertical(size_t startI, size_t centerJ, int maxCount, int originalStateCountTotal) {
 
-  int maxI = (int)image_->getHeight();
+  int maxI = image_->getHeight();
   int stateCount[5];
   for (int i = 0; i < 5; i++)
     stateCount[i] = 0;
 
 
   // Start counting up from center
-  int i = (int)startI;
+  int i = startI;
   while (i >= 0 && image_->get(centerJ, i)) {
     stateCount[2]++;
     i--;
@@ -11350,7 +11350,7 @@ float FinderPatternFinder::crossCheckVertical(size_t startI, size_t centerJ, int
   }
 
   // Now also count down from center
-  i = (int)(startI + 1);
+  i = startI + 1;
   while (i < maxI && image_->get(centerJ, i)) {
     stateCount[2]++;
     i++;
@@ -11386,12 +11386,12 @@ float FinderPatternFinder::crossCheckVertical(size_t startI, size_t centerJ, int
 float FinderPatternFinder::crossCheckHorizontal(size_t startJ, size_t centerI, int maxCount,
     int originalStateCountTotal) {
 
-  int maxJ = (int)image_->getWidth();
+  int maxJ = image_->getWidth();
   int stateCount[5];
   for (int i = 0; i < 5; i++)
     stateCount[i] = 0;
 
-  int j = (int)startJ;
+  int j = startJ;
   while (j >= 0 && image_->get(j, centerI)) {
     stateCount[2]++;
     j--;
@@ -11414,7 +11414,7 @@ float FinderPatternFinder::crossCheckHorizontal(size_t startJ, size_t centerI, i
     return NAN;
   }
 
-  j = (int)(startJ + 1);
+  j = startJ + 1;
   while (j < maxJ && image_->get(j, centerI)) {
     stateCount[2]++;
     j++;
@@ -11449,7 +11449,7 @@ float FinderPatternFinder::crossCheckHorizontal(size_t startJ, size_t centerI, i
 
 bool FinderPatternFinder::handlePossibleCenter(int* stateCount, size_t i, size_t j) {
   int stateCountTotal = stateCount[0] + stateCount[1] + stateCount[2] + stateCount[3] + stateCount[4];
-  float centerJ = centerFromEnd(stateCount, (int)j);
+  float centerJ = centerFromEnd(stateCount, j);
   float centerI = crossCheckVertical(i, (size_t)centerJ, stateCount[2], stateCountTotal);
   if (!isnan(centerI)) {
     // Re-cross check
@@ -11661,7 +11661,7 @@ Ref<FinderPatternInfo> FinderPatternFinder::find(DecodeHints const& hints) {
   // modules in size. This gives the smallest number of pixels the center
   // could be, so skip this often. When trying harder, look for all
   // QR versions regardless of how dense they are.
-  int iSkip = (int)((3 * maxI) / (4 * MAX_MODULES));
+  int iSkip = (3 * maxI) / (4 * MAX_MODULES);
   if (iSkip < MIN_SKIP || tryHarder) {
       iSkip = MIN_SKIP;
   }

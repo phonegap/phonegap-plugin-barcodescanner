@@ -4,7 +4,7 @@ git:
 node_js:
   - "0.10"
 install:
-  - echo -e "Host github.com\n\tStrictHostKeyChecking no\n" >> ~/.ssh/config 
+  - echo -e "Host github.com\n\tStrictHostKeyChecking no\n" >> ~/.ssh/config
   - cd ..
   - npm install -g cordova-paramedic
   - npm install -g cordova
