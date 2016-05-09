@@ -42,6 +42,9 @@ Note: Windows 10 applications can not be build for `AnyCPU` architecture, which 
 cordova run windows -- --archs=x86
 ```
 
+### PhoneGap Build
+If you're using [PhoneGap Build](https://build.phonegap.com/) please make sure you specify `gradle` as your Android build tool in `config.xml`: `<preference name="android-build-tool" value="gradle" />`.
+
 ## Using the plugin ##
 The plugin creates the object `cordova/plugin/BarcodeScanner` with the method `scan(success, fail)`. 
 
