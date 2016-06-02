@@ -282,6 +282,7 @@ module.exports = {
             closeButton.className = "app-bar-action action-close";
             navigationButtonsDiv.appendChild(closeButton);
 
+            BarcodeReader.scanCancelled = false;
             closeButton.addEventListener("click", cancelPreview, false);
             document.addEventListener('backbutton', cancelPreview, false);
 
@@ -432,14 +433,23 @@ module.exports = {
          * See https://github.com/phonegap-build/BarcodeScanner#using-the-plugin
          */
         function cancelPreview() {
+            BarcodeReader.scanCancelled = true;
             reader && reader.stop();
+        }
+
+        function checkCancelled() {
+            if (BarcodeReader.scanCancelled) {
+                throw new Error('Canceled');
+            }
         }
 
         WinJS.Promise.wrap(createPreview())
         .then(function () {
+            checkCancelled();
             return startPreview();
         })
         .then(function (captureSettings) {
+            checkCancelled();
             reader = BarcodeReader.get(captureSettings.capture);
             reader.init(captureSettings.capture, captureSettings.width, captureSettings.height);
 
@@ -447,6 +457,7 @@ module.exports = {
             // we would get an 'Invalid state' error from 'getPreviewFrameAsync'
             return WinJS.Promise.timeout(200)
             .then(function () {
+                checkCancelled();
                 return reader.readCode();
             });
         })
@@ -459,7 +470,14 @@ module.exports = {
             });
         }, function (error) {
             destroyPreview();
-            fail(error);
+
+            if (error.message == 'Canceled') {
+                success({
+                    cancelled: true
+                });
+            } else {
+                fail(error);
+            }
         });
     },
 
