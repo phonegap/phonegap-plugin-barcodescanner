@@ -11,6 +11,7 @@
 var urlutil = require('cordova/urlutil');
 
 var CAMERA_STREAM_STATE_CHECK_RETRY_TIMEOUT = 200; // milliseconds
+var OPERATION_IS_IN_PROGRESS = -2147024567;
 
 /**
  * List of supported barcode formats from ZXing library. Used to return format
@@ -316,7 +317,21 @@ module.exports = {
                 return result;
             }
 
-            return controller.focusControl.focusAsync();
+            // Multiple calls to focusAsync leads to internal focusing hang on some Windows Phone 8.1 devices
+            if (controller.focusControl.focusState === Windows.Media.Devices.MediaCaptureFocusState.searching) {
+                return result;
+            }
+
+            try {
+                return controller.focusControl.focusAsync();
+            } catch (e) {
+                // This happens on mutliple taps
+                if (e.number !== OPERATION_IS_IN_PROGRESS) {
+                    console.error('focusAsync failed: ' + e);
+                    return WinJS.Promise.wrapError(e);
+                }
+                return result;
+            }
         }
 
         function setupFocus(focusControl) {
@@ -333,6 +348,9 @@ module.exports = {
             var focusConfig = new Windows.Media.Devices.FocusSettings();
             focusConfig.autoFocusRange = Windows.Media.Devices.AutoFocusRange.normal;
 
+            // Determine a focus position if the focus search fails:
+            focusConfig.disableDriverFallback = false;
+
             if (supportsFocusMode(FocusMode.continuous)) {
                 console.log("Device supports continuous focus mode");
                 focusConfig.mode = FocusMode.continuous;
@@ -342,12 +360,23 @@ module.exports = {
             }
 
             focusControl.configure(focusConfig);
-            // Need to wrap this in setTimeout since continuous focus should start only after preview has started. See
-            // 'Remarks' at https://msdn.microsoft.com/en-us/library/windows/apps/windows.media.devices.focuscontrol.configure.aspx
-            return WinJS.Promise.timeout(200)
-            .then(function () {
-                return focusControl.focusAsync();
-            });
+
+            // Continuous focus should start only after preview has started. See 'Remarks' at 
+            // https://msdn.microsoft.com/en-us/library/windows/apps/windows.media.devices.focuscontrol.configure.aspx
+            function waitForIsPlaying() {
+                var isPlaying = !capturePreview.paused && !capturePreview.ended && capturePreview.readyState > 2;
+
+                if (!isPlaying) {
+                    return WinJS.Promise.timeout(CHECK_PLAYING_TIMEOUT)
+                    .then(function () {
+                        return waitForIsPlaying();
+                    });
+                }
+
+                return focus();
+            }
+
+            return waitForIsPlaying();
         }
 
         function disableZoomAndScroll() {
