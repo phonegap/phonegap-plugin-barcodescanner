@@ -12,6 +12,8 @@ var urlutil = require('cordova/urlutil');
 
 var CAMERA_STREAM_STATE_CHECK_RETRY_TIMEOUT = 200; // milliseconds
 var OPERATION_IS_IN_PROGRESS = -2147024567;
+var INITIAL_FOCUS_DELAY = 200; // milliseconds
+var CHECK_PLAYING_TIMEOUT = 100; // milliseconds
 
 /**
  * List of supported barcode formats from ZXing library. Used to return format
@@ -322,16 +324,20 @@ module.exports = {
                 return result;
             }
 
-            try {
-                return controller.focusControl.focusAsync();
-            } catch (e) {
-                // This happens on mutliple taps
-                if (e.number !== OPERATION_IS_IN_PROGRESS) {
-                    console.error('focusAsync failed: ' + e);
-                    return WinJS.Promise.wrapError(e);
+            // The delay prevents focus hang on slow devices
+            return WinJS.Promise.timeout(INITIAL_FOCUS_DELAY)
+            .then(function () {
+                try {
+                    return controller.focusControl.focusAsync();
+                } catch (e) {
+                    // This happens on mutliple taps
+                    if (e.number !== OPERATION_IS_IN_PROGRESS) {
+                        console.error('focusAsync failed: ' + e);
+                        return WinJS.Promise.wrapError(e);
+                    }
+                    return result;
                 }
-                return result;
-            }
+            });
         }
 
         function setupFocus(focusControl) {
