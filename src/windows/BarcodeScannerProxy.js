@@ -347,6 +347,16 @@ module.exports = {
             });
         }
 
+        function disableZoomAndScroll() {
+            document.body.classList.add('no-zoom');
+            document.body.classList.add('no-scroll');
+        }
+
+        function enableZoomAndScroll() {
+            document.body.classList.remove('no-zoom');
+            document.body.classList.remove('no-scroll');
+        }
+
         /**
          * Starts stream transmission to preview frame and then run barcode search
          */
@@ -394,6 +404,8 @@ module.exports = {
                 // Insert preview frame and controls into page
                 document.body.appendChild(capturePreviewFrame);
 
+                disableZoomAndScroll();
+
                 return setupFocus(captureSettings.capture.videoDeviceController.focusControl)
                 .then(function () {
                     Windows.Graphics.Display.DisplayInformation.getForCurrentView().addEventListener("orientationchanged", updatePreviewForRotation, false);
@@ -425,6 +437,8 @@ module.exports = {
 
             capture && capture.stopRecordAsync();
             capture = null;
+
+            enableZoomAndScroll();
         }
 
         /**
