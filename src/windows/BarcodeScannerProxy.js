@@ -10,6 +10,8 @@
 
 var urlutil = require('cordova/urlutil');
 
+var CAMERA_STREAM_STATE_CHECK_RETRY_TIMEOUT = 200; // milliseconds
+
 /**
  * List of supported barcode formats from ZXing library. Used to return format
  *   name instead of number code as per plugin spec.
@@ -410,6 +412,30 @@ module.exports = {
                 .then(function () {
                     Windows.Graphics.Display.DisplayInformation.getForCurrentView().addEventListener("orientationchanged", updatePreviewForRotation, false);
                     return updatePreviewForRotation();
+                })
+                .then(function () {
+
+                    if (!Windows.Media.Devices.CameraStreamState) {
+                        // CameraStreamState is available starting with Windows 10 so skip this check for 8.1
+                        // https://msdn.microsoft.com/en-us/library/windows/apps/windows.media.devices.camerastreamstate
+                        return WinJS.Promise.as();
+                    }
+
+                    function checkCameraStreamState() {
+                        if (capture.cameraStreamState !== Windows.Media.Devices.CameraStreamState.streaming) {
+
+                            // Using loop as MediaCapture.CameraStreamStateChanged does not fire with CameraStreamState.streaming state.
+                            return WinJS.Promise.timeout(CAMERA_STREAM_STATE_CHECK_RETRY_TIMEOUT)
+                            .then(function () {
+                                return checkCameraStreamState();
+                            });
+                        }
+
+                        return WinJS.Promise.as();
+                    }
+
+                    // Ensure CameraStreamState is Streaming
+                    return checkCameraStreamState();
                 })
                 .then(function () {
                     return captureSettings;
