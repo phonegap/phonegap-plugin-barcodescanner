@@ -15,8 +15,12 @@
 }
 
 .barcode-scanner-preview {
-    width: 100%;
+    width: auto;
     height: calc(100% - 70px);
+    position: absolute;
+    top: calc(50% - 35px);
+    left: 50%;
+    transform: translateX(-50%) translateY(-50%);
 }
 
 .barcode-scanner-mark {
@@ -36,6 +40,8 @@
     z-index: 9999999;
     text-align: center;
     user-select: none;
+    position: absolute;
+    bottom: 0px;
 }
 
 .app-bar-action {

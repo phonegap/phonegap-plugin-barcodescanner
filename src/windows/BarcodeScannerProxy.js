@@ -212,6 +212,26 @@ BarcodeReader.prototype.stop = function () {
     this._cancelled = true;
 };
 
+function degreesToRotation(degrees) {
+    switch (degrees) {
+        // portrait
+        case 90:
+            return Windows.Media.Capture.VideoRotation.clockwise90Degrees;
+        // landscape
+        case 0:
+            return Windows.Media.Capture.VideoRotation.none;
+        // portrait-flipped
+        case 270:
+            return Windows.Media.Capture.VideoRotation.clockwise270Degrees;
+        // landscape-flipped
+        case 180:
+            return Windows.Media.Capture.VideoRotation.clockwise180Degrees;
+        default:
+            // Falling back to portrait default
+            return Windows.Media.Capture.VideoRotation.clockwise90Degrees;
+    }
+}
+
 module.exports = {
 
     /**
@@ -235,8 +255,6 @@ module.exports = {
                 return;
             }
 
-            var ROTATION_KEY = "C380465D-2271-428C-9B83-ECEA3B4A85C1";
-
             var displayInformation = (evt && evt.target) || Windows.Graphics.Display.DisplayInformation.getForCurrentView();
             var currentOrientation = displayInformation.currentOrientation;
 
@@ -245,10 +263,8 @@ module.exports = {
             // Lookup up the rotation degrees.
             var rotDegree = videoPreviewRotationLookup(currentOrientation, previewMirroring);
 
-            // rotate the preview video
-            var videoEncodingProperties = capture.videoDeviceController.getMediaStreamProperties(Windows.Media.Capture.MediaStreamType.videoPreview);
-            videoEncodingProperties.properties.insert(ROTATION_KEY, rotDegree);
-            return capture.videoDeviceController.setMediaStreamPropertiesAsync(Windows.Media.Capture.MediaStreamType.videoPreview, videoEncodingProperties);
+            capture.setPreviewRotation(degreesToRotation(rotDegree));
+            return WinJS.Promise.as();
         }
 
         /**
