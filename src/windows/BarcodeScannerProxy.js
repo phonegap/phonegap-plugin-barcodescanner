@@ -250,6 +250,13 @@ module.exports = {
             capture,
             reader;
 
+        // Save call state for suspend/resume
+        BarcodeReader.scanCallArgs = {
+            success: success,
+            fail: fail,
+            args: args
+        };
+
         function updatePreviewForRotation(evt) {
             if (!capture) {
                 return;
@@ -499,6 +506,7 @@ module.exports = {
          * Removes preview frame and corresponding objects from window
          */
         function destroyPreview() {
+            var promise = WinJS.Promise.as();
 
             Windows.Graphics.Display.DisplayInformation.getForCurrentView().removeEventListener("orientationchanged", updatePreviewForRotation, false);
             document.removeEventListener('backbutton', cancelPreview);
@@ -509,14 +517,19 @@ module.exports = {
             if (capturePreviewFrame) {
                 document.body.removeChild(capturePreviewFrame);
             }
+            capturePreviewFrame = null;
 
             reader && reader.stop();
             reader = null;
 
-            capture && capture.stopRecordAsync();
+            if (capture) {
+                promise = capture.stopRecordAsync();
+            }
             capture = null;
 
             enableZoomAndScroll();
+
+            return promise;
         }
 
         /**
@@ -534,7 +547,7 @@ module.exports = {
             }
         }
 
-        WinJS.Promise.wrap(createPreview())
+        BarcodeReader.scanPromise = WinJS.Promise.wrap(createPreview())
         .then(function () {
             checkCancelled();
             return startPreview();
@@ -552,7 +565,12 @@ module.exports = {
                 return reader.readCode();
             });
         })
-        .done(function (result) {
+        .then(function (result) {
+            // Suppress null result (cancel) on suspending
+            if (BarcodeReader.suspended) {
+                return;
+            }
+
             destroyPreview();
             success({
                 text: result && result.text,
@@ -570,6 +588,12 @@ module.exports = {
                 fail(error);
             }
         });
+
+        BarcodeReader.videoPreviewIsVisible = function () {
+            return capturePreviewFrame !== null;
+        }
+
+        BarcodeReader.destroyPreview = destroyPreview;
     },
 
     /**
@@ -582,5 +606,28 @@ module.exports = {
         fail("Not implemented yet");
     }
 };
+
+var app = WinJS.Application;
+
+function waitForScanEnd() {
+    return BarcodeReader.scanPromise || WinJS.Promise.as();
+}
+
+// About to be suspended
+app.addEventListener('checkpoint', function (args) {
+    if (BarcodeReader.videoPreviewIsVisible && BarcodeReader.videoPreviewIsVisible() && BarcodeReader.destroyPreview) {
+        BarcodeReader.suspended = true;
+        args.setPromise(BarcodeReader.destroyPreview()
+        .then(waitForScanEnd, waitForScanEnd));
+    }
+});
+
+// Resuming from a user suspension
+Windows.UI.WebUI.WebUIApplication.addEventListener("resuming", function () {
+    if (BarcodeReader.suspended) {
+        BarcodeReader.suspended = false;
+        module.exports.scan(BarcodeReader.scanCallArgs.success, BarcodeReader.scanCallArgs.fail, BarcodeReader.scanCallArgs.args);
+    }
+}, false);
 
 require("cordova/exec/proxy").add("BarcodeScanner", module.exports);
