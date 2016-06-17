@@ -1070,17 +1070,17 @@ parentViewController:(UIViewController*)parentViewController
 
 - (BOOL)shouldAutorotate
 {
-  return NO; // if we want to support non-portrait orientation then this should change as well
+    return YES;
 }
 
 - (UIInterfaceOrientation)preferredInterfaceOrientationForPresentation
 {
-    return UIInterfaceOrientationPortrait;
+    return [[UIApplication sharedApplication] statusBarOrientation];
 }
 
 - (NSUInteger)supportedInterfaceOrientations
 {
-    return UIInterfaceOrientationMaskPortrait;
+    return UIInterfaceOrientationMaskAll;
 }
 
 - (BOOL)shouldAutorotateToInterfaceOrientation:(UIInterfaceOrientation)interfaceOrientation
@@ -1094,14 +1094,22 @@ parentViewController:(UIViewController*)parentViewController
 
 - (void) willAnimateRotationToInterfaceOrientation:(UIInterfaceOrientation)orientation duration:(NSTimeInterval)duration
 {
-    [CATransaction begin];
+    [UIView setAnimationsEnabled:NO];
+    AVCaptureVideoPreviewLayer* previewLayer = self.processor.previewLayer;
+    previewLayer.frame = self.view.bounds;
 
-    self.processor.previewLayer.connection.videoOrientation = orientation;
-    [self.processor.previewLayer layoutSublayers];
-    self.processor.previewLayer.frame = self.view.bounds;
+    if (orientation == UIInterfaceOrientationLandscapeLeft) {
+        [previewLayer setOrientation:AVCaptureVideoOrientationLandscapeLeft];
+    } else if (orientation == UIInterfaceOrientationLandscapeRight) {
+        [previewLayer setOrientation:AVCaptureVideoOrientationLandscapeRight];
+    } else if (orientation == UIInterfaceOrientationPortrait) {
+        [previewLayer setOrientation:AVCaptureVideoOrientationPortrait];
+    } else if (orientation == UIInterfaceOrientationPortraitUpsideDown) {
+        [previewLayer setOrientation:AVCaptureVideoOrientationPortraitUpsideDown];
+    }
 
-    [CATransaction commit];
-    [super willAnimateRotationToInterfaceOrientation:orientation duration:duration];
+    previewLayer.videoGravity = AVLayerVideoGravityResizeAspectFill;
+    [UIView setAnimationsEnabled:YES];
 }
 
 @end
