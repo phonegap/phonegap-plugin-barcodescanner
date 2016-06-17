@@ -10,6 +10,11 @@
 
 var urlutil = require('cordova/urlutil');
 
+var CAMERA_STREAM_STATE_CHECK_RETRY_TIMEOUT = 200; // milliseconds
+var OPERATION_IS_IN_PROGRESS = -2147024567;
+var INITIAL_FOCUS_DELAY = 200; // milliseconds
+var CHECK_PLAYING_TIMEOUT = 100; // milliseconds
+
 /**
  * List of supported barcode formats from ZXing library. Used to return format
  *   name instead of number code as per plugin spec.
@@ -207,6 +212,26 @@ BarcodeReader.prototype.stop = function () {
     this._cancelled = true;
 };
 
+function degreesToRotation(degrees) {
+    switch (degrees) {
+        // portrait
+        case 90:
+            return Windows.Media.Capture.VideoRotation.clockwise90Degrees;
+        // landscape
+        case 0:
+            return Windows.Media.Capture.VideoRotation.none;
+        // portrait-flipped
+        case 270:
+            return Windows.Media.Capture.VideoRotation.clockwise270Degrees;
+        // landscape-flipped
+        case 180:
+            return Windows.Media.Capture.VideoRotation.clockwise180Degrees;
+        default:
+            // Falling back to portrait default
+            return Windows.Media.Capture.VideoRotation.clockwise90Degrees;
+    }
+}
+
 module.exports = {
 
     /**
@@ -230,8 +255,6 @@ module.exports = {
                 return;
             }
 
-            var ROTATION_KEY = "C380465D-2271-428C-9B83-ECEA3B4A85C1";
-
             var displayInformation = (evt && evt.target) || Windows.Graphics.Display.DisplayInformation.getForCurrentView();
             var currentOrientation = displayInformation.currentOrientation;
 
@@ -240,10 +263,8 @@ module.exports = {
             // Lookup up the rotation degrees.
             var rotDegree = videoPreviewRotationLookup(currentOrientation, previewMirroring);
 
-            // rotate the preview video
-            var videoEncodingProperties = capture.videoDeviceController.getMediaStreamProperties(Windows.Media.Capture.MediaStreamType.videoPreview);
-            videoEncodingProperties.properties.insert(ROTATION_KEY, rotDegree);
-            return capture.videoDeviceController.setMediaStreamPropertiesAsync(Windows.Media.Capture.MediaStreamType.videoPreview, videoEncodingProperties);
+            capture.setPreviewRotation(degreesToRotation(rotDegree));
+            return WinJS.Promise.as();
         }
 
         /**
@@ -282,6 +303,7 @@ module.exports = {
             closeButton.className = "app-bar-action action-close";
             navigationButtonsDiv.appendChild(closeButton);
 
+            BarcodeReader.scanCancelled = false;
             closeButton.addEventListener("click", cancelPreview, false);
             document.addEventListener('backbutton', cancelPreview, false);
 
@@ -313,7 +335,25 @@ module.exports = {
                 return result;
             }
 
-            return controller.focusControl.focusAsync();
+            // Multiple calls to focusAsync leads to internal focusing hang on some Windows Phone 8.1 devices
+            if (controller.focusControl.focusState === Windows.Media.Devices.MediaCaptureFocusState.searching) {
+                return result;
+            }
+
+            // The delay prevents focus hang on slow devices
+            return WinJS.Promise.timeout(INITIAL_FOCUS_DELAY)
+            .then(function () {
+                try {
+                    return controller.focusControl.focusAsync();
+                } catch (e) {
+                    // This happens on mutliple taps
+                    if (e.number !== OPERATION_IS_IN_PROGRESS) {
+                        console.error('focusAsync failed: ' + e);
+                        return WinJS.Promise.wrapError(e);
+                    }
+                    return result;
+                }
+            });
         }
 
         function setupFocus(focusControl) {
@@ -330,6 +370,9 @@ module.exports = {
             var focusConfig = new Windows.Media.Devices.FocusSettings();
             focusConfig.autoFocusRange = Windows.Media.Devices.AutoFocusRange.normal;
 
+            // Determine a focus position if the focus search fails:
+            focusConfig.disableDriverFallback = false;
+
             if (supportsFocusMode(FocusMode.continuous)) {
                 console.log("Device supports continuous focus mode");
                 focusConfig.mode = FocusMode.continuous;
@@ -339,12 +382,33 @@ module.exports = {
             }
 
             focusControl.configure(focusConfig);
-            // Need to wrap this in setTimeout since continuous focus should start only after preview has started. See
-            // 'Remarks' at https://msdn.microsoft.com/en-us/library/windows/apps/windows.media.devices.focuscontrol.configure.aspx
-            return WinJS.Promise.timeout(200)
-            .then(function () {
-                return focusControl.focusAsync();
-            });
+
+            // Continuous focus should start only after preview has started. See 'Remarks' at 
+            // https://msdn.microsoft.com/en-us/library/windows/apps/windows.media.devices.focuscontrol.configure.aspx
+            function waitForIsPlaying() {
+                var isPlaying = !capturePreview.paused && !capturePreview.ended && capturePreview.readyState > 2;
+
+                if (!isPlaying) {
+                    return WinJS.Promise.timeout(CHECK_PLAYING_TIMEOUT)
+                    .then(function () {
+                        return waitForIsPlaying();
+                    });
+                }
+
+                return focus();
+            }
+
+            return waitForIsPlaying();
+        }
+
+        function disableZoomAndScroll() {
+            document.body.classList.add('no-zoom');
+            document.body.classList.add('no-scroll');
+        }
+
+        function enableZoomAndScroll() {
+            document.body.classList.remove('no-zoom');
+            document.body.classList.remove('no-scroll');
         }
 
         /**
@@ -394,10 +458,36 @@ module.exports = {
                 // Insert preview frame and controls into page
                 document.body.appendChild(capturePreviewFrame);
 
+                disableZoomAndScroll();
+
                 return setupFocus(captureSettings.capture.videoDeviceController.focusControl)
                 .then(function () {
                     Windows.Graphics.Display.DisplayInformation.getForCurrentView().addEventListener("orientationchanged", updatePreviewForRotation, false);
                     return updatePreviewForRotation();
+                })
+                .then(function () {
+
+                    if (!Windows.Media.Devices.CameraStreamState) {
+                        // CameraStreamState is available starting with Windows 10 so skip this check for 8.1
+                        // https://msdn.microsoft.com/en-us/library/windows/apps/windows.media.devices.camerastreamstate
+                        return WinJS.Promise.as();
+                    }
+
+                    function checkCameraStreamState() {
+                        if (capture.cameraStreamState !== Windows.Media.Devices.CameraStreamState.streaming) {
+
+                            // Using loop as MediaCapture.CameraStreamStateChanged does not fire with CameraStreamState.streaming state.
+                            return WinJS.Promise.timeout(CAMERA_STREAM_STATE_CHECK_RETRY_TIMEOUT)
+                            .then(function () {
+                                return checkCameraStreamState();
+                            });
+                        }
+
+                        return WinJS.Promise.as();
+                    }
+
+                    // Ensure CameraStreamState is Streaming
+                    return checkCameraStreamState();
                 })
                 .then(function () {
                     return captureSettings;
@@ -425,6 +515,8 @@ module.exports = {
 
             capture && capture.stopRecordAsync();
             capture = null;
+
+            enableZoomAndScroll();
         }
 
         /**
@@ -432,14 +524,23 @@ module.exports = {
          * See https://github.com/phonegap-build/BarcodeScanner#using-the-plugin
          */
         function cancelPreview() {
+            BarcodeReader.scanCancelled = true;
             reader && reader.stop();
+        }
+
+        function checkCancelled() {
+            if (BarcodeReader.scanCancelled) {
+                throw new Error('Canceled');
+            }
         }
 
         WinJS.Promise.wrap(createPreview())
         .then(function () {
+            checkCancelled();
             return startPreview();
         })
         .then(function (captureSettings) {
+            checkCancelled();
             reader = BarcodeReader.get(captureSettings.capture);
             reader.init(captureSettings.capture, captureSettings.width, captureSettings.height);
 
@@ -447,6 +548,7 @@ module.exports = {
             // we would get an 'Invalid state' error from 'getPreviewFrameAsync'
             return WinJS.Promise.timeout(200)
             .then(function () {
+                checkCancelled();
                 return reader.readCode();
             });
         })
@@ -459,7 +561,14 @@ module.exports = {
             });
         }, function (error) {
             destroyPreview();
-            fail(error);
+
+            if (error.message == 'Canceled') {
+                success({
+                    cancelled: true
+                });
+            } else {
+                fail(error);
+            }
         });
     },
 
