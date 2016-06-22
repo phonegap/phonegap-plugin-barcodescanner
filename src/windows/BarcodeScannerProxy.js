@@ -344,7 +344,16 @@ module.exports = {
             return WinJS.Promise.timeout(INITIAL_FOCUS_DELAY)
             .then(function () {
                 try {
-                    return controller.focusControl.focusAsync();
+                    return controller.focusControl.focusAsync().then(function () {
+                        return result;
+                    }, function (e) {
+                        // This happens on mutliple taps
+                        if (e.number !== OPERATION_IS_IN_PROGRESS) {
+                            console.error('focusAsync failed: ' + e);
+                            return WinJS.Promise.wrapError(e);
+                        }
+                        return result;
+                    });
                 } catch (e) {
                     // This happens on mutliple taps
                     if (e.number !== OPERATION_IS_IN_PROGRESS) {
