@@ -336,11 +336,11 @@ parentViewController:(UIViewController*)parentViewController
 }
 
 //--------------------------------------------------------------------------
-- (void)barcodeScanDone {
+- (void)barcodeScanDone:(void (^)(void))callbackBlock {
     self.capturing = NO;
     [self.captureSession stopRunning];
-    [self.parentViewController dismissViewControllerAnimated: YES completion:nil];
-
+    [self.parentViewController dismissViewControllerAnimated:YES completion:callbackBlock];
+    
     // viewcontroller holding onto a reference to us, release them so they
     // will release us
     self.viewController = nil;
@@ -380,22 +380,25 @@ parentViewController:(UIViewController*)parentViewController
 //--------------------------------------------------------------------------
 - (void)barcodeScanSucceeded:(NSString*)text format:(NSString*)format {
     dispatch_sync(dispatch_get_main_queue(), ^{
-        [self barcodeScanDone];
+        [self barcodeScanDone:^{
+            [self.plugin returnSuccess:text format:format cancelled:FALSE flipped:FALSE callback:self.callback];
+        }];
         AudioServicesPlaySystemSound(_soundFileObject);
-        [self.plugin returnSuccess:text format:format cancelled:FALSE flipped:FALSE callback:self.callback];
     });
 }
 
 //--------------------------------------------------------------------------
 - (void)barcodeScanFailed:(NSString*)message {
-    [self barcodeScanDone];
-    [self.plugin returnError:message callback:self.callback];
+    [self barcodeScanDone:^{
+        [self.plugin returnError:message callback:self.callback];
+    }];
 }
 
 //--------------------------------------------------------------------------
 - (void)barcodeScanCancelled {
-    [self barcodeScanDone];
-    [self.plugin returnSuccess:@"" format:@"" cancelled:TRUE flipped:self.isFlipped callback:self.callback];
+    [self barcodeScanDone:^{
+        [self.plugin returnSuccess:@"" format:@"" cancelled:TRUE flipped:self.isFlipped callback:self.callback];
+    }];
     if (self.isFlipped) {
         self.isFlipped = NO;
     }
