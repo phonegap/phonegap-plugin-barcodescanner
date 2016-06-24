@@ -112,6 +112,8 @@
         <framework src="src/windows/lib/WinRTBarcodeReader.csproj" custom="true" type="projectReference" versions="&lt;=8.1"/>
 
         <asset src="src/windows/assets/plugin-barcodeScanner.css" target="css/plugin-barcodeScanner.css" />
+        <hook src="hooks/windows/check-arch.js" type="before_compile" />
+        <hook src="hooks/windows/check-arch.js" type="before_run" />
     </platform>
 
     <!-- Windows Phone 8 -->
