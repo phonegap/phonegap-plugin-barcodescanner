@@ -97,21 +97,6 @@
         <dependency id="cordova-plugin-compat" version="^1.0.0" />
     </platform>
 
-    <platform name="windows8">
-        <js-module src="src/windows/BarcodeScannerProxy.js" name="BarcodeScannerProxy">
-            <merges target="" />
-        </js-module>
-
-        <config-file target="package.appxmanifest" parent="/Package/Capabilities">
-            <DeviceCapability Name="webcam" />
-        </config-file>
-
-        <framework src="src/windows/lib/WinRTBarcodeReader.csproj" custom="true" type="projectReference" versions="&lt;=8.1"/>
-        <framework src="src/windows/lib.UW/WinRTBarcodeReader.UW.csproj" custom="true" type="projectReference" versions=">8.1"/>
-
-        <asset src="src/windows/assets/plugin-barcodeScanner.css" target="css/plugin-barcodeScanner.css" />
-    </platform>
-
     <platform name="windows">
         <js-module src="src/windows/BarcodeScannerProxy.js" name="BarcodeScannerProxy">
             <merges target="" />
