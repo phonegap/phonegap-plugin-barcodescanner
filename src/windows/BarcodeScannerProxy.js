@@ -551,7 +551,7 @@ module.exports = {
         }
 
         function checkCancelled() {
-            if (BarcodeReader.scanCancelled) {
+            if (BarcodeReader.scanCancelled || BarcodeReader.suspended) {
                 throw new Error('Canceled');
             }
         }
@@ -587,8 +587,12 @@ module.exports = {
                 cancelled: !result
             });
         }, function (error) {
-            destroyPreview();
+            // Suppress null result (cancel) on suspending
+            if (BarcodeReader.suspended) {
+                return;
+            }
 
+            destroyPreview();
             if (error.message == 'Canceled') {
                 success({
                     cancelled: true
@@ -622,20 +626,46 @@ function waitForScanEnd() {
     return BarcodeReader.scanPromise || WinJS.Promise.as();
 }
 
+function suspend(args) {
+    BarcodeReader.suspended = true;
+    if (args) {
+        args.setPromise(BarcodeReader.destroyPreview()
+        .then(waitForScanEnd, waitForScanEnd));
+    } else {
+        BarcodeReader.destroyPreview();
+    }
+}
+
+function resume() {
+    BarcodeReader.suspended = false;
+    module.exports.scan(BarcodeReader.scanCallArgs.success, BarcodeReader.scanCallArgs.fail, BarcodeReader.scanCallArgs.args);
+}
+
+function onVisibilityChanged() {
+    if (document.visibilityState === 'hidden'
+        && BarcodeReader.videoPreviewIsVisible && BarcodeReader.videoPreviewIsVisible() && BarcodeReader.destroyPreview) {
+        suspend();
+    } else if (BarcodeReader.suspended) {
+        resume();
+    }
+}
+
+// Windows 8.1 projects
+document.addEventListener('msvisibilitychange', onVisibilityChanged);
+// Windows 10 projects
+document.addEventListener('visibilitychange', onVisibilityChanged);
+
 // About to be suspended
 app.addEventListener('checkpoint', function (args) {
     if (BarcodeReader.videoPreviewIsVisible && BarcodeReader.videoPreviewIsVisible() && BarcodeReader.destroyPreview) {
-        BarcodeReader.suspended = true;
-        args.setPromise(BarcodeReader.destroyPreview()
-        .then(waitForScanEnd, waitForScanEnd));
+        suspend(args);
     }
 });
 
 // Resuming from a user suspension
 Windows.UI.WebUI.WebUIApplication.addEventListener("resuming", function () {
     if (BarcodeReader.suspended) {
-        BarcodeReader.suspended = false;
-        module.exports.scan(BarcodeReader.scanCallArgs.success, BarcodeReader.scanCallArgs.fail, BarcodeReader.scanCallArgs.args);
+        resume();
     }
 }, false);
 
