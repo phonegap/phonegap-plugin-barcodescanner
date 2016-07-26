@@ -81,12 +81,24 @@
                     <action android:name="android.intent.action.VIEW"/>
                     <category android:name="android.intent.category.DEFAULT"/>
                 </intent-filter>
+            </activity><activity android:label="Share" android:name="com.google.zxing.client.android.history.HistoryActivity">
+                <intent-filter>
+                    <action android:name="android.intent.action.VIEW" />
+                    <category android:name="android.intent.category.DEFAULT" />
+                </intent-filter>
+            </activity>
+            <activity android:label="Share" android:name="com.google.zxing.client.android.PreferencesActivity">
+                <intent-filter>
+                    <action android:name="android.intent.action.VIEW" />
+                    <category android:name="android.intent.category.DEFAULT" />
+                </intent-filter>
             </activity>
         </config-file>
 
         <config-file target="AndroidManifest.xml" parent="/manifest">
             <uses-permission android:name="android.permission.CAMERA" />
             <uses-permission android:name="android.permission.FLASHLIGHT" />
+            <uses-permission android:name="android.permission.VIBRATE" />
             <!-- Not required to allow users to work around this -->
             <uses-feature android:name="android.hardware.camera" android:required="false" />
         </config-file>
@@ -159,8 +171,8 @@
         <lib-file src="src/blackberry10/native/simulator/libBarcodeScanner.so" arch="simulator"/>
         <config-file target="www/config.xml" parent="/widget">
             <feature name="BarcodeScanner">
-		<param name="blackberry-package" value="phonegap-plugin-barcodescanner" />
-	    </feature>
+        <param name="blackberry-package" value="phonegap-plugin-barcodescanner" />
+        </feature>
         </config-file>
         <config-file target="www/config.xml" parent="/widget/rim:permissions">
             <rim:permit>use_camera</rim:permit>
