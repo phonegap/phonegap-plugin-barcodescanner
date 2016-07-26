@@ -171,8 +171,8 @@
         <lib-file src="src/blackberry10/native/simulator/libBarcodeScanner.so" arch="simulator"/>
         <config-file target="www/config.xml" parent="/widget">
             <feature name="BarcodeScanner">
-        <param name="blackberry-package" value="phonegap-plugin-barcodescanner" />
-        </feature>
+                <param name="blackberry-package" value="phonegap-plugin-barcodescanner" />
+            </feature>
         </config-file>
         <config-file target="www/config.xml" parent="/widget/rim:permissions">
             <rim:permit>use_camera</rim:permit>
