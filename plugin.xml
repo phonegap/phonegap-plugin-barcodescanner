@@ -53,6 +53,13 @@
 
     <!-- android -->
     <platform name="android">
+        <edit-config file="AndroidManifest.xml" target="/manifest" mode="merge">
+          <manifest xmlns:tools="http://schemas.android.com/tools"/>
+        </edit-config>
+
+        <edit-config file="AndroidManifest.xml" target="/manifest/uses-sdk" mode="merge">
+          <uses-sdk tools:overrideLibrary="barcodescanner.xservices.nl.barcodescanner"/>
+        </edit-config>
 
         <source-file src="src/android/com/phonegap/plugins/barcodescanner/BarcodeScanner.java" target-dir="src/com/phonegap/plugins/barcodescanner" />
 
