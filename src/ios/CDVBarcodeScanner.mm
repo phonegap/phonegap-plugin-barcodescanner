@@ -407,11 +407,12 @@ parentViewController:(UIViewController*)parentViewController
 - (void)flipCamera {
     self.isFlipped = YES;
     self.isFrontCamera = !self.isFrontCamera;
-    [self barcodeScanDone];
-    if (self.isFlipped) {
-      self.isFlipped = NO;
-    }
+    [self barcodeScanDone:^{
+        if (self.isFlipped) {
+            self.isFlipped = NO;
+        }
     [self performSelector:@selector(scanBarcode) withObject:nil afterDelay:0.1];
+    }];
 }
 
 //--------------------------------------------------------------------------
