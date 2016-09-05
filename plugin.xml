@@ -28,6 +28,11 @@
             </feature>
         </config-file>
 
+        <!-- Usage description of the Camera, mandatory since iOS 10 -->
+        <config-file target="*-Info.plist" parent="NSCameraUsageDescription">
+            <string/>
+        </config-file>
+
         <resource-file src="src/ios/scannerOverlay.xib" />
         <resource-file src="src/ios/CDVBarcodeScanner.bundle" />
 
