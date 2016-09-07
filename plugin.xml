@@ -11,6 +11,8 @@
     <repo>https://github.com/phonegap/phonegap-plugin-barcodescanner</repo>
     <issue>https://github.com/phonegap/phonegap-plugin-barcodescanner/issues</issue>
 
+    <preference name="CAMERA_USAGE_DESCRIPTION" default=" " />
+
     <engines>
         <engine name="cordova" version=">=3.0.0" />
     </engines>
@@ -30,7 +32,7 @@
 
         <!-- Usage description of the Camera, mandatory since iOS 10 -->
         <config-file target="*-Info.plist" parent="NSCameraUsageDescription">
-            <string/>
+            <string>$CAMERA_USAGE_DESCRIPTION</string>
         </config-file>
 
         <resource-file src="src/ios/scannerOverlay.xib" />
