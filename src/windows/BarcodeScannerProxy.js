@@ -343,8 +343,14 @@ module.exports = {
             }
 
             // Multiple calls to focusAsync leads to internal focusing hang on some Windows Phone 8.1 devices
-            if (controller.focusControl.focusState === Windows.Media.Devices.MediaCaptureFocusState.searching) {
-                return result;
+            // Also need to wrap in try/catch to avoid crash on Surface 3 - looks like focusState property
+            // somehow is not accessible there. See https://github.com/phonegap/phonegap-plugin-barcodescanner/issues/288
+            try {
+                if (controller.focusControl.focusState === Windows.Media.Devices.MediaCaptureFocusState.searching) {
+                    return result;
+                }
+            } catch (e) {
+                // Nothing to do - just continue w/ focusing
             }
 
             // The delay prevents focus hang on slow devices
@@ -399,7 +405,7 @@ module.exports = {
 
             focusControl.configure(focusConfig);
 
-            // Continuous focus should start only after preview has started. See 'Remarks' at 
+            // Continuous focus should start only after preview has started. See 'Remarks' at
             // https://msdn.microsoft.com/en-us/library/windows/apps/windows.media.devices.focuscontrol.configure.aspx
             function waitForIsPlaying() {
                 var isPlaying = !capturePreview.paused && !capturePreview.ended && capturePreview.readyState > 2;
