@@ -482,13 +482,16 @@ parentViewController:(UIViewController*)parentViewController
     }
 
     [output setMetadataObjectTypes:@[AVMetadataObjectTypeQRCode,
+                                     AVMetadataObjectTypeAztecCode,
                                      AVMetadataObjectTypeDataMatrixCode,
                                      AVMetadataObjectTypeUPCECode,
                                      AVMetadataObjectTypeEAN8Code,
                                      AVMetadataObjectTypeEAN13Code,
                                      AVMetadataObjectTypeCode128Code,
+                                     AVMetadataObjectTypeCode93Code,
                                      AVMetadataObjectTypeCode39Code,
-                                     AVMetadataObjectTypeITF14Code]];
+                                     AVMetadataObjectTypeITF14Code,
+                                     AVMetadataObjectTypePDF417Code]];
     
     // setup capture preview layer
     self.previewLayer = [AVCaptureVideoPreviewLayer layerWithSession:captureSession];
@@ -570,6 +573,7 @@ parentViewController:(UIViewController*)parentViewController
 //--------------------------------------------------------------------------
 - (NSString*)formatStringFromMetadata:(AVMetadataMachineReadableCodeObject*)format {
     if (format.type == AVMetadataObjectTypeQRCode)          return @"QR_CODE";
+    if (format.type == AVMetadataObjectTypeAztecCode)       return @"AZTEC";
     if (format.type == AVMetadataObjectTypeDataMatrixCode)  return @"DATA_MATRIX";
     if (format.type == AVMetadataObjectTypeUPCECode)        return @"UPC_E";
     // According to Apple documentation, UPC_A is EAN13 with a leading 0.
@@ -577,8 +581,10 @@ parentViewController:(UIViewController*)parentViewController
     if (format.type == AVMetadataObjectTypeEAN8Code)        return @"EAN_8";
     if (format.type == AVMetadataObjectTypeEAN13Code)       return @"EAN_13";
     if (format.type == AVMetadataObjectTypeCode128Code)     return @"CODE_128";
+    if (format.type == AVMetadataObjectTypeCode93Code)      return @"CODE_93";
     if (format.type == AVMetadataObjectTypeCode39Code)      return @"CODE_39";
     if (format.type == AVMetadataObjectTypeITF14Code)          return @"ITF";
+    if (format.type == AVMetadataObjectTypePDF417Code)      return @"PDF_417";
     return @"???";
 }
 
