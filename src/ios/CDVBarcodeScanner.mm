@@ -55,7 +55,7 @@
 //------------------------------------------------------------------------------
 // class that does the grunt work
 //------------------------------------------------------------------------------
-@interface CDVbcsProcessor : NSObject <AVCaptureVideoDataOutputSampleBufferDelegate> {}
+@interface CDVbcsProcessor : NSObject <AVCaptureMetadataOutputObjectsDelegate> {}
 @property (nonatomic, retain) CDVBarcodeScanner*           plugin;
 @property (nonatomic, retain) NSString*                   callback;
 @property (nonatomic, retain) UIViewController*           parentViewController;
@@ -332,7 +332,7 @@ parentViewController:(UIViewController*)parentViewController
         return;
     }
 
-    self.viewController = [[CDVbcsViewController alloc] initWithProcessor: self alternateOverlay:self.alternateXib];
+    self.viewController = [[[CDVbcsViewController alloc] initWithProcessor: self alternateOverlay:self.alternateXib] autorelease];
     // here we set the orientation delegate to the MainViewController of the app (orientation controlled in the Project Settings)
     self.viewController.orientationDelegate = self.plugin.viewController;
 
@@ -454,18 +454,10 @@ parentViewController:(UIViewController*)parentViewController
     AVCaptureDeviceInput* input = [AVCaptureDeviceInput deviceInputWithDevice:device error:&error];
     if (!input) return @"unable to obtain video capture device input";
 
-    AVCaptureVideoDataOutput* output = [[AVCaptureVideoDataOutput alloc] init];
+    AVCaptureMetadataOutput* output = [[AVCaptureMetadataOutput alloc] init];
     if (!output) return @"unable to obtain video capture output";
 
-    NSDictionary* videoOutputSettings = [NSDictionary
-                                         dictionaryWithObject:[NSNumber numberWithInt:kCVPixelFormatType_32BGRA]
-                                         forKey:(id)kCVPixelBufferPixelFormatTypeKey
-                                         ];
-
-    output.alwaysDiscardsLateVideoFrames = YES;
-    output.videoSettings = videoOutputSettings;
-
-    [output setSampleBufferDelegate:self queue:dispatch_get_global_queue(DISPATCH_QUEUE_PRIORITY_LOW, 0)];
+    [output setMetadataObjectsDelegate:self queue:dispatch_get_global_queue(DISPATCH_QUEUE_PRIORITY_LOW, 0)];
 
     if ([captureSession canSetSessionPreset:AVCaptureSessionPresetHigh]) {
       captureSession.sessionPreset = AVCaptureSessionPresetHigh;
@@ -489,8 +481,21 @@ parentViewController:(UIViewController*)parentViewController
         return @"unable to add video capture output to session";
     }
 
+    [output setMetadataObjectTypes:@[AVMetadataObjectTypeQRCode,
+                                     AVMetadataObjectTypeAztecCode,
+                                     AVMetadataObjectTypeDataMatrixCode,
+                                     AVMetadataObjectTypeUPCECode,
+                                     AVMetadataObjectTypeEAN8Code,
+                                     AVMetadataObjectTypeEAN13Code,
+                                     AVMetadataObjectTypeCode128Code,
+                                     AVMetadataObjectTypeCode93Code,
+                                     AVMetadataObjectTypeCode39Code,
+                                     AVMetadataObjectTypeITF14Code,
+                                     AVMetadataObjectTypePDF417Code]];
+    
     // setup capture preview layer
     self.previewLayer = [AVCaptureVideoPreviewLayer layerWithSession:captureSession];
+    self.previewLayer.videoGravity = AVLayerVideoGravityResizeAspectFill;
 
     // run on next event loop pass [captureSession startRunning]
     [captureSession performSelector:@selector(startRunning) withObject:nil afterDelay:0];
@@ -501,7 +506,7 @@ parentViewController:(UIViewController*)parentViewController
 //--------------------------------------------------------------------------
 // this method gets sent the captured frames
 //--------------------------------------------------------------------------
-- (void)captureOutput:(AVCaptureOutput*)captureOutput didOutputSampleBuffer:(CMSampleBufferRef)sampleBuffer fromConnection:(AVCaptureConnection*)connection {
+- (void)captureOutput:(AVCaptureOutput*)captureOutput didOutputMetadataObjects:(NSArray *)metadataObjects fromConnection:(AVCaptureConnection*)connection {
 
     if (!self.capturing) return;
 
@@ -527,73 +532,15 @@ parentViewController:(UIViewController*)parentViewController
 #endif
 
 
-    using namespace zxing;
-
-    // LuminanceSource is pretty dumb; we have to give it a pointer to
-    // a byte array, but then can't get it back out again.  We need to
-    // get it back to free it.  Saving it in imageBytes.
-    uint8_t* imageBytes;
-
-    //        NSTimeInterval timeStart = [NSDate timeIntervalSinceReferenceDate];
-
     try {
-        NSArray *supportedFormats = nil;
-        if (self.formats != nil) {
-            supportedFormats = [self.formats componentsSeparatedByString:@","];
+        // This will bring in multiple entities if there are multiple 2D codes in frame.
+        for (AVMetadataObject *metaData in metadataObjects) {
+            AVMetadataMachineReadableCodeObject* code = (AVMetadataMachineReadableCodeObject*)[self.previewLayer transformedMetadataObjectForMetadataObject:(AVMetadataMachineReadableCodeObject*)metaData];
+            
+            if ([self checkResult:code.stringValue]) {
+                [self barcodeScanSucceeded:code.stringValue format:[self formatStringFromMetadata:code]];
+            }
         }
-        DecodeHints decodeHints;
-        if (supportedFormats == nil || [supportedFormats containsObject:[self formatStringFrom:BarcodeFormat_QR_CODE]]) {
-            decodeHints.addFormat(BarcodeFormat_QR_CODE);
-        }
-        if (supportedFormats == nil || [supportedFormats containsObject:[self formatStringFrom:BarcodeFormat_CODE_128]]) {
-            decodeHints.addFormat(BarcodeFormat_CODE_128);
-        }
-        if (supportedFormats == nil || [supportedFormats containsObject:[self formatStringFrom:BarcodeFormat_CODE_39]]) {
-            decodeHints.addFormat(BarcodeFormat_CODE_39);
-        }
-        if (supportedFormats == nil || [supportedFormats containsObject:[self formatStringFrom:BarcodeFormat_DATA_MATRIX]]) {
-            decodeHints.addFormat(BarcodeFormat_DATA_MATRIX);
-        }
-        if (supportedFormats == nil || [supportedFormats containsObject:[self formatStringFrom:BarcodeFormat_UPC_E]]) {
-            decodeHints.addFormat(BarcodeFormat_UPC_E);
-        }
-        if (supportedFormats == nil || [supportedFormats containsObject:[self formatStringFrom:BarcodeFormat_UPC_A]]) {
-            decodeHints.addFormat(BarcodeFormat_UPC_A);
-        }
-        if (supportedFormats == nil || [supportedFormats containsObject:[self formatStringFrom:BarcodeFormat_EAN_8]]) {
-            decodeHints.addFormat(BarcodeFormat_EAN_8);
-        }
-        if (supportedFormats == nil || [supportedFormats containsObject:[self formatStringFrom:BarcodeFormat_EAN_13]]) {
-            decodeHints.addFormat(BarcodeFormat_EAN_13);
-        }
-//        decodeHints.addFormat(BarcodeFormat_ITF);   causing crashes
-
-        // here's the meat of the decode process
-        Ref<LuminanceSource>   luminanceSource   ([self getLuminanceSourceFromSample: sampleBuffer imageBytes:&imageBytes]);
-        //            [self dumpImage: [[self getImageFromLuminanceSource:luminanceSource] autorelease]];
-        Ref<Binarizer>         binarizer         (new HybridBinarizer(luminanceSource));
-        Ref<BinaryBitmap>      bitmap            (new BinaryBitmap(binarizer));
-        Ref<MultiFormatReader> reader            (new MultiFormatReader());
-        Ref<Result>            result            (reader->decode(bitmap, decodeHints));
-        Ref<String>            resultText        (result->getText());
-        BarcodeFormat          formatVal =       result->getBarcodeFormat();
-        NSString*              format    =       [self formatStringFrom:formatVal];
-
-
-        const char* cString      = resultText->getText().c_str();
-        NSString*   resultString = [[NSString alloc] initWithCString:cString encoding:NSUTF8StringEncoding];
-
-        if ([self checkResult:resultString]) {
-            [self barcodeScanSucceeded:resultString format:format];
-        }
-    }
-    catch (zxing::ReaderException &rex) {
-        //            NSString *message = [[[NSString alloc] initWithCString:rex.what() encoding:NSUTF8StringEncoding] autorelease];
-        //            NSLog(@"decoding: ReaderException: %@", message);
-    }
-    catch (zxing::IllegalArgumentException &iex) {
-        //            NSString *message = [[[NSString alloc] initWithCString:iex.what() encoding:NSUTF8StringEncoding] autorelease];
-        //            NSLog(@"decoding: IllegalArgumentException: %@", message);
     }
     catch (...) {
         //            NSLog(@"decoding: unknown exception");
@@ -603,10 +550,6 @@ parentViewController:(UIViewController*)parentViewController
     //        NSTimeInterval timeElapsed  = [NSDate timeIntervalSinceReferenceDate] - timeStart;
     //        NSLog(@"decoding completed in %dms", (int) (timeElapsed * 1000));
 
-    // free the buffer behind the LuminanceSource
-    if (imageBytes) {
-        free(imageBytes);
-    }
 }
 
 //--------------------------------------------------------------------------
@@ -622,6 +565,26 @@ parentViewController:(UIViewController*)parentViewController
     if (format == zxing::BarcodeFormat_CODE_128)     return @"CODE_128";
     if (format == zxing::BarcodeFormat_CODE_39)      return @"CODE_39";
     if (format == zxing::BarcodeFormat_ITF)          return @"ITF";
+    return @"???";
+}
+
+//--------------------------------------------------------------------------
+// convert metadata object information to barcode format string
+//--------------------------------------------------------------------------
+- (NSString*)formatStringFromMetadata:(AVMetadataMachineReadableCodeObject*)format {
+    if (format.type == AVMetadataObjectTypeQRCode)          return @"QR_CODE";
+    if (format.type == AVMetadataObjectTypeAztecCode)       return @"AZTEC";
+    if (format.type == AVMetadataObjectTypeDataMatrixCode)  return @"DATA_MATRIX";
+    if (format.type == AVMetadataObjectTypeUPCECode)        return @"UPC_E";
+    // According to Apple documentation, UPC_A is EAN13 with a leading 0.
+    if (format.type == AVMetadataObjectTypeEAN13Code && [format.stringValue characterAtIndex:0] == '0') return @"UPC_A";
+    if (format.type == AVMetadataObjectTypeEAN8Code)        return @"EAN_8";
+    if (format.type == AVMetadataObjectTypeEAN13Code)       return @"EAN_13";
+    if (format.type == AVMetadataObjectTypeCode128Code)     return @"CODE_128";
+    if (format.type == AVMetadataObjectTypeCode93Code)      return @"CODE_93";
+    if (format.type == AVMetadataObjectTypeCode39Code)      return @"CODE_39";
+    if (format.type == AVMetadataObjectTypeITF14Code)          return @"ITF";
+    if (format.type == AVMetadataObjectTypePDF417Code)      return @"PDF_417";
     return @"???";
 }
 
@@ -962,31 +925,31 @@ parentViewController:(UIViewController*)parentViewController
     UIToolbar* toolbar = [[UIToolbar alloc] init];
     toolbar.autoresizingMask = UIViewAutoresizingFlexibleWidth | UIViewAutoresizingFlexibleTopMargin;
 
-    id cancelButton = [[UIBarButtonItem alloc]
+    id cancelButton = [[[UIBarButtonItem alloc]
                        initWithBarButtonSystemItem:UIBarButtonSystemItemCancel
                        target:(id)self
                        action:@selector(cancelButtonPressed:)
-                       ];
+                       ] autorelease];
 
 
-    id flexSpace = [[UIBarButtonItem alloc]
+    id flexSpace = [[[UIBarButtonItem alloc]
                     initWithBarButtonSystemItem:UIBarButtonSystemItemFlexibleSpace
                     target:nil
                     action:nil
-                    ];
+                    ] autorelease];
 
-    id flipCamera = [[UIBarButtonItem alloc]
+    id flipCamera = [[[UIBarButtonItem alloc]
                        initWithBarButtonSystemItem:UIBarButtonSystemItemCamera
                        target:(id)self
                        action:@selector(flipCameraButtonPressed:)
-                       ];
+                       ] autorelease];
 
 #if USE_SHUTTER
-    id shutterButton = [[UIBarButtonItem alloc]
+    id shutterButton = [[[UIBarButtonItem alloc]
                         initWithBarButtonSystemItem:UIBarButtonSystemItemCamera
                         target:(id)self
                         action:@selector(shutterButtonPressed)
-                        ];
+                        ] autorelease];
 
     if (_processor.isShowFlipCameraButton) {
       toolbar.items = [NSArray arrayWithObjects:flexSpace,cancelButton,flexSpace, flipCamera ,shutterButton,nil];
