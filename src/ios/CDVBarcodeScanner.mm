@@ -344,7 +344,7 @@ parentViewController:(UIViewController*)parentViewController
 - (void)openDialog {
     [self.parentViewController
      presentViewController:self.viewController
-     animated:YES completion:nil
+     animated:NO completion:nil
      ];
 }
 
@@ -352,7 +352,7 @@ parentViewController:(UIViewController*)parentViewController
 - (void)barcodeScanDone:(void (^)(void))callbackBlock {
     self.capturing = NO;
     [self.captureSession stopRunning];
-    [self.parentViewController dismissViewControllerAnimated:YES completion:callbackBlock];
+    [self.parentViewController dismissViewControllerAnimated:NO completion:callbackBlock];
     
     // viewcontroller holding onto a reference to us, release them so they
     // will release us
