@@ -138,6 +138,15 @@
     return result;
 }
 
+-(BOOL)notHasPermission
+{
+    AVAuthorizationStatus authStatus = [AVCaptureDevice authorizationStatusForMediaType:AVMediaTypeVideo];
+    return (authStatus == AVAuthorizationStatusDenied ||
+            authStatus == AVAuthorizationStatusRestricted);
+}
+
+
+
 //--------------------------------------------------------------------------
 - (void)scan:(CDVInvokedUrlCommand*)command {
     CDVbcsProcessor* processor;
@@ -159,6 +168,10 @@
     capabilityError = [self isScanNotPossible];
     if (capabilityError) {
         [self returnError:capabilityError callback:callback];
+        return;
+    } else if ([self notHasPermission]) {
+        NSString * error = NSLocalizedString(@"Access to the camera has been prohibited; please enable it in the Settings app to continue.",nil);
+        [self returnError:error callback:callback];
         return;
     }
 
@@ -407,11 +420,12 @@ parentViewController:(UIViewController*)parentViewController
 - (void)flipCamera {
     self.isFlipped = YES;
     self.isFrontCamera = !self.isFrontCamera;
-    [self barcodeScanDone];
-    if (self.isFlipped) {
-      self.isFlipped = NO;
-    }
+    [self barcodeScanDone:^{
+        if (self.isFlipped) {
+            self.isFlipped = NO;
+        }
     [self performSelector:@selector(scanBarcode) withObject:nil afterDelay:0.1];
+    }];
 }
 
 //--------------------------------------------------------------------------

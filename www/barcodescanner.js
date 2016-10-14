@@ -7,7 +7,7 @@
  */
 
 
-        var exec = require("cordova/exec");
+        var exec = cordova.require("cordova/exec");
 
         var scanInProgress = false;
 
