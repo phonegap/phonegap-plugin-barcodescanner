@@ -1,130 +1,183 @@
-<?xml version="1.0" encoding="UTF-8" standalone="yes"?>
-<plugin xmlns="http://www.phonegap.com/ns/plugins/1.0" xmlns:android="http://schemas.android.com/apk/res/android" xmlns:rim="http://www.blackberry.com/ns/widgets" id="phonegap-plugin-barcodescanner" version="6.0.2">
-  <name>BarcodeScanner</name>
-  <description>You can use the BarcodeScanner plugin to scan different types of barcodes (using the device's camera) and get the metadata encoded in them for processing within your application.</description>
-  <license>MIT</license>
-  <repo>https://github.com/phonegap/phonegap-plugin-barcodescanner</repo>
-  <issue>https://github.com/phonegap/phonegap-plugin-barcodescanner/issues</issue>
-  <engines>
-    <engine name="cordova" version=">=3.0.0"/>
-  </engines>
-  <js-module src="www/barcodescanner.js" name="BarcodeScanner">
-    <clobbers target="cordova.plugins.barcodeScanner"/>
-  </js-module>
-  <platform name="ios">
-    <config-file target="config.xml" parent="/*">
-      <feature name="BarcodeScanner">
-        <param name="ios-package" value="CDVBarcodeScanner"/>
-      </feature>
-    </config-file>
-    <preference name="CAMERA_USAGE_DESCRIPTION" default=" "/>
-    <config-file target="*-Info.plist" parent="NSCameraUsageDescription">
-      <string>$CAMERA_USAGE_DESCRIPTION</string>
-    </config-file>
-    <resource-file src="src/ios/scannerOverlay.xib"/>
-    <resource-file src="src/ios/CDVBarcodeScanner.bundle"/>
-    <header-file src="src/ios/zxing-all-in-one.h"/>
-    <source-file src="src/ios/CDVBarcodeScanner.mm" compiler-flags="-fno-objc-arc"/>
-    <source-file src="src/ios/zxing-all-in-one.cpp"/>
-    <framework src="libiconv.dylib"/>
-    <framework src="AVFoundation.framework"/>
-    <framework src="AssetsLibrary.framework"/>
-    <framework src="CoreVideo.framework"/>
-    <framework src="QuartzCore.framework"/>
-    <framework src="CoreGraphics.framework"/>
-    <framework src="CoreImage.framework"/>
-    <framework src="AudioToolbox.framework"/>
-  </platform>
-  <platform name="android">
-    <source-file src="src/android/com/phonegap/plugins/barcodescanner/BarcodeScanner.java" target-dir="src/com/phonegap/plugins/barcodescanner"/>
-    <config-file target="res/xml/config.xml" parent="/*">
-      <feature name="BarcodeScanner">
-        <param name="android-package" value="com.phonegap.plugins.barcodescanner.BarcodeScanner"/>
-      </feature>
-    </config-file>
-    <config-file target="AndroidManifest.xml" parent="/manifest/application">
-      <activity android:name="com.google.zxing.client.android.CaptureActivity" android:clearTaskOnLaunch="true" android:configChanges="orientation|keyboardHidden|screenSize" android:theme="@android:style/Theme.NoTitleBar.Fullscreen" android:windowSoftInputMode="stateAlwaysHidden" android:exported="false">
-        <intent-filter>
-          <action android:name="com.google.zxing.client.android.SCAN"/>
-          <category android:name="android.intent.category.DEFAULT"/>
-        </intent-filter>
-      </activity>
-      <activity android:name="com.google.zxing.client.android.encode.EncodeActivity" android:label="Share">
-        <intent-filter>
-          <action android:name="com.phonegap.plugins.barcodescanner.ENCODE"/>
-          <category android:name="android.intent.category.DEFAULT"/>
-        </intent-filter>
-      </activity>
-      <activity android:name="com.google.zxing.client.android.HelpActivity" android:label="Share">
-        <intent-filter>
-          <action android:name="android.intent.action.VIEW"/>
-          <category android:name="android.intent.category.DEFAULT"/>
-        </intent-filter>
-      </activity>
-    </config-file>
-    <config-file target="AndroidManifest.xml" parent="/manifest">
-      <uses-permission android:name="android.permission.CAMERA"/>
-      <uses-permission android:name="android.permission.FLASHLIGHT"/>
-      <uses-feature android:name="android.hardware.camera" android:required="true"/>
-    </config-file>
-    <framework src="src/android/barcodescanner.gradle" custom="true" type="gradleReference"/>
-    <resource-file src="src/android/barcodescanner-release-2.0.1.aar" target="libs/barcodescanner.aar"/>
-    <dependency id="cordova-plugin-compat" version="^1.0.0"/>
-  </platform>
-  <platform name="windows">
-    <js-module src="src/windows/BarcodeScannerProxy.js" name="BarcodeScannerProxy">
-      <merges target=""/>
+<?xml version="1.0" encoding="UTF-8"?><plugin xmlns="http://www.phonegap.com/ns/plugins/1.0"
+    xmlns:android="http://schemas.android.com/apk/res/android"
+    xmlns:rim="http://www.blackberry.com/ns/widgets"
+    id="phonegap-plugin-barcodescanner"
+    version="6.0.1">
+
+    <name>BarcodeScanner</name>
+    <description>You can use the BarcodeScanner plugin to scan different types of barcodes (using the device's camera) and get the metadata encoded in them for processing within your application.</description>
+    <license>MIT</license>
+
+    <repo>https://github.com/phonegap/phonegap-plugin-barcodescanner</repo>
+    <issue>https://github.com/phonegap/phonegap-plugin-barcodescanner/issues</issue>
+
+    <engines>
+        <engine name="cordova" version=">=3.0.0" />
+    </engines>
+
+    <js-module src="www/barcodescanner.js" name="BarcodeScanner">
+        <clobbers target="cordova.plugins.barcodeScanner" />
     </js-module>
-    <config-file target="package.appxmanifest" parent="/Package/Capabilities">
-      <DeviceCapability Name="webcam"/>
-    </config-file>
-    <framework src="src/windows/lib.UW/x86/ZXing.winmd" target-dir="x86" arch="x86" custom="true" versions=">8.1"/>
-    <framework src="src/windows/lib.UW/x64/ZXing.winmd" target-dir="x64" arch="x64" custom="true" versions=">8.1"/>
-    <framework src="src/windows/lib.UW/ARM/ZXing.winmd" target-dir="ARM" arch="ARM" custom="true" versions=">8.1"/>
-    <framework src="src/windows/lib/WinRTBarcodeReader.csproj" custom="true" type="projectReference" versions="&lt;=8.1"/>
-    <asset src="src/windows/assets/plugin-barcodeScanner.css" target="css/plugin-barcodeScanner.css"/>
-    <hook src="hooks/windows/check-arch.js" type="before_compile"/>
-    <hook src="hooks/windows/check-arch.js" type="before_run"/>
-  </platform>
-  <platform name="wp8">
-    <config-file target="config.xml" parent="/*">
-      <feature name="BarcodeScanner">
-        <param name="wp-package" value="BarcodeScanner"/>
-      </feature>
-    </config-file>
-    <config-file target="Properties/WMAppManifest.xml" parent="/Deployment/App/Capabilities">
-      <Capability Name="ID_CAP_ISV_CAMERA"/>
-    </config-file>
-    <framework src="src/wp8/lib/zxing.wp8.0.dll" custom="true"/>
-    <asset src="src/wp8/assets/cancel.png" target="Images/appbar.cancel.png"/>
-    <source-file src="src/wp8/BarcodeScanner.cs"/>
-    <source-file src="src/wp8/BarcodeScannerTask.cs"/>
-    <source-file src="src/wp8/BarcodeScannerUI.xaml"/>
-    <source-file src="src/wp8/BarcodeScannerUI.xaml.cs"/>
-  </platform>
-  <platform name="browser">
-    <config-file target="config.xml" parent="/*">
-      <feature name="BarcodeScanner">
-        <param name="browser-package" value="BarcodeScanner"/>
-      </feature>
-    </config-file>
-    <js-module src="src/browser/BarcodeScannerProxy.js" name="BarcodeScannerProxy">
-      <runs/>
-    </js-module>
-  </platform>
-  <platform name="blackberry10">
-    <source-file src="src/blackberry10/index.js" target-dir="BarcodeScanner"/>
-    <source-file src="src/blackberry10/qrcode.js" target-dir="BarcodeScanner"/>
-    <lib-file src="src/blackberry10/native/device/libBarcodeScanner.so" arch="device"/>
-    <lib-file src="src/blackberry10/native/simulator/libBarcodeScanner.so" arch="simulator"/>
-    <config-file target="www/config.xml" parent="/widget">
-      <feature name="BarcodeScanner">
-        <param name="blackberry-package" value="phonegap-plugin-barcodescanner"/>
-      </feature>
-    </config-file>
-    <config-file target="www/config.xml" parent="/widget/rim:permissions">
-      <rim:permit>use_camera</rim:permit>
-    </config-file>
-    <dependency id="cordova-plugin-bb-app"/>
-  </platform>
+
+    <!-- ios -->
+    <platform name="ios">
+        <!-- Cordova >= 2.8 -->
+        <config-file target="config.xml" parent="/*">
+            <feature name="BarcodeScanner">
+                <param name="ios-package" value="CDVBarcodeScanner" />
+            </feature>
+        </config-file>
+
+        <resource-file src="src/ios/scannerOverlay.xib" />
+        <resource-file src="src/ios/CDVBarcodeScanner.bundle" />
+
+        <header-file src="src/ios/zxing-all-in-one.h" />
+
+        <source-file src="src/ios/CDVBarcodeScanner.mm" compiler-flags="-fno-objc-arc" />
+        <source-file src="src/ios/zxing-all-in-one.cpp" />
+
+        <framework src="libiconv.dylib" />
+        <framework src="AVFoundation.framework" />
+        <framework src="AssetsLibrary.framework" />
+        <framework src="CoreVideo.framework" />
+        <framework src="QuartzCore.framework" />
+        <framework src="CoreGraphics.framework" />
+        <framework src="CoreImage.framework" />
+        <framework src="AudioToolbox.framework" />
+    </platform>
+
+    <!-- android -->
+    <platform name="android">
+
+        <source-file src="src/android/com/phonegap/plugins/barcodescanner/BarcodeScanner.java" target-dir="src/com/phonegap/plugins/barcodescanner" />
+
+        <config-file target="res/xml/config.xml" parent="/*">
+            <feature name="BarcodeScanner">
+                <param name="android-package" value="com.phonegap.plugins.barcodescanner.BarcodeScanner" />
+            </feature>
+        </config-file>
+
+        <config-file target="AndroidManifest.xml" parent="/manifest/application">
+            <activity
+                android:name="com.google.zxing.client.android.CaptureActivity"
+                android:clearTaskOnLaunch="true"
+                android:configChanges="orientation|keyboardHidden|screenSize"
+                android:theme="@android:style/Theme.NoTitleBar.Fullscreen"
+                android:windowSoftInputMode="stateAlwaysHidden"
+                android:exported="false">
+                <intent-filter>
+                    <action android:name="com.google.zxing.client.android.SCAN"/>
+                    <category android:name="android.intent.category.DEFAULT"/>
+                </intent-filter>
+            </activity>
+            <activity android:name="com.google.zxing.client.android.encode.EncodeActivity" android:label="Share">
+                <intent-filter>
+                    <action android:name="com.phonegap.plugins.barcodescanner.ENCODE"/>
+                    <category android:name="android.intent.category.DEFAULT"/>
+                </intent-filter>
+            </activity>
+            <activity android:name="com.google.zxing.client.android.HelpActivity" android:label="Share">
+                <intent-filter>
+                    <action android:name="android.intent.action.VIEW"/>
+                    <category android:name="android.intent.category.DEFAULT"/>
+                </intent-filter>
+            </activity>
+            </activity><activity android:name="com.google.zxing.client.android.history.HistoryActivity" android:label="Share">
+                <intent-filter>
+                    <action android:name="android.intent.action.VIEW" />
+                    <category android:name="android.intent.category.DEFAULT" />
+                </intent-filter>
+            </activity>
+            <activity android:name="com.google.zxing.client.android.PreferencesActivity" android:label="Share">
+                <intent-filter>
+                    <action android:name="android.intent.action.VIEW" />
+                    <category android:name="android.intent.category.DEFAULT" />
+                </intent-filter>
+            </activity>
+        </config-file>
+
+        <config-file target="AndroidManifest.xml" parent="/manifest">
+            <uses-permission android:name="android.permission.CAMERA" />
+            <uses-permission android:name="android.permission.FLASHLIGHT" />
+            <uses-permission android:name="android.permission.VIBRATE" />
+            <!-- Not required to allow users to work around this -->
+            <uses-feature android:name="android.hardware.camera" android:required="false" />
+        </config-file>
+
+        <framework src="src/android/barcodescanner.gradle" custom="true" type="gradleReference"/>
+        <resource-file src="src/android/barcodescanner-release-2.0.1.aar" target="libs/barcodescanner.aar" />
+
+        <dependency id="cordova-plugin-compat" version="^1.0.0" />
+    </platform>
+
+    <platform name="windows">
+        <js-module src="src/windows/BarcodeScannerProxy.js" name="BarcodeScannerProxy">
+            <merges target="" />
+        </js-module>
+
+        <config-file target="package.appxmanifest" parent="/Package/Capabilities">
+            <DeviceCapability Name="webcam" />
+        </config-file>
+
+        <framework src="src/windows/lib.UW/x86/ZXing.winmd" target-dir="x86" arch="x86" custom="true" versions=">8.1" />
+        <framework src="src/windows/lib.UW/x64/ZXing.winmd" target-dir="x64" arch="x64" custom="true" versions=">8.1" />
+        <framework src="src/windows/lib.UW/ARM/ZXing.winmd" target-dir="ARM" arch="ARM" custom="true" versions=">8.1" />
+        <framework src="src/windows/lib/WinRTBarcodeReader.csproj" custom="true" type="projectReference" versions="&lt;=8.1"/>
+
+        <asset src="src/windows/assets/plugin-barcodeScanner.css" target="css/plugin-barcodeScanner.css" />
+        <hook src="hooks/windows/check-arch.js" type="before_compile" />
+        <hook src="hooks/windows/check-arch.js" type="before_run" />
+    </platform>
+
+    <!-- Windows Phone 8 -->
+    <platform name="wp8">
+        <config-file target="config.xml" parent="/*">
+            <feature name="BarcodeScanner">
+                <param name="wp-package" value="BarcodeScanner"/>
+            </feature>
+        </config-file>
+
+        <config-file target="Properties/WMAppManifest.xml" parent="/Deployment/App/Capabilities">
+            <Capability Name="ID_CAP_ISV_CAMERA" />
+        </config-file>
+
+        <framework src="src/wp8/lib/zxing.wp8.0.dll" custom="true" />
+
+        <asset src="src/wp8/assets/cancel.png" target="Images/appbar.cancel.png" />
+
+        <source-file src="src/wp8/BarcodeScanner.cs" />
+        <source-file src="src/wp8/BarcodeScannerTask.cs" />
+        <source-file src="src/wp8/BarcodeScannerUI.xaml" />
+        <source-file src="src/wp8/BarcodeScannerUI.xaml.cs" />
+    </platform>
+
+    <!-- browser -->
+    <platform name="browser">
+        <config-file target="config.xml" parent="/*">
+            <feature name="BarcodeScanner">
+                <param name="browser-package" value="BarcodeScanner" />
+            </feature>
+        </config-file>
+
+        <js-module src="src/browser/BarcodeScannerProxy.js" name="BarcodeScannerProxy">
+            <runs />
+        </js-module>
+    </platform>
+
+    <!-- BlackBerry 10 -->
+    <platform name="blackberry10">
+        <source-file src="src/blackberry10/index.js" target-dir="BarcodeScanner" />
+        <source-file src="src/blackberry10/qrcode.js" target-dir="BarcodeScanner" />
+        <lib-file src="src/blackberry10/native/device/libBarcodeScanner.so" arch="device"/>
+        <lib-file src="src/blackberry10/native/simulator/libBarcodeScanner.so" arch="simulator"/>
+        <config-file target="www/config.xml" parent="/widget">
+            <feature name="BarcodeScanner">
+                <param name="blackberry-package" value="phonegap-plugin-barcodescanner" />
+            </feature>
+        </config-file>
+        <config-file target="www/config.xml" parent="/widget/rim:permissions">
+            <rim:permit>use_camera</rim:permit>
+        </config-file>
+        <dependency id="cordova-plugin-bb-app" />
+    </platform>
 </plugin>
