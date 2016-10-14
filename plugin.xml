@@ -81,13 +81,14 @@
                     <action android:name="android.intent.action.VIEW"/>
                     <category android:name="android.intent.category.DEFAULT"/>
                 </intent-filter>
-            </activity><activity android:label="Share" android:name="com.google.zxing.client.android.history.HistoryActivity">
+            </activity>
+            </activity><activity android:name="com.google.zxing.client.android.history.HistoryActivity" android:label="Share">
                 <intent-filter>
                     <action android:name="android.intent.action.VIEW" />
                     <category android:name="android.intent.category.DEFAULT" />
                 </intent-filter>
             </activity>
-            <activity android:label="Share" android:name="com.google.zxing.client.android.PreferencesActivity">
+            <activity android:name="com.google.zxing.client.android.PreferencesActivity" android:label="Share">
                 <intent-filter>
                     <action android:name="android.intent.action.VIEW" />
                     <category android:name="android.intent.category.DEFAULT" />
