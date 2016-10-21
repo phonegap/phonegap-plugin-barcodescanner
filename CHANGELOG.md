@@ -1,8 +1,9 @@
 # Change Log
 
-[6.0.2](https://github.com/phonegap/phonegap-plugin-barcodescanner/tree/6.0.2) (2016-07-09)
-[Full Changelog](https://github.com/phonegap/phonegap-plugin-barcodescanner/compare/6.0.1..6.0.2)
+[6.0.3](https://github.com/phonegap/phonegap-plugin-barcodescanner/tree/6.0.3) (2016-10-21)
+[Full Changelog](https://github.com/phonegap/phonegap-plugin-barcodescanner/compare/6.0.2..6.0.3)
 
+- Merge pull request #338 from jlowe234/master [view commit](https://github.com/phonegap/phonegap-plugin-barcodescanner/commit/7f4e4daf19951692873a490c845446cfa0fbda68)
 - 6.0.2 [view commit](http://github.com/phonegap/phonegap-plugin-barcodescanner/commit/18f958796ee9587d5bc21e6229f40139dd4f0c8a)
 - Bumping plugin version to 6.0.2 [view commit](http://github.com/phonegap/phonegap-plugin-barcodescanner/commit/8728015c06d6d201cbd421621384cd19857f6720)
 - Update pluginpub [view commit](http://github.com/phonegap/phonegap-plugin-barcodescanner/commit/ca4973214b3f99a135d3844d52f40a086022ddcb)
