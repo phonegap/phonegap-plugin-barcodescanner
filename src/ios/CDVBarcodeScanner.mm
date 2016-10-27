@@ -60,6 +60,7 @@
 @property (nonatomic, retain) NSString*                   callback;
 @property (nonatomic, retain) UIViewController*           parentViewController;
 @property (nonatomic, retain) CDVbcsViewController*        viewController;
+@property (nonatomic, retain) UIWindow*                   modalWindow;
 @property (nonatomic, retain) AVCaptureSession*           captureSession;
 @property (nonatomic, retain) AVCaptureVideoPreviewLayer* previewLayer;
 @property (nonatomic, retain) NSString*                   alternateXib;
@@ -342,17 +343,28 @@ parentViewController:(UIViewController*)parentViewController
 
 //--------------------------------------------------------------------------
 - (void)openDialog {
-    [self.parentViewController
-     presentViewController:self.viewController
-     animated:YES completion:nil
-     ];
+    // create the window object. It's for the case that CDVbcsViewController on MainViewController whose view is not in the window hierarchy.
+    UIWindow* modalWindow = [[UIWindow alloc] initWithFrame:[[UIScreen mainScreen] bounds]];
+    
+    modalWindow.backgroundColor = [UIColor blackColor];
+    modalWindow.windowLevel = UIWindowLevelNormal;
+    modalWindow.hidden = NO;
+    self.modalWindow = modalWindow;
+    
+    // set root view controller
+    modalWindow.rootViewController = self.viewController;
 }
 
 //--------------------------------------------------------------------------
 - (void)barcodeScanDone:(void (^)(void))callbackBlock {
     self.capturing = NO;
     [self.captureSession stopRunning];
-    [self.parentViewController dismissViewControllerAnimated:YES completion:callbackBlock];
+    // hide window and show original one
+    [[[[UIApplication sharedApplication] delegate] window] makeKeyAndVisible];
+    self.modalWindow.hidden = YES;
+    self.modalWindow.rootViewController = nil;
+    self.modalWindow = nil;
+    callbackBlock();
     
     // viewcontroller holding onto a reference to us, release them so they
     // will release us
@@ -859,7 +871,7 @@ parentViewController:(UIViewController*)parentViewController
 - (void)viewWillAppear:(BOOL)animated {
 
     // set video orientation to what the camera sees
-    self.processor.previewLayer.connection.videoOrientation = [[UIApplication sharedApplication] statusBarOrientation];
+    self.processor.previewLayer.connection.videoOrientation = (AVCaptureVideoOrientation)[[UIApplication sharedApplication] statusBarOrientation];
 
     // this fixes the bug when the statusbar is landscape, and the preview layer
     // starts up in portrait (not filling the whole view)
