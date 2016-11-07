@@ -43,24 +43,8 @@
       </feature>
     </config-file>
     <config-file target="AndroidManifest.xml" parent="/manifest/application">
-      <activity android:name="com.google.zxing.client.android.CaptureActivity" android:clearTaskOnLaunch="true" android:configChanges="orientation|keyboardHidden|screenSize" android:theme="@android:style/Theme.NoTitleBar.Fullscreen" android:windowSoftInputMode="stateAlwaysHidden" android:exported="false">
-        <intent-filter>
-          <action android:name="com.google.zxing.client.android.SCAN"/>
-          <category android:name="android.intent.category.DEFAULT"/>
-        </intent-filter>
-      </activity>
-      <activity android:name="com.google.zxing.client.android.encode.EncodeActivity" android:label="Share">
-        <intent-filter>
-          <action android:name="com.phonegap.plugins.barcodescanner.ENCODE"/>
-          <category android:name="android.intent.category.DEFAULT"/>
-        </intent-filter>
-      </activity>
-      <activity android:name="com.google.zxing.client.android.HelpActivity" android:label="Share">
-        <intent-filter>
-          <action android:name="android.intent.action.VIEW"/>
-          <category android:name="android.intent.category.DEFAULT"/>
-        </intent-filter>
-      </activity>
+      <activity android:name="com.google.zxing.client.android.CaptureActivity" android:clearTaskOnLaunch="true" android:configChanges="orientation|keyboardHidden|screenSize" android:theme="@android:style/Theme.NoTitleBar.Fullscreen" android:windowSoftInputMode="stateAlwaysHidden" android:exported="false" />
+      <activity android:name="com.google.zxing.client.android.encode.EncodeActivity" android:label="Share"/>
     </config-file>
     <config-file target="AndroidManifest.xml" parent="/manifest">
       <uses-permission android:name="android.permission.CAMERA"/>
