@@ -23,6 +23,8 @@ import org.apache.cordova.CallbackContext;
 import org.apache.cordova.PluginResult;
 import org.apache.cordova.PermissionHelper;
 
+import com.google.zxing.client.android.CaptureActivity;
+import com.google.zxing.client.android.encode.EncodeActivity;
 import com.google.zxing.client.android.Intents;
 
 /**
@@ -45,10 +47,6 @@ public class BarcodeScanner extends CordovaPlugin {
     private static final String SHOW_FLIP_CAMERA_BUTTON = "showFlipCameraButton";
     private static final String FORMATS = "formats";
     private static final String PROMPT = "prompt";
-    private static final String SCAN_INTENT = "com.google.zxing.client.android.SCAN";
-    private static final String ENCODE_DATA = "ENCODE_DATA";
-    private static final String ENCODE_TYPE = "ENCODE_TYPE";
-    private static final String ENCODE_INTENT = "com.phonegap.plugins.barcodescanner.ENCODE";
     private static final String TEXT_TYPE = "TEXT_TYPE";
     private static final String EMAIL_TYPE = "EMAIL_TYPE";
     private static final String PHONE_TYPE = "PHONE_TYPE";
@@ -133,7 +131,8 @@ public class BarcodeScanner extends CordovaPlugin {
         cordova.getThreadPool().execute(new Runnable() {
             public void run() {
 
-                Intent intentScan = new Intent(SCAN_INTENT);
+                Intent intentScan = new Intent(that.cordova.getActivity().getBaseContext(), CaptureActivity.class);
+                intentScan.setAction(Intents.Scan.ACTION);
                 intentScan.addCategory(Intent.CATEGORY_DEFAULT);
 
                 // add config as intent extras
@@ -240,9 +239,10 @@ public class BarcodeScanner extends CordovaPlugin {
      * @param data The data to encode in the bar code.
      */
     public void encode(String type, String data) {
-        Intent intentEncode = new Intent(ENCODE_INTENT);
-        intentEncode.putExtra(ENCODE_TYPE, type);
-        intentEncode.putExtra(ENCODE_DATA, data);
+        Intent intentEncode = new Intent(this.cordova.getActivity().getBaseContext(), EncodeActivity.class);
+        intentEncode.setAction(Intents.Encode.ACTION);
+        intentEncode.putExtra(Intents.Encode.TYPE, type);
+        intentEncode.putExtra(Intents.Encode.DATA, data);
         // avoid calling other phonegap apps
         intentEncode.setPackage(this.cordova.getActivity().getApplicationContext().getPackageName());
 
