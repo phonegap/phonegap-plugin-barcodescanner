@@ -538,7 +538,12 @@ module.exports = {
             capturePreview.src = null;
 
             if (capturePreviewFrame) {
-                document.body.removeChild(capturePreviewFrame);
+                try {
+                    document.body.removeChild(capturePreviewFrame);
+                } catch (e) {
+                    // Catching NotFoundError
+                    console.error(e);
+                }
             }
             capturePreviewFrame = null;
 
@@ -546,7 +551,12 @@ module.exports = {
             reader = null;
 
             if (capture) {
-                promise = capture.stopRecordAsync();
+                try {
+                    promise = capture.stopRecordAsync();
+                } catch (e) {
+                    // Catching NotFoundError
+                    console.error(e);
+                }
             }
             capture = null;
 
@@ -570,7 +580,25 @@ module.exports = {
             }
         }
 
-        BarcodeReader.scanPromise = WinJS.Promise.wrap(createPreview())
+        function errorHandler(error) {
+            // Suppress null result (cancel) on suspending
+            if (BarcodeReader.suspended) {
+                return;
+            }
+
+            destroyPreview();
+            if (error.message == 'Canceled') {
+                success({
+                    cancelled: true
+                });
+            } else {
+                fail(error);
+            }
+        }
+
+        // Timeout is needed so that the .done finalizer below has some time 
+        // to be attached to the promise.
+        BarcodeReader.scanPromise = WinJS.Promise.timeout(200, WinJS.Promise.wrap(createPreview()))
         .then(function () {
             checkCancelled();
             return startPreview();
@@ -600,21 +628,10 @@ module.exports = {
                 format: result && BARCODE_FORMAT[result.barcodeFormat],
                 cancelled: !result
             });
-        }, function (error) {
-            // Suppress null result (cancel) on suspending
-            if (BarcodeReader.suspended) {
-                return;
-            }
+        }, errorHandler);
 
-            destroyPreview();
-            if (error.message == 'Canceled') {
-                success({
-                    cancelled: true
-                });
-            } else {
-                fail(error);
-            }
-        });
+        // Catching any errors here
+        BarcodeReader.scanPromise.done(function () {}, errorHandler);
 
         BarcodeReader.videoPreviewIsVisible = function () {
             return capturePreviewFrame !== null;
