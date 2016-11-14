@@ -534,8 +534,18 @@ module.exports = {
             Windows.Graphics.Display.DisplayInformation.getForCurrentView().removeEventListener("orientationchanged", updatePreviewForRotation, false);
             document.removeEventListener('backbutton', cancelPreview);
 
-            capturePreview.pause();
-            capturePreview.src = null;
+            if (capturePreview) {
+                var isPlaying = !capturePreview.paused && !capturePreview.ended && capturePreview.readyState > 2;
+                if (isPlaying) {
+                    capturePreview.pause();
+                }
+
+                // http://stackoverflow.com/a/28060352/4177762
+                capturePreview.src = "";
+                if (capturePreview.load) {
+                    capturePreview.load();
+                }
+            }
 
             if (capturePreviewFrame) {
                 try {
