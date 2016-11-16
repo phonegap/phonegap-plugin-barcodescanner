@@ -186,7 +186,10 @@ A full example could be:
 ```
 
 ## Windows quirks ##
-Windows implementation currently doesn't support encode functionality.
+
+* Windows implementation currently doesn't support encode functionality.
+
+* On Windows 10 desktop ensure that you have Windows Media Player and Media Feature pack installed. 
 
 ## Windows Phone 8 quirks ##
 Windows Phone 8 implementation currently doesn't support encode functionality.
