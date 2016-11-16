@@ -12,6 +12,7 @@ var urlutil = require('cordova/urlutil');
 
 var CAMERA_STREAM_STATE_CHECK_RETRY_TIMEOUT = 200; // milliseconds
 var OPERATION_IS_IN_PROGRESS = -2147024567;
+var REGDB_E_CLASSNOTREG = -2147221164;
 var INITIAL_FOCUS_DELAY = 200; // milliseconds
 var CHECK_PLAYING_TIMEOUT = 100; // milliseconds
 
@@ -440,7 +441,18 @@ module.exports = {
         function startPreview() {
             return findCamera()
             .then(function (id) {
-                var captureSettings = new Windows.Media.Capture.MediaCaptureInitializationSettings();
+                var captureSettings;
+
+                try {
+                    captureSettings = new Windows.Media.Capture.MediaCaptureInitializationSettings();
+                } catch (e) {
+                    if (e.number === REGDB_E_CLASSNOTREG) {
+                        throw new Error('Ensure that you have Windows Media Player and Media Feature pack installed.');
+                    }
+
+                    throw e;
+                }
+
                 captureSettings.streamingCaptureMode = Windows.Media.Capture.StreamingCaptureMode.video;
                 captureSettings.photoCaptureSource = Windows.Media.Capture.PhotoCaptureSource.videoPreview;
                 captureSettings.videoDeviceId = id;
