@@ -590,26 +590,10 @@ module.exports = {
             }
         }
 
-        function errorHandler(error) {
-            // Suppress null result (cancel) on suspending
-            if (BarcodeReader.suspended) {
-                return;
-            }
-
-            destroyPreview();
-            if (error.message == 'Canceled') {
-                success({
-                    cancelled: true
-                });
-            } else {
-                fail(error);
-            }
-        }
-
-        // Timeout is needed so that the .done finalizer below has some time 
-        // to be attached to the promise.
-        BarcodeReader.scanPromise = WinJS.Promise.timeout(200, WinJS.Promise.wrap(createPreview()))
-        .then(function () {
+        // Timeout is needed so that the .done finalizer below can be attached to the promise.
+        BarcodeReader.scanPromise = WinJS.Promise.timeout()
+        .then(function() {
+            createPreview();
             checkCancelled();
             return startPreview();
         })
@@ -638,10 +622,24 @@ module.exports = {
                 format: result && BARCODE_FORMAT[result.barcodeFormat],
                 cancelled: !result
             });
-        }, errorHandler);
+        });
 
         // Catching any errors here
-        BarcodeReader.scanPromise.done(function () {}, errorHandler);
+        BarcodeReader.scanPromise.done(function () { }, function (error) {
+            // Suppress null result (cancel) on suspending
+            if (BarcodeReader.suspended) {
+                return;
+            }
+
+            destroyPreview();
+            if (error.message == 'Canceled') {
+                success({
+                    cancelled: true
+                });
+            } else {
+                fail(error);
+            }
+        });
 
         BarcodeReader.videoPreviewIsVisible = function () {
             return capturePreviewFrame !== null;
