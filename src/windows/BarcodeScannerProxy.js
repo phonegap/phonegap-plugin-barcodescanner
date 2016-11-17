@@ -534,11 +534,26 @@ module.exports = {
             Windows.Graphics.Display.DisplayInformation.getForCurrentView().removeEventListener("orientationchanged", updatePreviewForRotation, false);
             document.removeEventListener('backbutton', cancelPreview);
 
-            capturePreview.pause();
-            capturePreview.src = null;
+            if (capturePreview) {
+                var isPlaying = !capturePreview.paused && !capturePreview.ended && capturePreview.readyState > 2;
+                if (isPlaying) {
+                    capturePreview.pause();
+                }
+
+                // http://stackoverflow.com/a/28060352/4177762
+                capturePreview.src = "";
+                if (capturePreview.load) {
+                    capturePreview.load();
+                }
+            }
 
             if (capturePreviewFrame) {
-                document.body.removeChild(capturePreviewFrame);
+                try {
+                    document.body.removeChild(capturePreviewFrame);
+                } catch (e) {
+                    // Catching NotFoundError
+                    console.error(e);
+                }
             }
             capturePreviewFrame = null;
 
@@ -546,7 +561,12 @@ module.exports = {
             reader = null;
 
             if (capture) {
-                promise = capture.stopRecordAsync();
+                try {
+                    promise = capture.stopRecordAsync();
+                } catch (e) {
+                    // Catching NotFoundError
+                    console.error(e);
+                }
             }
             capture = null;
 
@@ -570,8 +590,10 @@ module.exports = {
             }
         }
 
-        BarcodeReader.scanPromise = WinJS.Promise.wrap(createPreview())
-        .then(function () {
+        // Timeout is needed so that the .done finalizer below can be attached to the promise.
+        BarcodeReader.scanPromise = WinJS.Promise.timeout()
+        .then(function() {
+            createPreview();
             checkCancelled();
             return startPreview();
         })
@@ -600,7 +622,10 @@ module.exports = {
                 format: result && BARCODE_FORMAT[result.barcodeFormat],
                 cancelled: !result
             });
-        }, function (error) {
+        });
+
+        // Catching any errors here
+        BarcodeReader.scanPromise.done(function () { }, function (error) {
             // Suppress null result (cancel) on suspending
             if (BarcodeReader.suspended) {
                 return;
