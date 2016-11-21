@@ -69,6 +69,7 @@
 @property (nonatomic)         BOOL                        is2D;
 @property (nonatomic)         BOOL                        capturing;
 @property (nonatomic)         BOOL                        isFrontCamera;
+@property (nonatomic, retain) NSString*                   prompt;
 @property (nonatomic)         BOOL                        isShowFlipCameraButton;
 @property (nonatomic)         BOOL                        isFlipped;
 
@@ -160,7 +161,8 @@
     if ([options isKindOfClass:[NSNull class]]) {
       options = [NSDictionary dictionary];
     }
-    NSLog(@"prompt: %@", [options[@"prompt"]);
+
+    NSString *prompt = [[NSString alloc] initWithString:options[@"prompt"]];
     BOOL preferFrontCamera = [options[@"preferFrontCamera"] boolValue];
     BOOL showFlipCameraButton = [options[@"showFlipCameraButton"] boolValue];
     // We allow the user to define an alternate xib file for loading the overlay.
@@ -183,6 +185,10 @@
                  alterateOverlayXib:overlayXib
                  ];
     // queue [processor scanBarcode] to run on the event loop
+
+    if ([prompt length] != 0) {
+      processor.prompt = prompt;
+    }
 
     if (preferFrontCamera) {
       processor.isFrontCamera = true;
@@ -998,6 +1004,16 @@ parentViewController:(UIViewController*)parentViewController
     ;
 
     [overlayView addSubview: reticleView];
+
+    if (_processor.prompt) {
+      UITextView *textView = [[UITextView alloc]initWithFrame:CGRectMake(0, self.view.frame.size.height-100, self.view.frame.size.width, 50)];
+      textView.text = _processor.prompt;
+      textView.font = [UIFont systemFontOfSize:17.0];
+      textView.backgroundColor = [UIColor greenColor];
+      textView.textAlignment = NSTextAlignmentCenter;
+
+      [overlayView addSubview: textView];
+    }
 
     return overlayView;
 }
