@@ -353,7 +353,7 @@ parentViewController:(UIViewController*)parentViewController
     self.capturing = NO;
     [self.captureSession stopRunning];
     [self.parentViewController dismissViewControllerAnimated:YES completion:callbackBlock];
-    
+
     // viewcontroller holding onto a reference to us, release them so they
     // will release us
     self.viewController = nil;
@@ -1060,7 +1060,7 @@ parentViewController:(UIViewController*)parentViewController
 
 - (NSUInteger)supportedInterfaceOrientations
 {
-    return UIInterfaceOrientationMaskAll;
+    return UIInterfaceOrientationPortrait;
 }
 
 - (BOOL)shouldAutorotateToInterfaceOrientation:(UIInterfaceOrientation)interfaceOrientation
@@ -1090,6 +1090,21 @@ parentViewController:(UIViewController*)parentViewController
 
     previewLayer.videoGravity = AVLayerVideoGravityResizeAspectFill;
     [UIView setAnimationsEnabled:YES];
+}
+
+- (void)touchesBegan:(NSSet *)touches withEvent:(UIEvent *)event {
+
+    AVCaptureDevice *device = [AVCaptureDevice defaultDeviceWithMediaType:AVMediaTypeVideo];
+    if ([device hasTorch]) {
+        [device lockForConfiguration:nil];
+        if ([device isTorchActive]) {
+            [device setTorchMode:AVCaptureTorchModeOff];
+        } else {
+            [device setTorchMode:AVCaptureTorchModeOn];
+        }
+        [device unlockForConfiguration];
+    }
+
 }
 
 @end
