@@ -6,11 +6,8 @@
  * Copyright (c) 2011, IBM Corporation
  */
 
-#import <Foundation/Foundation.h>
-#import <UIKit/UIKit.h>
 #import <AVFoundation/AVFoundation.h>
 #import <AssetsLibrary/AssetsLibrary.h>
-#import <AudioToolbox/AudioToolbox.h>
 
 //------------------------------------------------------------------------------
 // use the all-in-one version of zxing that we built
@@ -72,6 +69,7 @@
 @property (nonatomic)         BOOL                        isShowFlipCameraButton;
 @property (nonatomic)         BOOL                        isShowTorchButton;
 @property (nonatomic)         BOOL                        isFlipped;
+@property (nonatomic)         BOOL                        isTransitionAnimated;
 
 
 - (id)initWithPlugin:(CDVBarcodeScanner*)plugin callback:(NSString*)callback parentViewController:(UIViewController*)parentViewController alterateOverlayXib:(NSString *)alternateXib;
@@ -164,6 +162,7 @@
     BOOL preferFrontCamera = [options[@"preferFrontCamera"] boolValue];
     BOOL showFlipCameraButton = [options[@"showFlipCameraButton"] boolValue];
     BOOL showTorchButton = [options[@"showTorchButton"] boolValue];
+    BOOL disableAnimations = [options[@"disableAnimations"] boolValue];
 
     // We allow the user to define an alternate xib file for loading the overlay.
     NSString *overlayXib = [options objectForKey:@"overlayXib"];
@@ -197,6 +196,8 @@
     if (showTorchButton) {
       processor.isShowTorchButton = true;
     }
+
+    processor.isTransitionAnimated = !disableAnimations;
 
     processor.formats = options[@"formats"];
 
@@ -351,7 +352,7 @@ parentViewController:(UIViewController*)parentViewController
 - (void)openDialog {
     [self.parentViewController
      presentViewController:self.viewController
-     animated:NO completion:nil
+     animated:self.isTransitionAnimated completion:nil
      ];
 }
 
@@ -359,8 +360,8 @@ parentViewController:(UIViewController*)parentViewController
 - (void)barcodeScanDone:(void (^)(void))callbackBlock {
     self.capturing = NO;
     [self.captureSession stopRunning];
-    [self.parentViewController dismissViewControllerAnimated:NO completion:callbackBlock];
-    
+    [self.parentViewController dismissViewControllerAnimated:self.isTransitionAnimated completion:callbackBlock];
+
     // viewcontroller holding onto a reference to us, release them so they
     // will release us
     self.viewController = nil;
@@ -512,7 +513,7 @@ parentViewController:(UIViewController*)parentViewController
                                      AVMetadataObjectTypeCode39Code,
                                      AVMetadataObjectTypeITF14Code,
                                      AVMetadataObjectTypePDF417Code]];
-    
+
     // setup capture preview layer
     self.previewLayer = [AVCaptureVideoPreviewLayer layerWithSession:captureSession];
     self.previewLayer.videoGravity = AVLayerVideoGravityResizeAspectFill;
@@ -556,7 +557,7 @@ parentViewController:(UIViewController*)parentViewController
         // This will bring in multiple entities if there are multiple 2D codes in frame.
         for (AVMetadataObject *metaData in metadataObjects) {
             AVMetadataMachineReadableCodeObject* code = (AVMetadataMachineReadableCodeObject*)[self.previewLayer transformedMetadataObjectForMetadataObject:(AVMetadataMachineReadableCodeObject*)metaData];
-            
+
             if ([self checkResult:code.stringValue]) {
                 [self barcodeScanSucceeded:code.stringValue format:[self formatStringFromMetadata:code]];
             }
@@ -1003,7 +1004,7 @@ parentViewController:(UIViewController*)parentViewController
                          target:(id)self
                          action:@selector(torchButtonPressed:)
                          ] autorelease];
-      
+
       [items insertObject:torchButton atIndex:0];
     }
 
