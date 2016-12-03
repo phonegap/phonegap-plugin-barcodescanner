@@ -70,6 +70,7 @@
 @property (nonatomic)         BOOL                        capturing;
 @property (nonatomic)         BOOL                        isFrontCamera;
 @property (nonatomic)         BOOL                        isShowFlipCameraButton;
+@property (nonatomic)         BOOL                        isShowTorchButton;
 @property (nonatomic)         BOOL                        isFlipped;
 
 
@@ -162,6 +163,8 @@
     }
     BOOL preferFrontCamera = [options[@"preferFrontCamera"] boolValue];
     BOOL showFlipCameraButton = [options[@"showFlipCameraButton"] boolValue];
+    BOOL showTorchButton = [options[@"showTorchButton"] boolValue];
+
     // We allow the user to define an alternate xib file for loading the overlay.
     NSString *overlayXib = [options objectForKey:@"overlayXib"];
 
@@ -189,6 +192,10 @@
 
     if (showFlipCameraButton) {
       processor.isShowFlipCameraButton = true;
+    }
+
+    if (showTorchButton) {
+      processor.isShowTorchButton = true;
     }
 
     processor.formats = options[@"formats"];
@@ -426,6 +433,19 @@ parentViewController:(UIViewController*)parentViewController
         }
     [self performSelector:@selector(scanBarcode) withObject:nil afterDelay:0.1];
     }];
+}
+
+- (void)toggleTorch {
+  AVCaptureDevice *device = [AVCaptureDevice defaultDeviceWithMediaType:AVMediaTypeVideo];
+  [device lockForConfiguration:nil];
+  if (device.flashActive) {
+    [device setTorchMode:AVCaptureTorchModeOff];
+    [device setFlashMode:AVCaptureFlashModeOff];
+  } else {
+    [device setTorchModeOnWithLevel:AVCaptureMaxAvailableTorchLevel error:nil];
+    [device setFlashMode:AVCaptureFlashModeOn];
+  }
+  [device unlockForConfiguration];
 }
 
 //--------------------------------------------------------------------------
@@ -893,6 +913,11 @@ parentViewController:(UIViewController*)parentViewController
     [self.processor performSelector:@selector(flipCamera) withObject:nil afterDelay:0];
 }
 
+- (void)torchButtonPressed:(id)sender
+{
+  [self.processor performSelector:@selector(toggleTorch) withObject:nil afterDelay:0];
+}
+
 //--------------------------------------------------------------------------
 - (UIView *)buildOverlayViewFromXib
 {
@@ -944,6 +969,8 @@ parentViewController:(UIViewController*)parentViewController
                        action:@selector(flipCameraButtonPressed:)
                        ] autorelease];
 
+    NSMutableArray *items;
+
 #if USE_SHUTTER
     id shutterButton = [[[UIBarButtonItem alloc]
                         initWithBarButtonSystemItem:UIBarButtonSystemItemCamera
@@ -952,17 +979,36 @@ parentViewController:(UIViewController*)parentViewController
                         ] autorelease];
 
     if (_processor.isShowFlipCameraButton) {
-      toolbar.items = [NSArray arrayWithObjects:flexSpace,cancelButton,flexSpace, flipCamera ,shutterButton,nil];
+      items = [NSMutableArray arrayWithObjects:flexSpace, cancelButton, flexSpace, flipCamera, shutterButton, nil];
     } else {
-      toolbar.items = [NSArray arrayWithObjects:flexSpace,cancelButton,flexSpace ,shutterButton,nil];
+      items = [NSMutableArray arrayWithObjects:flexSpace, cancelButton, flexSpace, shutterButton, nil];
     }
 #else
     if (_processor.isShowFlipCameraButton) {
-      toolbar.items = [NSArray arrayWithObjects:flexSpace,cancelButton,flexSpace, flipCamera,nil];
+      items = [NSMutableArray arrayWithObjects:flexSpace, cancelButton, flexSpace, flipCamera, nil];
     } else {
-      toolbar.items = [NSArray arrayWithObjects:flexSpace,cancelButton,flexSpace,nil];
+      items = [NSMutableArray arrayWithObjects:flexSpace, cancelButton, flexSpace, nil];
     }
 #endif
+
+    if (_processor.isShowTorchButton && !_processor.isFrontCamera) {
+      NSURL *bundleURL = [[NSBundle mainBundle] URLForResource:@"CDVBarcodeScanner" withExtension:@"bundle"];
+      NSBundle *bundle = [NSBundle bundleWithURL:bundleURL];
+      NSString *imagePath = [bundle pathForResource:@"torch" ofType:@"png"];
+      UIImage *image = [UIImage imageWithContentsOfFile:imagePath];
+
+      id torchButton = [[[UIBarButtonItem alloc]
+                         initWithImage:image
+                         style:UIBarButtonItemStylePlain
+                         target:(id)self
+                         action:@selector(torchButtonPressed:)
+                         ] autorelease];
+      
+      [items insertObject:torchButton atIndex:0];
+    }
+
+    toolbar.items = items;
+
     bounds = overlayView.bounds;
 
     [toolbar sizeToFit];
