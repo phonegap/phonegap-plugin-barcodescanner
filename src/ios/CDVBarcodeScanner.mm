@@ -154,18 +154,20 @@
 
     callback = command.callbackId;
 
-    NSDictionary* options = command.arguments.count == 0 ? [NSNull null] : [command.arguments objectAtIndex:0];
-
-    if ([options isKindOfClass:[NSNull class]]) {
+    NSDictionary* options;
+    if (command.arguments.count == 0) {
       options = [NSDictionary dictionary];
+    } else {
+      options = command.arguments[0];
     }
+
     BOOL preferFrontCamera = [options[@"preferFrontCamera"] boolValue];
     BOOL showFlipCameraButton = [options[@"showFlipCameraButton"] boolValue];
     BOOL showTorchButton = [options[@"showTorchButton"] boolValue];
     BOOL disableAnimations = [options[@"disableAnimations"] boolValue];
 
     // We allow the user to define an alternate xib file for loading the overlay.
-    NSString *overlayXib = [options objectForKey:@"overlayXib"];
+    NSString *overlayXib = options[@"overlayXib"];
 
     capabilityError = [self isScanNotPossible];
     if (capabilityError) {
@@ -177,12 +179,12 @@
         return;
     }
 
-    processor = [[CDVbcsProcessor alloc]
-                 initWithPlugin:self
-                 callback:callback
-                 parentViewController:self.viewController
-                 alterateOverlayXib:overlayXib
-                 ];
+    processor = [[[CDVbcsProcessor alloc]
+                initWithPlugin:self
+                      callback:callback
+          parentViewController:self.viewController
+            alterateOverlayXib:overlayXib
+            ] autorelease];
     // queue [processor scanBarcode] to run on the event loop
 
     if (preferFrontCamera) {
@@ -228,8 +230,8 @@
 
 - (void)returnImage:(NSString*)filePath format:(NSString*)format callback:(NSString*)callback{
     NSMutableDictionary* resultDict = [[[NSMutableDictionary alloc] init] autorelease];
-    [resultDict setObject:format forKey:@"format"];
-    [resultDict setObject:filePath forKey:@"file"];
+    resultDict[@"format"] = format;
+    resultDict[@"file"] = filePath;
 
     CDVPluginResult* result = [CDVPluginResult
                                resultWithStatus: CDVCommandStatus_OK
@@ -241,12 +243,12 @@
 
 //--------------------------------------------------------------------------
 - (void)returnSuccess:(NSString*)scannedText format:(NSString*)format cancelled:(BOOL)cancelled flipped:(BOOL)flipped callback:(NSString*)callback{
-    NSNumber* cancelledNumber = [NSNumber numberWithInt:(cancelled?1:0)];
+    NSNumber* cancelledNumber = @(cancelled ? 1 : 0);
 
-    NSMutableDictionary* resultDict = [[NSMutableDictionary alloc] init];
-    [resultDict setObject:scannedText     forKey:@"text"];
-    [resultDict setObject:format          forKey:@"format"];
-    [resultDict setObject:cancelledNumber forKey:@"cancelled"];
+    NSMutableDictionary* resultDict = [[NSMutableDictionary new] autorelease];
+    resultDict[@"text"] = scannedText;
+    resultDict[@"format"] = format;
+    resultDict[@"cancelled"] = cancelledNumber;
 
     CDVPluginResult* result = [CDVPluginResult
                                resultWithStatus: CDVCommandStatus_OK
@@ -302,7 +304,7 @@ parentViewController:(UIViewController*)parentViewController
     self.is1D      = YES;
     self.is2D      = YES;
     self.capturing = NO;
-    self.results = [NSMutableArray new];
+    self.results = [[NSMutableArray new] autorelease];
 
     CFURLRef soundFileURLRef  = CFBundleCopyResourceURL(CFBundleGetMainBundle(), CFSTR("CDVBarcodeScanner.bundle/beep"), CFSTR ("caf"), NULL);
     AudioServicesCreateSystemSoundID(soundFileURLRef, &_soundFileObject);
@@ -383,7 +385,7 @@ parentViewController:(UIViewController*)parentViewController
     }
 
     BOOL allEqual = YES;
-    NSString *compareString = [self.results objectAtIndex:0];
+    NSString *compareString = self.results[0];
 
     for (NSString *aResult in self.results)
     {
@@ -453,7 +455,7 @@ parentViewController:(UIViewController*)parentViewController
 - (NSString*)setUpCaptureSession {
     NSError* error = nil;
 
-    AVCaptureSession* captureSession = [[AVCaptureSession alloc] init];
+    AVCaptureSession* captureSession = [[[AVCaptureSession alloc] init] autorelease];
     self.captureSession = captureSession;
 
        AVCaptureDevice* __block device = nil;
@@ -475,7 +477,7 @@ parentViewController:(UIViewController*)parentViewController
     AVCaptureDeviceInput* input = [AVCaptureDeviceInput deviceInputWithDevice:device error:&error];
     if (!input) return @"unable to obtain video capture device input";
 
-    AVCaptureMetadataOutput* output = [[AVCaptureMetadataOutput alloc] init];
+    AVCaptureMetadataOutput* output = [[[AVCaptureMetadataOutput alloc] init] autorelease];
     if (!output) return @"unable to obtain video capture output";
 
     [output setMetadataObjectsDelegate:self queue:dispatch_get_global_queue(DISPATCH_QUEUE_PRIORITY_LOW, 0)];
@@ -736,7 +738,7 @@ parentViewController:(UIViewController*)parentViewController
 //--------------------------------------------------------------------------
 - (void)dumpImage:(UIImage*)image {
     NSLog(@"writing image to library: %dx%d", (int)image.size.width, (int)image.size.height);
-    ALAssetsLibrary* assetsLibrary = [[ALAssetsLibrary alloc] init];
+    ALAssetsLibrary* assetsLibrary = [[[ALAssetsLibrary alloc] init] autorelease];
     [assetsLibrary
      writeImageToSavedPhotosAlbum:image.CGImage
      orientation:ALAssetOrientationUp
@@ -880,7 +882,7 @@ parentViewController:(UIViewController*)parentViewController
 - (void)viewWillAppear:(BOOL)animated {
 
     // set video orientation to what the camera sees
-    self.processor.previewLayer.connection.videoOrientation = (AVCaptureVideoOrientation)[[UIApplication sharedApplication] statusBarOrientation];
+    self.processor.previewLayer.connection.videoOrientation = (AVCaptureVideoOrientation) [[UIApplication sharedApplication] statusBarOrientation];
 
     // this fixes the bug when the statusbar is landscape, and the preview layer
     // starts up in portrait (not filling the whole view)
@@ -986,9 +988,9 @@ parentViewController:(UIViewController*)parentViewController
     }
 #else
     if (_processor.isShowFlipCameraButton) {
-      items = [NSMutableArray arrayWithObjects:flexSpace, cancelButton, flexSpace, flipCamera, nil];
+      items = [@[flexSpace, cancelButton, flexSpace, flipCamera] mutableCopy];
     } else {
-      items = [NSMutableArray arrayWithObjects:flexSpace, cancelButton, flexSpace, nil];
+      items = [@[flexSpace, cancelButton, flexSpace] mutableCopy];
     }
 #endif
 
@@ -1022,25 +1024,25 @@ parentViewController:(UIViewController*)parentViewController
     [overlayView addSubview: toolbar];
 
     UIImage* reticleImage = [self buildReticleImage];
-    UIView* reticleView = [[UIImageView alloc] initWithImage: reticleImage];
+    UIView* reticleView = [[[UIImageView alloc] initWithImage:reticleImage] autorelease];
     CGFloat minAxis = MIN(rootViewHeight, rootViewWidth);
 
     rectArea = CGRectMake(
-                          0.5 * (rootViewWidth  - minAxis),
-                          0.5 * (rootViewHeight - minAxis),
-                          minAxis,
-                          minAxis
-                          );
+        (CGFloat) (0.5 * (rootViewWidth  - minAxis)),
+        (CGFloat) (0.5 * (rootViewHeight - minAxis)),
+        minAxis,
+        minAxis
+    );
 
     [reticleView setFrame:rectArea];
 
     reticleView.opaque           = NO;
     reticleView.contentMode      = UIViewContentModeScaleAspectFit;
-    reticleView.autoresizingMask = 0
-    | UIViewAutoresizingFlexibleLeftMargin
-    | UIViewAutoresizingFlexibleRightMargin
-    | UIViewAutoresizingFlexibleTopMargin
-    | UIViewAutoresizingFlexibleBottomMargin
+    reticleView.autoresizingMask = (UIViewAutoresizing) (0
+        | UIViewAutoresizingFlexibleLeftMargin
+        | UIViewAutoresizingFlexibleRightMargin
+        | UIViewAutoresizingFlexibleTopMargin
+        | UIViewAutoresizingFlexibleBottomMargin)
     ;
 
     [overlayView addSubview: reticleView];
@@ -1068,9 +1070,9 @@ parentViewController:(UIViewController*)parentViewController
         CGContextSetStrokeColorWithColor(context, color.CGColor);
         CGContextSetLineWidth(context, RETICLE_WIDTH);
         CGContextBeginPath(context);
-        CGFloat lineOffset = RETICLE_OFFSET+(0.5*RETICLE_WIDTH);
+        CGFloat lineOffset = (CGFloat) (RETICLE_OFFSET+(0.5*RETICLE_WIDTH));
         CGContextMoveToPoint(context, lineOffset, RETICLE_SIZE/2);
-        CGContextAddLineToPoint(context, RETICLE_SIZE-lineOffset, 0.5*RETICLE_SIZE);
+        CGContextAddLineToPoint(context, RETICLE_SIZE-lineOffset, (CGFloat) (0.5*RETICLE_SIZE));
         CGContextStrokePath(context);
     }
 
