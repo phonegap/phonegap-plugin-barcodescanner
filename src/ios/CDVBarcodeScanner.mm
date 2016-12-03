@@ -859,7 +859,7 @@ parentViewController:(UIViewController*)parentViewController
 - (void)viewWillAppear:(BOOL)animated {
 
     // set video orientation to what the camera sees
-    self.processor.previewLayer.connection.videoOrientation = [[UIApplication sharedApplication] statusBarOrientation];
+    self.processor.previewLayer.connection.videoOrientation = (AVCaptureVideoOrientation)[[UIApplication sharedApplication] statusBarOrientation];
 
     // this fixes the bug when the statusbar is landscape, and the preview layer
     // starts up in portrait (not filling the whole view)
