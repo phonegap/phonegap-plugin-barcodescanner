@@ -15,6 +15,7 @@ import org.json.JSONObject;
 import android.Manifest;
 import android.app.Activity;
 import android.content.Intent;
+import android.os.Bundle;
 import android.util.Log;
 import android.content.pm.PackageManager;
 
@@ -301,5 +302,14 @@ public class BarcodeScanner extends CordovaPlugin {
                break;
        }
    }
+
+    /**
+     * This plugin launches an external Activity when the camera is opened, so we
+     * need to implement the save/restore API in case the Activity gets killed
+     * by the OS while it's in the background.
+     */
+    public void onRestoreStateForActivityResult(Bundle state, CallbackContext callbackContext) {
+        this.callbackContext = callbackContext;
+    }
 
 }
