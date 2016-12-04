@@ -1,8 +1,19 @@
 # Change Log
 
-[6.0.3](https://github.com/phonegap/phonegap-plugin-barcodescanner/tree/6.0.3) (2016-10-21)
-[Full Changelog](https://github.com/phonegap/phonegap-plugin-barcodescanner/compare/6.0.2..6.0.3)
+[6.0.4](https://github.com/phonegap/phonegap-plugin-barcodescanner/tree/6.0.4) (2016-12-04)
+[Full Changelog](https://github.com/phonegap/phonegap-plugin-barcodescanner/compare/6.0.3..6.0.4)
 
+- Focus improvements [view commit](https://github.com/phonegap/phonegap-plugin-barcodescanner/commit/52a23b0f42d454d6a9f2e29a693b5e984c0bb13f)
+- Crash on iOS on low memory devices [view commit](https://github.com/phonegap/phonegap-plugin-barcodescanner/commit/6e3718c2db03fda3d8ea439a9471b3a08e121f21)
+- Disable Animation [view commit](https://github.com/phonegap/phonegap-plugin-barcodescanner/commit/f9960f9b81aef35bd85ecba856c63058bc109ac1)
+- Flashlight option [view commit](https://github.com/phonegap/phonegap-plugin-barcodescanner/commit/a7ed6890d4e5e2cb386c8754aca081fad559ba1a)
+- Merge pull request #343 from cepm-nate/master [view commit](https://github.com/phonegap/phonegap-plugin-barcodescanner/commit/77622ca92f5607a8d22131f62f2dea720857a5ed)
+- Merge pull request #334 from lucatorella/patch-1 [view commit](https://github.com/phonegap/phonegap-plugin-barcodescanner/commit/10f94bc81aff5329291272a4922837e04569a339)
+- Merge pull request #346 from kunder-lab/master [view commit](https://github.com/phonegap/phonegap-plugin-barcodescanner/commit/1cdbf871c9d290630e4535e8ed9db0804b413f74)
+- Catch Class not registered exception in case of missing Media Player [view commit](https://github.com/phonegap/phonegap-plugin-barcodescanner/commit/d43964f06c8eb57fc168d7b19027462e957ba23d)
+- Adds promise scan .done particularly to handle "No cameras" error [view commit](https://github.com/phonegap/phonegap-plugin-barcodescanner/commit/68b6fd14a95f34b32ea2bb651f9715ff880e4ade)
+- Merge pull request #358 from vladimir-kotikov/explicit_intent [view commit](https://github.com/phonegap/phonegap-plugin-barcodescanner/commit/75cffc3282f09f6973d078d8ce9b306bff210bd5)
+- Use explicit intent to launch scan activity [view commit](https://github.com/phonegap/phonegap-plugin-barcodescanner/commit/4c046898543dee838b259997a5ec360240e26354)
 - Merge pull request #338 from jlowe234/master [view commit](https://github.com/phonegap/phonegap-plugin-barcodescanner/commit/7f4e4daf19951692873a490c845446cfa0fbda68)
 - 6.0.2 [view commit](http://github.com/phonegap/phonegap-plugin-barcodescanner/commit/18f958796ee9587d5bc21e6229f40139dd4f0c8a)
 - Bumping plugin version to 6.0.2 [view commit](http://github.com/phonegap/phonegap-plugin-barcodescanner/commit/8728015c06d6d201cbd421621384cd19857f6720)
