@@ -832,7 +832,8 @@ parentViewController:(UIViewController*)parentViewController
     CGImageRelease(cgImage);
 
     /* save image to file */
-    NSString* filePath = [NSTemporaryDirectory() stringByAppendingPathComponent:@"tmpqrcode.jpeg"];
+    NSString* fileName = [[[NSProcessInfo processInfo] globallyUniqueString] stringByAppendingString:@".jpg"];
+    NSString* filePath = [NSTemporaryDirectory() stringByAppendingPathComponent:fileName];
     [UIImageJPEGRepresentation(qrImage, 1.0) writeToFile:filePath atomically:YES];
 
     /* return file path back to cordova */
