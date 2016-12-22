@@ -46,7 +46,9 @@ public class BarcodeScanner extends CordovaPlugin {
     private static final String PREFER_FRONTCAMERA = "preferFrontCamera";
     private static final String ORIENTATION = "orientation";
     private static final String SHOW_FLIP_CAMERA_BUTTON = "showFlipCameraButton";
+    private static final String RESULTDISPLAY_DURATION = "resultDisplayDuration";
     private static final String SHOW_TORCH_BUTTON = "showTorchButton";
+    private static final String TORCH_ON = "torchOn";
     private static final String FORMATS = "formats";
     private static final String PROMPT = "prompt";
     private static final String TEXT_TYPE = "TEXT_TYPE";
@@ -174,6 +176,10 @@ public class BarcodeScanner extends CordovaPlugin {
                         intentScan.putExtra(Intents.Scan.CAMERA_ID, obj.optBoolean(PREFER_FRONTCAMERA, false) ? 1 : 0);
                         intentScan.putExtra(Intents.Scan.SHOW_FLIP_CAMERA_BUTTON, obj.optBoolean(SHOW_FLIP_CAMERA_BUTTON, false));
                         intentScan.putExtra(Intents.Scan.SHOW_TORCH_BUTTON, obj.optBoolean(SHOW_TORCH_BUTTON, false));
+                        intentScan.putExtra(Intents.Scan.TORCH_ON, obj.optBoolean(TORCH_ON, false));
+                        if (obj.has(RESULTDISPLAY_DURATION)) {
+                            intentScan.putExtra(Intents.Scan.RESULT_DISPLAY_DURATION_MS, "" + obj.optLong(RESULTDISPLAY_DURATION));
+                        }
                         if (obj.has(FORMATS)) {
                             intentScan.putExtra(Intents.Scan.FORMATS, obj.optString(FORMATS));
                         }
