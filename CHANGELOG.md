@@ -1,7 +1,7 @@
 # Change Log
 
 [6.0.5](https://github.com/phonegap/phonegap-plugin-barcodescanner/tree/6.0.5) (2016-12-22)
-[Full Changelog](https://github.com/phonegap/phonegap-plugin-barcodescanner/compare/6.0.4..6.0.5)
+[Full Changelog](https://github.com/phonegap/phonegap-plugin-barcodescanner/compare/6.0.4...6.0.5)
 
 - Flashlight default value #385, Turning off found plain text #259, Remove Result Prompt #234, Custom Result Messages #219 [view commit](https://github.com/phonegap/phonegap-plugin-barcodescanner/commit/fee66a7d1b4c3bca845beb3fa8c99365b4c15ce2)
 - Flipping orientation on Android crashes app [view commit](https://github.com/phonegap/phonegap-plugin-barcodescanner/commit/72ae2c75d3d66df24c124a6da9c26e48f7ad36a0)
