@@ -1006,20 +1006,23 @@ parentViewController:(UIViewController*)parentViewController
 #endif
 
     if (_processor.isShowTorchButton && !_processor.isFrontCamera) {
-      NSURL *bundleURL = [[NSBundle mainBundle] URLForResource:@"CDVBarcodeScanner" withExtension:@"bundle"];
-      NSBundle *bundle = [NSBundle bundleWithURL:bundleURL];
-      NSString *imagePath = [bundle pathForResource:@"torch" ofType:@"png"];
-      UIImage *image = [UIImage imageWithContentsOfFile:imagePath];
+      AVCaptureDevice *device = [AVCaptureDevice defaultDeviceWithMediaType:AVMediaTypeVideo];
+      if ([device hasTorch] && [device hasFlash]) {
+        NSURL *bundleURL = [[NSBundle mainBundle] URLForResource:@"CDVBarcodeScanner" withExtension:@"bundle"];
+        NSBundle *bundle = [NSBundle bundleWithURL:bundleURL];
+        NSString *imagePath = [bundle pathForResource:@"torch" ofType:@"png"];
+        UIImage *image = [UIImage imageWithContentsOfFile:imagePath];
 
-      id torchButton = [[[UIBarButtonItem alloc]
-                         initWithImage:image
-                         style:UIBarButtonItemStylePlain
-                         target:(id)self
-                         action:@selector(torchButtonPressed:)
-                         ] autorelease];
+        id torchButton = [[[UIBarButtonItem alloc]
+                           initWithImage:image
+                                   style:UIBarButtonItemStylePlain
+                                  target:(id)self
+                                  action:@selector(torchButtonPressed:)
+                           ] autorelease];
 
       [items insertObject:torchButton atIndex:0];
     }
+  }
 
     toolbar.items = items;
 
