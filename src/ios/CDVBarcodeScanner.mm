@@ -70,6 +70,7 @@
 @property (nonatomic)         BOOL                        isShowTorchButton;
 @property (nonatomic)         BOOL                        isFlipped;
 @property (nonatomic)         BOOL                        isTransitionAnimated;
+@property (nonatomic)         BOOL                        isSuccessBeepEnabled;
 
 
 - (id)initWithPlugin:(CDVBarcodeScanner*)plugin callback:(NSString*)callback parentViewController:(UIViewController*)parentViewController alterateOverlayXib:(NSString *)alternateXib;
@@ -165,6 +166,7 @@
     BOOL showFlipCameraButton = [options[@"showFlipCameraButton"] boolValue];
     BOOL showTorchButton = [options[@"showTorchButton"] boolValue];
     BOOL disableAnimations = [options[@"disableAnimations"] boolValue];
+    BOOL disableSuccessBeep = [options[@"disableSuccessBeep"] boolValue];
 
     // We allow the user to define an alternate xib file for loading the overlay.
     NSString *overlayXib = options[@"overlayXib"];
@@ -198,6 +200,8 @@
     if (showTorchButton) {
       processor.isShowTorchButton = true;
     }
+
+    processor.isSuccessBeepEnabled = !disableSuccessBeep;
 
     processor.isTransitionAnimated = !disableAnimations;
 
@@ -406,7 +410,9 @@ parentViewController:(UIViewController*)parentViewController
         [self barcodeScanDone:^{
             [self.plugin returnSuccess:text format:format cancelled:FALSE flipped:FALSE callback:self.callback];
         }];
-        AudioServicesPlaySystemSound(_soundFileObject);
+        if (self.isSuccessBeepEnabled) {
+          AudioServicesPlaySystemSound(_soundFileObject);
+        }
     });
 }
 
