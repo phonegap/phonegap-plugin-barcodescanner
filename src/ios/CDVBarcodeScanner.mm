@@ -167,8 +167,8 @@
     BOOL showTorchButton = [options[@"showTorchButton"] boolValue];
     BOOL disableAnimations = [options[@"disableAnimations"] boolValue];
     BOOL disableSuccessBeep = [options[@"disableSuccessBeep"] boolValue];
-    BOOL disable1dLines = [options[@"disable1dLines"] boolValue];
-    BOOL disable2dLines = [options[@"disable2dLines"] boolValue];
+    BOOL disable1d = [options[@"disable1d"] boolValue];
+    BOOL disable2d = [options[@"disable2d"] boolValue];
 
     // We allow the user to define an alternate xib file for loading the overlay.
     NSString *overlayXib = options[@"overlayXib"];
@@ -205,8 +205,8 @@
 
     processor.isSuccessBeepEnabled = !disableSuccessBeep;
 
-    processor.is1D = !disable1dLines;
-    processor.is2D = !disable2dLines;
+    processor.is1D = !disable1d;
+    processor.is2D = !disable2d;
 
     processor.isTransitionAnimated = !disableAnimations;
 
