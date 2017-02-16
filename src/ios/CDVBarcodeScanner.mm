@@ -167,6 +167,8 @@
     BOOL showTorchButton = [options[@"showTorchButton"] boolValue];
     BOOL disableAnimations = [options[@"disableAnimations"] boolValue];
     BOOL disableSuccessBeep = [options[@"disableSuccessBeep"] boolValue];
+    BOOL disable1dLines = [options[@"disable1dLines"] boolValue];
+    BOOL disable2dLines = [options[@"disable2dLines"] boolValue];
 
     // We allow the user to define an alternate xib file for loading the overlay.
     NSString *overlayXib = options[@"overlayXib"];
@@ -202,6 +204,9 @@
     }
 
     processor.isSuccessBeepEnabled = !disableSuccessBeep;
+
+    processor.is1D = !disable1dLines;
+    processor.is2D = !disable2dLines;
 
     processor.isTransitionAnimated = !disableAnimations;
 
@@ -305,8 +310,6 @@ parentViewController:(UIViewController*)parentViewController
     self.parentViewController = parentViewController;
     self.alternateXib         = alternateXib;
 
-    self.is1D      = YES;
-    self.is2D      = YES;
     self.capturing = NO;
     self.results = [[NSMutableArray new] autorelease];
 
