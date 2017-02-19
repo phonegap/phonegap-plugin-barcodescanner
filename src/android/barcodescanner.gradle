@@ -1,10 +1,4 @@
-def minSdkVersion = 15
-
-if(cdvMinSdkVersion == null) {
-    ext.cdvMinSdkVersion = minSdkVersion;
-} else if (cdvMinSdkVersion.toInteger() < minSdkVersion) {
-    ext.cdvMinSdkVersion = minSdkVersion;
-}
+cdvMinSdkVersion = Math.max(15, cdvHelpers.getConfigPreference('android-minSdkVersion', 0) as Integer)
 
 repositories{
     jcenter()
