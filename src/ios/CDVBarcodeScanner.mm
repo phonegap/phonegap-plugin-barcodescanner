@@ -62,6 +62,7 @@
 @property (nonatomic, retain) NSString*                   alternateXib;
 @property (nonatomic, retain) NSMutableArray*             results;
 @property (nonatomic, retain) NSString*                   formats;
+@property (nonatomic, retain) NSString*                   cancelButtonString;
 @property (nonatomic)         BOOL                        is1D;
 @property (nonatomic)         BOOL                        is2D;
 @property (nonatomic)         BOOL                        capturing;
@@ -167,6 +168,7 @@
     BOOL showTorchButton = [options[@"showTorchButton"] boolValue];
     BOOL disableAnimations = [options[@"disableAnimations"] boolValue];
     BOOL disableSuccessBeep = [options[@"disableSuccessBeep"] boolValue];
+    NSString *cancelButtonString = options[@"cancelButtonString"];
 
     // We allow the user to define an alternate xib file for loading the overlay.
     NSString *overlayXib = options[@"overlayXib"];
@@ -188,6 +190,8 @@
             alterateOverlayXib:overlayXib
             ] autorelease];
     // queue [processor scanBarcode] to run on the event loop
+    
+    processor.cancelButtonString = @"X";
 
     if (preferFrontCamera) {
       processor.isFrontCamera = true;
@@ -199,6 +203,10 @@
 
     if (showTorchButton) {
       processor.isShowTorchButton = true;
+    }
+    
+    if (cancelButtonString) {
+        processor.cancelButtonString = cancelButtonString;
     }
 
     processor.isSuccessBeepEnabled = !disableSuccessBeep;
@@ -972,11 +980,11 @@ parentViewController:(UIViewController*)parentViewController
     toolbar.autoresizingMask = UIViewAutoresizingFlexibleWidth | UIViewAutoresizingFlexibleTopMargin;
 
     id cancelButton = [[[UIBarButtonItem alloc]
-                       initWithBarButtonSystemItem:UIBarButtonSystemItemCancel
-                       target:(id)self
-                       action:@selector(cancelButtonPressed:)
-                       ] autorelease];
-
+                        initWithTitle:self.processor.cancelButtonString
+                        style:UIBarButtonItemStylePlain
+                        target:(id)self
+                        action:@selector(cancelButtonPressed:)] autorelease];
+    [cancelButton setTintColor:[UIColor colorWithRed:0 green:0 blue:0 alpha:1]];
 
     id flexSpace = [[[UIBarButtonItem alloc]
                     initWithBarButtonSystemItem:UIBarButtonSystemItemFlexibleSpace
@@ -1087,7 +1095,7 @@ parentViewController:(UIViewController*)parentViewController
     CGContextRef context = UIGraphicsGetCurrentContext();
 
     if (self.processor.is1D) {
-        UIColor* color = [UIColor colorWithRed:1.0 green:0.0 blue:0.0 alpha:RETICLE_ALPHA];
+        UIColor* color = [UIColor colorWithRed:0.0 green:0.0 blue:0.0 alpha:0];
         CGContextSetStrokeColorWithColor(context, color.CGColor);
         CGContextSetLineWidth(context, RETICLE_WIDTH);
         CGContextBeginPath(context);
@@ -1098,7 +1106,7 @@ parentViewController:(UIViewController*)parentViewController
     }
 
     if (self.processor.is2D) {
-        UIColor* color = [UIColor colorWithRed:0.0 green:1.0 blue:0.0 alpha:RETICLE_ALPHA];
+        UIColor* color = [UIColor colorWithRed:1.0 green:1.0 blue:1.0 alpha:RETICLE_ALPHA];
         CGContextSetStrokeColorWithColor(context, color.CGColor);
         CGContextSetLineWidth(context, RETICLE_WIDTH);
         CGContextStrokeRect(context,
