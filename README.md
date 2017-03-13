@@ -53,6 +53,13 @@ To add this entry you can pass the following variable on plugin install.
 cordova plugin add phonegap-plugin-barcodescanner --variable CAMERA_USAGE_DESCRIPTION="To scan barcodes"
 ```
 
+If you are using Phonegap Build you can add this to your config.xml
+```
+<gap:config-file platform="ios" parent="NSCameraUsageDescription" overwrite="true">
+   <string>We are using the Camera for something..</string>
+</gap:config-file>
+```
+
 ### PhoneGap Build
 If you're using [PhoneGap Build](https://build.phonegap.com/) please make sure you specify `gradle` as your Android build tool in `config.xml`: `<preference name="android-build-tool" value="gradle" />`.
 
