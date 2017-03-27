@@ -52,7 +52,7 @@
       <uses-feature android:name="android.hardware.camera" android:required="true"/>
     </config-file>
     <framework src="src/android/barcodescanner.gradle" custom="true" type="gradleReference"/>
-    <resource-file src="src/android/barcodescanner-release-2.1.2.aar" target="libs/barcodescanner.aar"/>
+    <resource-file src="src/android/barcodescanner-release-2.1.5.aar" target="libs/barcodescanner.aar"/>
     <dependency id="cordova-plugin-compat" version="^1.0.0"/>
   </platform>
   <platform name="windows">
