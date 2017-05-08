@@ -143,5 +143,27 @@ BarcodeScanner.prototype.scan = function (successCallback, errorCallback, config
             ]);
         };
 
+        //-------------------------------------------------------------------
+	BarcodeScanner.prototype.encodeX = function (type, data, successCallback, errorCallback, options) {
+		if (errorCallback == null) {
+			errorCallback = function () {
+			};
+		}
+
+		if (typeof errorCallback != "function") {
+			console.log("BarcodeScanner.encode failure: failure parameter not a function");
+			return;
+		}
+
+		if (typeof successCallback != "function") {
+			console.log("BarcodeScanner.encode failure: success callback parameter must be a function");
+			return;
+		}
+
+		exec(successCallback, errorCallback, 'BarcodeScanner', 'encodeX', [
+			{"type": type, "data": data, "options": options}
+		]);
+	};
+
         var barcodeScanner = new BarcodeScanner();
         module.exports = barcodeScanner;

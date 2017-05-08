@@ -8,6 +8,16 @@
  */
 package com.phonegap.plugins.barcodescanner;
 
+import java.io.ByteArrayOutputStream;
+import java.io.IOException;
+import java.io.InputStream;
+import java.util.ArrayList;
+import java.util.Arrays;
+import java.util.Collections;
+import java.util.EnumMap;
+import java.util.List;
+import java.util.Map;
+
 import org.json.JSONArray;
 import org.json.JSONException;
 import org.json.JSONObject;
@@ -18,15 +28,24 @@ import android.content.Intent;
 import android.os.Bundle;
 import android.util.Log;
 import android.content.pm.PackageManager;
+import android.graphics.Bitmap;
+import android.util.Base64;
 
 import org.apache.cordova.CordovaPlugin;
 import org.apache.cordova.CallbackContext;
 import org.apache.cordova.PluginResult;
 import org.apache.cordova.PermissionHelper;
 
+import com.google.zxing.BarcodeFormat;
+import com.google.zxing.EncodeHintType;
+import com.google.zxing.MultiFormatWriter;
+import com.google.zxing.Result;
+import com.google.zxing.WriterException;
+
 import com.google.zxing.client.android.CaptureActivity;
 import com.google.zxing.client.android.encode.EncodeActivity;
 import com.google.zxing.client.android.Intents;
+import com.google.zxing.common.BitMatrix;
 
 /**
  * This calls out to the ZXing barcode reader and returns the result.
@@ -35,6 +54,9 @@ import com.google.zxing.client.android.Intents;
  */
 public class BarcodeScanner extends CordovaPlugin {
     public static final int REQUEST_CODE = 0x0ba7c0de;
+
+    private static final int WHITE = 0xFFFFFFFF;
+    private static final int BLACK = 0xFF000000;
 
     private static final String SCAN = "scan";
     private static final String ENCODE = "encode";
@@ -111,6 +133,68 @@ public class BarcodeScanner extends CordovaPlugin {
                 callbackContext.error("User did not specify data to encode");
                 return true;
             }
+        } else if (action.equals("encodeX")) {
+            JSONObject obj = args.optJSONObject(0);
+            if (obj != null) {
+                String type = obj.optString(TYPE);
+                String data = obj.optString(DATA);
+
+                // If the type is null then force the type to text
+                if (type == null) {
+                    type = TEXT_TYPE;
+                }
+
+                if (data == null) {
+                    callbackContext.error("User did not specify data to encode");
+                    return true;
+                }
+
+                //encode
+				String contentsToEncode = data;
+                Map<EncodeHintType, Object> hints = null;
+                String encoding = guessAppropriateEncoding(contentsToEncode);
+                if (encoding != null) {
+                    hints = new EnumMap<EncodeHintType, Object>(EncodeHintType.class);
+                    hints.put(EncodeHintType.CHARACTER_SET, encoding);
+                }
+                BitMatrix result;
+                try {
+                    result = new MultiFormatWriter().encode(contentsToEncode, BarcodeFormat.QR_CODE, 400, 400, hints);
+                } catch (Exception ex) {
+                    callbackContext.error("Unsupported format");
+                    return true;
+                }
+                int width = result.getWidth();
+                int height = result.getHeight();
+                int[] pixels = new int[width * height];
+                for (int y = 0; y < height; y++) {
+                    int offset = y * width;
+                    for (int x = 0; x < width; x++) {
+                        pixels[offset + x] = result.get(x, y) ? BLACK : WHITE;
+                    }
+                }
+
+                try {
+                    Bitmap bitmap = Bitmap.createBitmap(width, height, Bitmap.Config.ARGB_8888);
+                    bitmap.setPixels(pixels, 0, width, 0, 0, width, height);
+                    //return bitmap;
+                    //return base64 encoded image data
+                    ByteArrayOutputStream out = new ByteArrayOutputStream();
+                    bitmap.compress(Bitmap.CompressFormat.PNG, 100, out); 
+                    out.flush();
+                    out.close();
+                    byte[] imgBytes = out.toByteArray();
+                    callbackContext.success(Base64.encodeToString(imgBytes, Base64.DEFAULT));
+                } catch (Exception ex) {
+                    callbackContext.error(ex.getMessage());
+                    return true;
+                }
+				//
+
+            } else {
+                callbackContext.error("User did not specify data to encode");
+                return true;
+            }
         } else if (action.equals(SCAN)) {
 
             //android permission auto add
@@ -123,6 +207,16 @@ public class BarcodeScanner extends CordovaPlugin {
             return false;
         }
         return true;
+    }
+
+    private static String guessAppropriateEncoding(CharSequence contents) {
+        // Very crude at the moment
+        for (int i = 0; i < contents.length(); i++) {
+            if (contents.charAt(i) > 0xFF) {
+                return "UTF-8";
+            }
+        }
+        return null;
     }
 
     /**
