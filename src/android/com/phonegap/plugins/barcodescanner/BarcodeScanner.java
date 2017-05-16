@@ -27,6 +27,7 @@ import org.apache.cordova.PermissionHelper;
 import com.google.zxing.client.android.CaptureActivity;
 import com.google.zxing.client.android.encode.EncodeActivity;
 import com.google.zxing.client.android.Intents;
+import com.google.zxing.DecodeHintType;
 
 /**
  * This calls out to the ZXing barcode reader and returns the result.
@@ -49,6 +50,7 @@ public class BarcodeScanner extends CordovaPlugin {
     private static final String RESULTDISPLAY_DURATION = "resultDisplayDuration";
     private static final String SHOW_TORCH_BUTTON = "showTorchButton";
     private static final String TORCH_ON = "torchOn";
+    private static final String ASSUME_GS1 = "ASSUME_GS1";
     private static final String FORMATS = "formats";
     private static final String PROMPT = "prompt";
     private static final String TEXT_TYPE = "TEXT_TYPE";
@@ -177,6 +179,8 @@ public class BarcodeScanner extends CordovaPlugin {
                         intentScan.putExtra(Intents.Scan.SHOW_FLIP_CAMERA_BUTTON, obj.optBoolean(SHOW_FLIP_CAMERA_BUTTON, false));
                         intentScan.putExtra(Intents.Scan.SHOW_TORCH_BUTTON, obj.optBoolean(SHOW_TORCH_BUTTON, false));
                         intentScan.putExtra(Intents.Scan.TORCH_ON, obj.optBoolean(TORCH_ON, false));
+                        /* dirty constant definition, but package com.google.zxing.DecodeHintType.ASSUME_GS1 is an enum */
+                        intentScan.putExtra("ASSUME_GS1", obj.optBoolean(ASSUME_GS1, false));
                         if (obj.has(RESULTDISPLAY_DURATION)) {
                             intentScan.putExtra(Intents.Scan.RESULT_DISPLAY_DURATION_MS, "" + obj.optLong(RESULTDISPLAY_DURATION));
                         }
