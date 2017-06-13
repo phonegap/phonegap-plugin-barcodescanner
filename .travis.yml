@@ -8,6 +8,7 @@ install:
   - cd ..
   - npm install -g cordova-paramedic
   - npm install -g cordova
-  - npm install -g ios-emulate
+  - npm install -g ios-deploy
+  - npm install -g ios-sim
 script:
   - cordova-paramedic --platform ios --plugin ${TRAVIS_BUILD_DIR} --verbose
