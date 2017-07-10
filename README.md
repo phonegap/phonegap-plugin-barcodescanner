@@ -64,7 +64,7 @@ If you are using Phonegap Build you can add this to your config.xml
 If you're using [PhoneGap Build](https://build.phonegap.com/) please make sure you specify `gradle` as your Android build tool in `config.xml`: `<preference name="android-build-tool" value="gradle" />`.
 
 ## Using the plugin ##
-The plugin creates the object `cordova/plugin/BarcodeScanner` with the method `scan(success, fail)`.
+The plugin creates the object `cordova.plugins.barcodeScanner` with the method `scan(success, fail)`.
 
 The following barcode types are currently supported:
 ### Android
