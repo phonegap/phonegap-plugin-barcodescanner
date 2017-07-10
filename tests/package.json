@@ -1,0 +1,15 @@
+{
+  "name": "phonegap-plugin-barcodescanner-tests",
+  "version": "6.0.6",
+  "description": "",
+  "cordova": {
+    "id": "phonegap-plugin-barcodescanner-tests",
+    "platforms": []
+  },
+  "keywords": [
+    "ecosystem:cordova",
+    "ecosystem:phonegap"
+  ],
+  "author": "",
+  "license": "MIT"
+}
