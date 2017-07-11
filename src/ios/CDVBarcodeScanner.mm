@@ -418,9 +418,11 @@ parentViewController:(UIViewController*)parentViewController
 
 //--------------------------------------------------------------------------
 - (void)barcodeScanFailed:(NSString*)message {
-    [self barcodeScanDone:^{
-        [self.plugin returnError:message callback:self.callback];
-    }];
+    dispatch_sync(dispatch_get_main_queue(), ^{
+        [self barcodeScanDone:^{
+            [self.plugin returnError:message callback:self.callback];
+        }];
+    });
 }
 
 //--------------------------------------------------------------------------
