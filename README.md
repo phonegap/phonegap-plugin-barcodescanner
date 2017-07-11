@@ -84,7 +84,7 @@ The following barcode types are currently supported:
 * RSS_EXPANDED
 
 Not by default, but supported if you pass in the "formats" option:
-* PDF417
+* PDF_417
 * AZTEC
 
 ### iOS
@@ -115,7 +115,7 @@ Not by default, but supported if you pass in the "formats" option:
 * QR_CODE
 * DATA_MATRIX
 * AZTEC
-* PDF417
+* PDF_417
 
 ### Windows Phone 8
 
@@ -133,7 +133,7 @@ Not by default, but supported if you pass in the "formats" option:
 * QR_CODE
 * DATA_MATRIX
 * AZTEC
-* PDF417
+* PDF_417
 
 ### BlackBerry 10
 * UPC_A
