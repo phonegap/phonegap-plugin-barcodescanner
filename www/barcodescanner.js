@@ -79,6 +79,10 @@ BarcodeScanner.prototype.scan = function (successCallback, errorCallback, config
                 // do nothing
             } else {
                 if (typeof(config) === 'object') {
+                    // string spaces between formats, ZXing does not like that
+                    if (config.formats) {
+                        config.formats = config.formats.replace(/\s+/g, '');
+                    }
                     config = [ config ];
                 } else {
                     config = [];
