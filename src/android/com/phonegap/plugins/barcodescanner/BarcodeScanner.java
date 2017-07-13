@@ -220,7 +220,7 @@ public class BarcodeScanner extends CordovaPlugin {
                 try {
                     obj.put(TEXT, intent.getStringExtra("SCAN_RESULT"));
                     obj.put(FORMAT, intent.getStringExtra("SCAN_RESULT_FORMAT"));
-                    obj.put(RAWBYTES, intent.getStringExtra("SCAN_RESULT_FORMAT"));
+                    obj.put(RAWBYTES, intent.getStringExtra("SCAN_RESULT_BYTES"));
                     obj.put(CANCELLED, false);
                 } catch (JSONException e) {
                     Log.d(LOG_TAG, "This should never happen");
