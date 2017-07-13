@@ -50,6 +50,7 @@ public class BarcodeScanner extends CordovaPlugin {
     private static final String RESULTDISPLAY_DURATION = "resultDisplayDuration";
     private static final String SHOW_TORCH_BUTTON = "showTorchButton";
     private static final String TORCH_ON = "torchOn";
+    private static final String ASSUME_GS1 = "ASSUME_GS1";
     private static final String FORMATS = "formats";
     private static final String PROMPT = "prompt";
     private static final String TEXT_TYPE = "TEXT_TYPE";
