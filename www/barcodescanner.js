@@ -114,6 +114,10 @@ BarcodeScanner.prototype.scan = function (successCallback, errorCallback, config
             exec(
                 function(result) {
                     scanInProgress = false;
+                    // work around bug in ZXing library
+                    if (result.format === 'UPC_A' && result.text.length === 13) {
+                        result.text = result.text.substring(1);
+                    }
                     successCallback(result);
                 },
                 function(error) {
