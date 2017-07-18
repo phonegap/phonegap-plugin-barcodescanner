@@ -1,5 +1,29 @@
 # Change Log
 
+## [v6.0.8](https://github.com/* remote origin
+  Fetch URL: https://github.com//tree/v6.0.8) (2017-07-18)
+[Full Changelog](https://github.com/* remote origin
+  Fetch URL: https://github.com//compare/v6.0.7...v6.0.8)
+
+- 6.0.8 [view commit](http://github.com/* remote origin
+  Fetch URL: https://github.com//commit/b3e99476b768df3fb4da50ff3bca4aea6f863710)
+- :bookmark: Bumping plugin version to 6.0.8 [view commit](http://github.com/* remote origin
+  Fetch URL: https://github.com//commit/7cf0c179ca40c8fefaec4016ac2d759ae728cd7a)
+- :bug: Issue #364: UPC_A codes now scans with extra 0 at the start [view commit](http://github.com/* remote origin
+  Fetch URL: https://github.com//commit/f311beeb945f80ac8790391f8238bd57d9fa0cd9)
+- Merge pull request #505 from renanbandeira/patch-1 [view commit](http://github.com/* remote origin
+  Fetch URL: https://github.com//commit/919a626daf6df124c79c792863b352ca0a87044d)
+- Updates README.md with new saveHistory prop [view commit](http://github.com/* remote origin
+  Fetch URL: https://github.com//commit/e63ab0db5e278d9565b50ab1f5140dd75ecd1742)
+- reverts 523501d [view commit](http://github.com/* remote origin
+  Fetch URL: https://github.com//commit/7b3c22aeb9cf0683937ae43cc30ccbff1dfbd83c)
+- Gets saveHistory from preference defined in config [view commit](http://github.com/* remote origin
+  Fetch URL: https://github.com//commit/523501d8d7199928093c8dbebf67d9358476cc77)
+- Adds saveHistory flag [view commit](http://github.com/* remote origin
+  Fetch URL: https://github.com//commit/132359c564750651a9b10a01caf4b8dc30862556)
+- Updating CHANGELOG [view commit](http://github.com/* remote origin
+  Fetch URL: https://github.com//commit/20727f81f2add352433c0649a9e5e3e5093467ac)
+
 ## [v6.0.7](https://github.com/* remote origin
   Fetch URL: https://github.com//tree/v6.0.7) (2017-07-12)
 [Full Changelog](https://github.com/* remote origin
