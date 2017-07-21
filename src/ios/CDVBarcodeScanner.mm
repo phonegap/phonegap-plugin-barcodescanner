@@ -118,6 +118,8 @@
 - (UIImage*)buildReticleImage;
 - (void)shutterButtonPressed;
 - (IBAction)cancelButtonPressed:(id)sender;
+- (IBAction)flipCameraButtonPressed:(id)sender;
+- (IBAction)torchButtonPressed:(id)sender;
 
 @end
 
