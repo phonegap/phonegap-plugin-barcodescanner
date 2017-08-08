@@ -967,6 +967,8 @@ parentViewController:(UIViewController*)parentViewController
         NSLog(@"%@", @"An error occurred loading the overlay xib.  It appears that the overlayView outlet is not set.");
         return nil;
     }
+    
+    self.overlayView.frame = self.view.bounds;
 
     return self.overlayView;
 }
