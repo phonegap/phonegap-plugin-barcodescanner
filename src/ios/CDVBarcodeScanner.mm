@@ -16,6 +16,11 @@
 #import <Cordova/CDVPlugin.h>
 
 
+typedef enum {
+    LineOrientationHorizontal = 0,
+    LineOrientationVertical = 1,
+} LineOrientation;
+
 //------------------------------------------------------------------------------
 // Delegate to handle orientation functions
 //------------------------------------------------------------------------------
@@ -71,6 +76,7 @@
 @property (nonatomic)         BOOL                        isFlipped;
 @property (nonatomic)         BOOL                        isTransitionAnimated;
 @property (nonatomic)         BOOL                        isSuccessBeepEnabled;
+@property (nonatomic)         LineOrientation             lineOrientation;
 
 
 - (id)initWithPlugin:(CDVBarcodeScanner*)plugin callback:(NSString*)callback parentViewController:(UIViewController*)parentViewController alterateOverlayXib:(NSString *)alternateXib;
@@ -169,6 +175,7 @@
     BOOL showTorchButton = [options[@"showTorchButton"] boolValue];
     BOOL disableAnimations = [options[@"disableAnimations"] boolValue];
     BOOL disableSuccessBeep = [options[@"disableSuccessBeep"] boolValue];
+    NSString *lineOrientation = options[@"lineOrientation"];
 
     // We allow the user to define an alternate xib file for loading the overlay.
     NSString *overlayXib = options[@"overlayXib"];
@@ -208,6 +215,14 @@
     processor.isTransitionAnimated = !disableAnimations;
 
     processor.formats = options[@"formats"];
+
+    if ((lineOrientation != nil) &&
+        [lineOrientation isKindOfClass: [NSString class]] &&
+        [lineOrientation isEqualToString: @"vertical"]) {
+        processor.lineOrientation = LineOrientationVertical;
+    } else {
+        processor.lineOrientation = LineOrientationHorizontal;
+    }
 
     [processor performSelector:@selector(scanBarcode) withObject:nil afterDelay:0];
 }
@@ -291,6 +306,7 @@
 @synthesize is2D                 = _is2D;
 @synthesize capturing            = _capturing;
 @synthesize results              = _results;
+@synthesize lineOrientation      = _lineOrientation;
 
 SystemSoundID _soundFileObject;
 
@@ -311,6 +327,7 @@ parentViewController:(UIViewController*)parentViewController
     self.is2D      = YES;
     self.capturing = NO;
     self.results = [[NSMutableArray new] autorelease];
+    self.lineOrientation = LineOrientationHorizontal;
 
     CFURLRef soundFileURLRef  = CFBundleCopyResourceURL(CFBundleGetMainBundle(), CFSTR("CDVBarcodeScanner.bundle/beep"), CFSTR ("caf"), NULL);
     AudioServicesCreateSystemSoundID(soundFileURLRef, &_soundFileObject);
@@ -1121,8 +1138,14 @@ parentViewController:(UIViewController*)parentViewController
         CGContextSetLineWidth(context, RETICLE_WIDTH);
         CGContextBeginPath(context);
         CGFloat lineOffset = (CGFloat) (RETICLE_OFFSET+(0.5*RETICLE_WIDTH));
-        CGContextMoveToPoint(context, lineOffset, RETICLE_SIZE/2);
-        CGContextAddLineToPoint(context, RETICLE_SIZE-lineOffset, (CGFloat) (0.5*RETICLE_SIZE));
+
+        if (_processor.lineOrientation == LineOrientationVertical) {
+            CGContextMoveToPoint(context, RETICLE_SIZE/2, lineOffset);
+            CGContextAddLineToPoint(context, (CGFloat) (0.5*RETICLE_SIZE), RETICLE_SIZE-lineOffset);
+        } else {
+            CGContextMoveToPoint(context, lineOffset, RETICLE_SIZE/2);
+            CGContextAddLineToPoint(context, RETICLE_SIZE-lineOffset, (CGFloat) (0.5*RETICLE_SIZE));
+        }
         CGContextStrokePath(context);
     }
 
