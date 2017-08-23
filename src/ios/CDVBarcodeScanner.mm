@@ -1102,7 +1102,7 @@ parentViewController:(UIViewController*)parentViewController
     [overlayView addSubview: reticleView];
     
     
-    // ------Adding custom top view around scanning area with opcity---------- //
+    // ------Adding custom top view with opacity and black color around scanning area with opcity---------- //
     CGFloat REAL_OFFSET = RETICLE_OFFSET - RETICLE_WIDTH / 2.0;
     CGFloat marginTop = (rootViewHeight - rectArea.size.height) / 2.0;
     marginTop += rectArea.size.height * REAL_OFFSET / RETICLE_SIZE;
@@ -1126,42 +1126,54 @@ parentViewController:(UIViewController*)parentViewController
     // imvLogo.image = [UIImage imageNamed:@"logo"];
     // [viewTop addSubview:imvLogo];
 
-    
+    // --------------Added left view with opacity and black color around scanning area -------------- //
     UIView *viewLeft = [[UIView alloc]initWithFrame:CGRectMake(0, marginTop, marginLeft, rootViewHeight - 2 * marginTop)];
     viewLeft.backgroundColor = [UIColor blackColor];
     viewLeft.alpha = RETICLE_ALPHA;
     
     [overlayView addSubview:viewLeft];
+    // --------------Added successfully--------------- //
     
+
+    // --------------Added right view with opacity and black color around scanning area ------------- //
     UIView *viewRight = [[UIView alloc]initWithFrame:CGRectMake(rectArea.size.width - marginLeft, marginTop, marginLeft, rootViewHeight - 2 * marginTop)];
     viewRight.backgroundColor = [UIColor blackColor];
     viewRight.alpha = RETICLE_ALPHA;
     
     [overlayView addSubview:viewRight];
-    
+    // --------------Added successfuly --------------- //
+
+
+    // --------------Added bottom view with opacity and black color around scanning area--------------- //
     UIView *viewBottom = [[UIView alloc]initWithFrame:CGRectMake(0, rootViewHeight - marginTop, rootViewWidth, marginTop)];
     viewBottom.backgroundColor = [UIColor blackColor];
     viewBottom.alpha = RETICLE_ALPHA;
     
     [overlayView addSubview:viewBottom];
+    // --------------Added successfully--------------- //
     
-    //  barcorde-shape overlay image view
+    // --------------Added barcorde-shape overlay image view with opacity and black color over the scanning area------------------- //
     UIImageView *barcodeView = [[UIImageView alloc]initWithFrame:CGRectMake(marginLeft, marginTop, rootViewWidth - marginLeft * 2, rootViewHeight - 2 * marginTop)];
     barcodeView.contentMode = UIViewContentModeScaleAspectFit;
     barcodeView.backgroundColor = [UIColor clearColor];
     barcodeView.image = [UIImage imageNamed:@"barcode"];
     [overlayView addSubview:barcodeView];
+    // --------------Added successfully--------------- //
     
     // CGRect someRect = CGRectMake(0.0, 0.0, 100.0, 30.0);
     // UITextField* searchField = [[UITextField alloc] initWithFrame:someRect];
     // [viewBottom addSubview:searchField];
     
+    // --------------Added scan label "SCAN BARCODE" to the bottom of the scanning area----------------- //
     UILabel *scanLbl = [[UILabel alloc] initWithFrame:CGRectMake(0.0, marginTop + barcodeView.bounds.size.height, 320, 40)];
     scanLbl.text = @"SCAN BARCODE";
     scanLbl.textColor = [UIColor whiteColor];
     scanLbl.textAlignment = NSTextAlignmentCenter;
     [overlayView addSubview:scanLbl];
+    // --------------Added successfully---------------- //
     
+
+    // --------------Added cancel button to the bottom of whole overlay view------------------- //
     UIView *viewToolBar = [[UIView alloc]initWithFrame:CGRectMake(0, rootViewHeight - toolbarHeight, rootViewWidth, toolbarHeight)];
     viewToolBar.backgroundColor = [UIColor clearColor];
     UIButton *btnCancel = [[UIButton alloc]initWithFrame:CGRectMake(0, 0, rootViewWidth, toolbarHeight)];
@@ -1170,8 +1182,10 @@ parentViewController:(UIViewController*)parentViewController
     [btnCancel.titleLabel setFont:[UIFont systemFontOfSize:18.0]];
     [btnCancel setTitleColor:[UIColor whiteColor] forState:UIControlStateNormal];
     [btnCancel addTarget:self action:@selector(cancelButtonPressed:) forControlEvents:UIControlEventTouchUpInside];
-    [viewToolBar addSubview:btnCancel];
     
+    [viewToolBar addSubview:btnCancel];
+    // --------------Added successfully--------------- //
+
     [overlayView addSubview:viewToolBar];
     
     return overlayView;
