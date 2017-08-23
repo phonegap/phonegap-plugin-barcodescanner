@@ -933,11 +933,13 @@ parentViewController:(UIViewController*)parentViewController
 }
 
 - (void)viewDidLoad {
-    UINavigationBar *navbar = [[UINavigationBar alloc]initWithFrame:CGRectMake(0, 0, 320, 60)];
-    [navbar setBackgroundColor:[UIColor redColor]];
+    // UINavigation bar will be added here...
+    // Will update when it is needed...
+    // UINavigationBar *navbar = [[UINavigationBar alloc]initWithFrame:CGRectMake(0, 0, 320, 60)];
+    // [navbar setBackgroundColor:[UIColor redColor]];
     
-    //do something like background color, title, etc you self
-    [self.view addSubview:navbar];
+    // //do something like background color, title, etc you self
+    // [self.view addSubview:navbar];
 }
 
 //--------------------------------------------------------------------------
