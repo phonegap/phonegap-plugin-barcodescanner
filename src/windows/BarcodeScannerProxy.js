@@ -157,6 +157,21 @@ BarcodeReader.prototype.init = function (capture, width, height) {
     this._height = height;
     this._zxingReader = new ZXing.BarcodeReader();
     this._zxingReader.tryHarder = true;
+
+    var formatsList = BarcodeReader.scanCallArgs.args.length > 0 && BarcodeReader.scanCallArgs.args[0].formats;	
+	if (formatsList) {		
+        var possibleFormats = formatsList
+            .split(",")
+            .map(format => {
+                for (var index in BARCODE_FORMAT) {
+                    if (BARCODE_FORMAT[index] === format) {                        
+                        return index;
+                    }
+                }
+            });
+
+        this._zxingReader.possibleFormats = possibleFormats;
+    }
 };
 
 /**
