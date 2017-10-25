@@ -36,6 +36,16 @@ plugman currently doesn't support Library Project refs, so its been
 prebuilt as a jar library. Any updates to the Library Project should be
 committed with an updated jar.
 
+Note: If getting error `AAPT: Error parsing XML: unbound prefix` on Android compile/run, update your config.xml with permissions including xmlns definition
+
+```
+<config-file mode="merge" parent="/*" target="AndroidManifest.xml">
+    <uses-permission android:name="android.permission.FLASHLIGHT" xmlns:android="http://schemas.android.com/apk/res/android" />
+    <uses-permission android:name="android.permission.CAMERA" xmlns:android="http://schemas.android.com/apk/res/android" />
+    <uses-feature android:name="android.hardware.camera" android:required="true" xmlns:android="http://schemas.android.com/apk/res/android" />
+</config-file>
+```
+
 Note: Windows 10 applications can not be build for `AnyCPU` architecture, which is default for Windows platform. If you want to build/run Windows 10 app, you should specify target architecture explicitly, for example (Cordova CLI):
 
 ```
