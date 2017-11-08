@@ -183,17 +183,17 @@
         return;
     }
 
-   UIViewController* vc = self.viewController;
-    if (vc.view.window == nil){
-        //for uiwebview viewcontroller, if privacyscreen plugin's viewcontroller is presented, the scanner viewcontroller needs
-        //to be presented by the privacyscreen's viewcontroller.
+    UIViewController* vc = self.viewController;
+    if (vc.view.window != [UIApplication sharedApplication].keyWindow){
+        //for wkwebview, the privacy screen plugin is presented from a different window object
+        vc = [UIApplication sharedApplication].keyWindow.rootViewController;
         while (vc.presentedViewController != nil && ![vc.presentedViewController isBeingDismissed]){
             vc = vc.presentedViewController;
         }
     }
-    else if (vc.view.window != [UIApplication sharedApplication].keyWindow){
-        //for wkwebview, the privacy screen plugin is presented from a different window object
-        vc = [UIApplication sharedApplication].keyWindow.rootViewController;
+    else {
+        //for uiwebview viewcontroller, if inappbrowser or privacyscreen viewcontroller is presented,
+        //then they should be used to repsent the new view control.
         while (vc.presentedViewController != nil && ![vc.presentedViewController isBeingDismissed]){
             vc = vc.presentedViewController;
         }
