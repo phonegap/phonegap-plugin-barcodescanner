@@ -118,8 +118,6 @@
 - (UIImage*)buildReticleImage;
 - (void)shutterButtonPressed;
 - (IBAction)cancelButtonPressed:(id)sender;
-- (IBAction)flipCameraButtonPressed:(id)sender;
-- (IBAction)torchButtonPressed:(id)sender;
 
 @end
 
@@ -934,13 +932,23 @@ parentViewController:(UIViewController*)parentViewController
     [super viewDidAppear:animated];
 }
 
+- (void)viewDidLoad {
+    // UINavigation bar will be added here...
+    // Will update when it is needed...
+    // UINavigationBar *navbar = [[UINavigationBar alloc]initWithFrame:CGRectMake(0, 0, 320, 60)];
+    // [navbar setBackgroundColor:[UIColor redColor]];
+    
+    // //do something like background color, title, etc you self
+    // [self.view addSubview:navbar];
+}
+
 //--------------------------------------------------------------------------
 - (void)startCapturing {
     self.processor.capturing = YES;
 }
 
 //--------------------------------------------------------------------------
-- (IBAction)shutterButtonPressed {
+- (void)shutterButtonPressed {
     self.shutterPressed = YES;
 }
 
@@ -949,12 +957,12 @@ parentViewController:(UIViewController*)parentViewController
     [self.processor performSelector:@selector(barcodeScanCancelled) withObject:nil afterDelay:0];
 }
 
-- (IBAction)flipCameraButtonPressed:(id)sender
+- (void)flipCameraButtonPressed:(id)sender
 {
     [self.processor performSelector:@selector(flipCamera) withObject:nil afterDelay:0];
 }
 
-- (IBAction)torchButtonPressed:(id)sender
+- (void)torchButtonPressed:(id)sender
 {
   [self.processor performSelector:@selector(toggleTorch) withObject:nil afterDelay:0];
 }
@@ -969,20 +977,18 @@ parentViewController:(UIViewController*)parentViewController
         NSLog(@"%@", @"An error occurred loading the overlay xib.  It appears that the overlayView outlet is not set.");
         return nil;
     }
-	
-	self.overlayView.autoresizesSubviews = YES;
-    self.overlayView.autoresizingMask    = UIViewAutoresizingFlexibleWidth | UIViewAutoresizingFlexibleHeight;
-    self.overlayView.opaque              = NO;
-	
-	CGRect bounds = self.view.bounds;
-    bounds = CGRectMake(0, 0, bounds.size.width, bounds.size.height);
-	
-	[self.overlayView setFrame:bounds];
-	
+
     return self.overlayView;
 }
 
-//--------------------------------------------------------------------------
+#define RETICLE_SIZE    500.0f
+#define RETICLE_WIDTH    5.0f
+#define BOUNDARY_WIDTH   2.0f
+#define RETICLE_OFFSET   60.0f
+#define RETICLE_ALPHA     0.4f
+#define LOGO_WIDTH      300.0f
+
+//-------------------------------------------------------------------------- Added custom code here----------------
 - (UIView*)buildOverlayView {
 
     if ( nil != self.alternateXib )
@@ -1000,11 +1006,11 @@ parentViewController:(UIViewController*)parentViewController
     UIToolbar* toolbar = [[UIToolbar alloc] init];
     toolbar.autoresizingMask = UIViewAutoresizingFlexibleWidth | UIViewAutoresizingFlexibleTopMargin;
 
-    id cancelButton = [[[UIBarButtonItem alloc]
-                       initWithBarButtonSystemItem:UIBarButtonSystemItemCancel
-                       target:(id)self
-                       action:@selector(cancelButtonPressed:)
-                       ] autorelease];
+//    id cancelButton = [[[UIBarButtonItem alloc]
+//                       initWithBarButtonSystemItem:UIBarButtonSystemItemCancel
+//                       target:(id)self
+//                       action:@selector(cancelButtonPressed:)
+//                       ] autorelease];
 
 
     id flexSpace = [[[UIBarButtonItem alloc]
@@ -1035,9 +1041,9 @@ parentViewController:(UIViewController*)parentViewController
     }
 #else
     if (_processor.isShowFlipCameraButton) {
-      items = [@[flexSpace, cancelButton, flexSpace, flipCamera] mutableCopy];
+      items = [@[flexSpace, flexSpace, flipCamera] mutableCopy];
     } else {
-      items = [@[flexSpace, cancelButton, flexSpace] mutableCopy];
+      items = [@[flexSpace, flexSpace] mutableCopy];
     }
 #endif
 
@@ -1096,16 +1102,100 @@ parentViewController:(UIViewController*)parentViewController
     ;
 
     [overlayView addSubview: reticleView];
+    
+    
+    // ------Adding custom top view with opacity and black color around scanning area with opcity---------- //
+    CGFloat REAL_OFFSET = RETICLE_OFFSET - RETICLE_WIDTH / 2.0;
+    CGFloat marginTop = (rootViewHeight - rectArea.size.height) / 2.0;
+    marginTop += rectArea.size.height * REAL_OFFSET / RETICLE_SIZE;
+    
+    CGFloat marginLeft = (rootViewWidth - rectArea.size.width) / 2.0;
+    marginLeft += rectArea.size.width * REAL_OFFSET / RETICLE_SIZE;
+    
+    CGFloat marginLeftLogoView = (rootViewWidth - LOGO_WIDTH) / 2.0;
+    
+    UIView *viewTop = [[UIView alloc]initWithFrame:CGRectMake(0, 0, rootViewWidth, marginTop)];
+    viewTop.backgroundColor = [UIColor blackColor];
+    viewTop.alpha = RETICLE_ALPHA;
+    
+    [overlayView addSubview:viewTop];
+    // ------Added successfully------------- //
 
+    // ---Added logo image here, will be updated later-----
+    // UIImageView *imvLogo = [[UIImageView alloc]initWithFrame:CGRectMake(marginLeftLogoView, 100, LOGO_WIDTH, 40)];
+    // imvLogo.contentMode = UIViewContentModeScaleAspectFit;
+    // imvLogo.backgroundColor = [UIColor clearColor];
+    // imvLogo.image = [UIImage imageNamed:@"logo"];
+    // [viewTop addSubview:imvLogo];
+
+    // --------------Added left view with opacity and black color around scanning area -------------- //
+    UIView *viewLeft = [[UIView alloc]initWithFrame:CGRectMake(0, marginTop, marginLeft, rootViewHeight - 2 * marginTop)];
+    viewLeft.backgroundColor = [UIColor blackColor];
+    viewLeft.alpha = RETICLE_ALPHA;
+    
+    [overlayView addSubview:viewLeft];
+    // --------------Added successfully--------------- //
+    
+
+    // --------------Added right view with opacity and black color around scanning area ------------- //
+    UIView *viewRight = [[UIView alloc]initWithFrame:CGRectMake(rectArea.size.width - marginLeft, marginTop, marginLeft, rootViewHeight - 2 * marginTop)];
+    viewRight.backgroundColor = [UIColor blackColor];
+    viewRight.alpha = RETICLE_ALPHA;
+    
+    [overlayView addSubview:viewRight];
+    // --------------Added successfuly --------------- //
+
+
+    // --------------Added bottom view with opacity and black color around scanning area--------------- //
+    UIView *viewBottom = [[UIView alloc]initWithFrame:CGRectMake(0, rootViewHeight - marginTop, rootViewWidth, marginTop)];
+    viewBottom.backgroundColor = [UIColor blackColor];
+    viewBottom.alpha = RETICLE_ALPHA;
+    
+    [overlayView addSubview:viewBottom];
+    // --------------Added successfully--------------- //
+    
+    // --------------Added barcorde-shape overlay image view with opacity and black color over the scanning area------------------- //
+    UIImageView *barcodeView = [[UIImageView alloc]initWithFrame:CGRectMake(marginLeft, marginTop, rootViewWidth - marginLeft * 2, rootViewHeight - 2 * marginTop)];
+    barcodeView.contentMode = UIViewContentModeScaleAspectFit;
+    barcodeView.backgroundColor = [UIColor clearColor];
+    barcodeView.image = [UIImage imageNamed:@"barcode"];
+    [overlayView addSubview:barcodeView];
+    // --------------Added successfully--------------- //
+    
+    // CGRect someRect = CGRectMake(0.0, 0.0, 100.0, 30.0);
+    // UITextField* searchField = [[UITextField alloc] initWithFrame:someRect];
+    // [viewBottom addSubview:searchField];
+    
+    // --------------Added scan label "SCAN BARCODE" to the bottom of the scanning area----------------- //
+    UILabel *scanLbl = [[UILabel alloc] initWithFrame:CGRectMake(0.0, marginTop + barcodeView.bounds.size.height, 320, 40)];
+    scanLbl.text = @"SCAN BARCODE";
+    scanLbl.textColor = [UIColor whiteColor];
+    scanLbl.textAlignment = NSTextAlignmentCenter;
+    [overlayView addSubview:scanLbl];
+    // --------------Added successfully---------------- //
+    
+
+    // --------------Added cancel button to the bottom of whole overlay view------------------- //
+    UIView *viewToolBar = [[UIView alloc]initWithFrame:CGRectMake(0, rootViewHeight - toolbarHeight, rootViewWidth, toolbarHeight)];
+    viewToolBar.backgroundColor = [UIColor clearColor];
+    UIButton *btnCancel = [[UIButton alloc]initWithFrame:CGRectMake(0, 0, rootViewWidth, toolbarHeight)];
+    [btnCancel setTitle:@"Cancel" forState:UIControlStateNormal];
+    [btnCancel setBackgroundColor:[UIColor redColor]];
+    [btnCancel.titleLabel setFont:[UIFont systemFontOfSize:18.0]];
+    [btnCancel setTitleColor:[UIColor whiteColor] forState:UIControlStateNormal];
+    [btnCancel addTarget:self action:@selector(cancelButtonPressed:) forControlEvents:UIControlEventTouchUpInside];
+    
+    [viewToolBar addSubview:btnCancel];
+    // --------------Added successfully--------------- //
+
+    [overlayView addSubview:viewToolBar];
+    
     return overlayView;
 }
 
 //--------------------------------------------------------------------------
 
-#define RETICLE_SIZE    500.0f
-#define RETICLE_WIDTH    10.0f
-#define RETICLE_OFFSET   60.0f
-#define RETICLE_ALPHA     0.4f
+
 
 //-------------------------------------------------------------------------
 // builds the green box and red line
@@ -1114,9 +1204,10 @@ parentViewController:(UIViewController*)parentViewController
     UIImage* result;
     UIGraphicsBeginImageContext(CGSizeMake(RETICLE_SIZE, RETICLE_SIZE));
     CGContextRef context = UIGraphicsGetCurrentContext();
-
+    
     if (self.processor.is1D) {
-        UIColor* color = [UIColor colorWithRed:1.0 green:0.0 blue:0.0 alpha:RETICLE_ALPHA];
+        UIColor* color = [UIColor colorWithRed:1.0 green:0.0 blue:0.0 alpha:0];
+        // UIColor *color = [UIColor colorWithWhite:1.0 alpha:RETICLE_ALPHA];
         CGContextSetStrokeColorWithColor(context, color.CGColor);
         CGContextSetLineWidth(context, RETICLE_WIDTH);
         CGContextBeginPath(context);
@@ -1127,9 +1218,10 @@ parentViewController:(UIViewController*)parentViewController
     }
 
     if (self.processor.is2D) {
-        UIColor* color = [UIColor colorWithRed:0.0 green:1.0 blue:0.0 alpha:RETICLE_ALPHA];
+        // UIColor* color = [UIColor colorWithRed:0.0 green:1.0 blue:0.0 alpha:RETICLE_ALPHA];
+        UIColor *color = [UIColor colorWithWhite:1.0 alpha:0];
         CGContextSetStrokeColorWithColor(context, color.CGColor);
-        CGContextSetLineWidth(context, RETICLE_WIDTH);
+        CGContextSetLineWidth(context, BOUNDARY_WIDTH);
         CGContextStrokeRect(context,
                             CGRectMake(
                                        RETICLE_OFFSET,
@@ -1149,7 +1241,7 @@ parentViewController:(UIViewController*)parentViewController
 
 - (BOOL)shouldAutorotate
 {
-    return YES;
+    return NO;
 }
 
 - (UIInterfaceOrientation)preferredInterfaceOrientationForPresentation
