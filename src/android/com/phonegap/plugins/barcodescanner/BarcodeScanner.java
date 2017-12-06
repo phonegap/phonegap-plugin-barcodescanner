@@ -18,6 +18,10 @@ import android.content.Intent;
 import android.os.Bundle;
 import android.util.Log;
 import android.content.pm.PackageManager;
+import android.content.BroadcastReceiver;
+import android.content.IntentFilter;
+import android.content.Context;
+import android.support.v4.content.LocalBroadcastManager;
 
 import org.apache.cordova.CordovaPlugin;
 import org.apache.cordova.CallbackContext;
@@ -46,6 +50,7 @@ public class BarcodeScanner extends CordovaPlugin {
     private static final String PREFER_FRONTCAMERA = "preferFrontCamera";
     private static final String ORIENTATION = "orientation";
     private static final String SHOW_FLIP_CAMERA_BUTTON = "showFlipCameraButton";
+    private static final String CONTINUOS_MODE = "continuosMode";
     private static final String RESULTDISPLAY_DURATION = "resultDisplayDuration";
     private static final String SHOW_TORCH_BUTTON = "showTorchButton";
     private static final String TORCH_ON = "torchOn";
@@ -64,6 +69,9 @@ public class BarcodeScanner extends CordovaPlugin {
 
     private JSONArray requestArgs;
     private CallbackContext callbackContext;
+
+    private LocalBroadcastManager broadcastManager;
+    private BroadcastReceiver continuosModeBroadcastReceiver;
 
     /**
      * Constructor.
@@ -194,6 +202,35 @@ public class BarcodeScanner extends CordovaPlugin {
                         if (obj.has(ORIENTATION)) {
                             intentScan.putExtra(Intents.Scan.ORIENTATION_LOCK, obj.optString(ORIENTATION));
                         }
+
+                        boolean isContinuous = obj.optBoolean(CONTINUOS_MODE, false);
+                        if (isContinuous) {
+                            intentScan.putExtra(Intents.Scan.BULK_SCAN, true);
+                            BarcodeScanner.this.continuosModeBroadcastReceiver = new BroadcastReceiver() {
+                                @Override
+                                public void onReceive(Context context, Intent intent) {
+                                    JSONObject obj = new JSONObject();
+                                    try {
+                                        obj.put(TEXT, intent.getStringExtra(Intents.Scan.RESULT));
+                                        obj.put(FORMAT, intent.getStringExtra(Intents.Scan.RESULT_FORMAT));
+                                        obj.put(CANCELLED, false);
+                                    } catch (JSONException e) {
+                                        Log.d(LOG_TAG, "This should never happen");
+                                    }
+                                    PluginResult result = new PluginResult(PluginResult.Status.OK, obj);
+                                    result.setKeepCallback(true);
+                                    callbackContext.sendPluginResult(result);
+                                }
+                            };
+                            IntentFilter filter = new IntentFilter("bulk-barcode-result");
+
+                            if (BarcodeScanner.this.broadcastManager == null) {
+                                BarcodeScanner.this.broadcastManager = LocalBroadcastManager
+                                        .getInstance(that.cordova.getActivity());
+                            }
+                            BarcodeScanner.this.broadcastManager
+                                    .registerReceiver(BarcodeScanner.this.continuosModeBroadcastReceiver, filter);
+                        }
                     }
 
                 }
@@ -242,6 +279,10 @@ public class BarcodeScanner extends CordovaPlugin {
             } else {
                 //this.error(new PluginResult(PluginResult.Status.ERROR), this.callback);
                 this.callbackContext.error("Unexpected error");
+            }
+
+            if (this.broadcastManager != null && this.continuosModeBroadcastReceiver != null) {
+                this.broadcastManager.unregisterReceiver(this.continuosModeBroadcastReceiver);
             }
         }
     }
