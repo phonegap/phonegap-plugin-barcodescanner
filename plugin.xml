@@ -38,7 +38,7 @@
   </platform>
   <platform name="android">
     <source-file src="src/android/com/phonegap/plugins/barcodescanner/BarcodeScanner.java" target-dir="src/com/phonegap/plugins/barcodescanner"/>
-    <config-file target="res/xml/config.xml" parent="/*">
+    <config-file target="app/src/main/res/xml/config.xml" parent="/*">
       <feature name="BarcodeScanner">
         <param name="android-package" value="com.phonegap.plugins.barcodescanner.BarcodeScanner"/>
       </feature>
