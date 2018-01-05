@@ -7,7 +7,7 @@
   <issue>https://github.com/phonegap/phonegap-plugin-barcodescanner/issues</issue>
   <engines>
     <engine name="cordova" version=">=3.0.0"/>
-    <engine name="cordova-android" version=">=6.3.0"/>
+    <engine name="cordova-android" version=">=7.0.0"/>
   </engines>
   <js-module src="www/barcodescanner.js" name="BarcodeScanner">
     <clobbers target="cordova.plugins.barcodeScanner"/>
@@ -38,16 +38,16 @@
   </platform>
   <platform name="android">
     <source-file src="src/android/com/phonegap/plugins/barcodescanner/BarcodeScanner.java" target-dir="src/com/phonegap/plugins/barcodescanner"/>
-    <config-file target="res/xml/config.xml" parent="/*">
+    <config-file target="app/src/main/res/xml/config.xml" parent="/*">
       <feature name="BarcodeScanner">
         <param name="android-package" value="com.phonegap.plugins.barcodescanner.BarcodeScanner"/>
       </feature>
     </config-file>
-    <config-file target="AndroidManifest.xml" parent="/manifest/application">
+    <config-file target="app/src/main/AndroidManifest.xml" parent="/manifest/application">
       <activity android:name="com.google.zxing.client.android.CaptureActivity" android:clearTaskOnLaunch="true" android:configChanges="orientation|keyboardHidden|screenSize" android:theme="@android:style/Theme.NoTitleBar.Fullscreen" android:windowSoftInputMode="stateAlwaysHidden" android:exported="false"/>
       <activity android:name="com.google.zxing.client.android.encode.EncodeActivity" android:label="Share"/>
     </config-file>
-    <config-file target="AndroidManifest.xml" parent="/manifest">
+    <config-file target="app/src/main/AndroidManifest.xml" parent="/manifest">
       <uses-permission android:name="android.permission.CAMERA"/>
       <uses-permission android:name="android.permission.FLASHLIGHT"/>
       <uses-feature android:name="android.hardware.camera" android:required="true"/>
