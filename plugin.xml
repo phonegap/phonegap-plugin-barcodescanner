@@ -53,7 +53,7 @@
       <uses-feature android:name="android.hardware.camera" android:required="true"/>
     </config-file>
     <framework src="src/android/barcodescanner.gradle" custom="true" type="gradleReference"/>
-    <resource-file src="src/android/barcodescanner-release-2.1.5.aar" target="libs/barcodescanner.aar"/>
+    <lib-file src="src/android/barcodescanner-release-2.1.5.aar"/>
   </platform>
   <platform name="windows">
     <js-module src="src/windows/BarcodeScannerProxy.js" name="BarcodeScannerProxy">
