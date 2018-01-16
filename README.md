@@ -42,15 +42,17 @@ Note: Windows 10 applications can not be build for `AnyCPU` architecture, which 
 cordova run windows -- --archs=x86
 ```
 
-Note: Since iOS 10 it's mandatory to add a `NSCameraUsageDescription` in the info.plist.
+Note: Since iOS 10 it's mandatory to add a `NSCameraUsageDescription` in the `Info.plist`.
 
-`NSCameraUsageDescription` describes the reason that the app accesses the user’s camera.
-When the system prompts the user to allow access, this string is displayed as part of the dialog box.
+`NSCameraUsageDescription` describes the reason that the app accesses the user's camera.
+When the system prompts the user to allow access, this string is displayed as part of the dialog box. If you didn't provide the usage description, the app will crash before showing the dialog. Also, Apple will reject apps that access private data but don't provide an usage description.
 
-To add this entry you can pass the following variable on plugin install.
+To add this entry you can use the `edit-config` tag in the `config.xml` like this:
 
 ```
-cordova plugin add phonegap-plugin-barcodescanner --variable CAMERA_USAGE_DESCRIPTION="To scan barcodes"
+<edit-config target="NSCameraUsageDescription" file="*-Info.plist" mode="merge">
+    <string>To scan barcodes</string>
+</edit-config>
 ```
 
 ### PhoneGap Build Usage
@@ -59,9 +61,7 @@ Add the following to your config.xml:
 
 ```
 <!-- add a version here, otherwise PGB will use whatever the latest version of the package on npm is -->
-<plugin name="phonegap-plugin-barcodescanner">
-  <param name="CAMERA_USAGE_DESCRIPTION" value="To scan barcodes." />
-</plugin>
+<plugin name="phonegap-plugin-barcodescanner" />
 ```
 On PhoneGap Build if you're using a version of cordova-android of 4 or less, ensure you're building with gradle:
 ```
