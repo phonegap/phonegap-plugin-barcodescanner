@@ -23,7 +23,7 @@ MAIN
     COMMAND "Scan"
       LET options.showTorchButton=TRUE
       LET options.showFlipCameraButton=TRUE
-      LET options.formats="PDF_417"
+      LET options.formats="PDF_417,DATA_MATRIX"
       CALL ui.Interface.frontCall("cordova","call",
             ["BarcodeScanner","scan",options],[result])
       CALL fgldialog.fgl_winMessage("Result",result,"info")
