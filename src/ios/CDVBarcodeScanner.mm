@@ -233,7 +233,7 @@
                                messageAsDictionary:resultDict
                                ];
 
-    [[self commandDelegate] sendPluginResult:result callbackId:callback];
+    [self.commandDelegate sendPluginResult:result callbackId:callback];
 }
 
 //--------------------------------------------------------------------------
