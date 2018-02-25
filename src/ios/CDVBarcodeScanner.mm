@@ -920,7 +920,7 @@ parentViewController:(UIViewController*)parentViewController
 - (void)viewDidAppear:(BOOL)animated {
     // setup capture preview layer
     AVCaptureVideoPreviewLayer* previewLayer = self.processor.previewLayer;
-    previewLayer.frame = [self safeBounds];
+    previewLayer.frame = self.view.bounds;
     previewLayer.videoGravity = AVLayerVideoGravityResizeAspectFill;
 
     if ([previewLayer.connection isVideoOrientationSupported]) {
@@ -933,14 +933,6 @@ parentViewController:(UIViewController*)parentViewController
     [self startCapturing];
 
     [super viewDidAppear:animated];
-}
-
--(CGRect)safeBounds {
-    if (@available(iOS 11.0, *)) {
-        return self.view.safeAreaLayoutGuide.layoutFrame;
-    } else {
-        return self.view.bounds;
-    }
 }
 
 //--------------------------------------------------------------------------
@@ -998,10 +990,10 @@ parentViewController:(UIViewController*)parentViewController
     {
         return [self buildOverlayViewFromXib];
     }
-    CGRect bounds = [self safeBounds];
+    CGRect bounds = self.view.frame;
     bounds = CGRectMake(0, 0, bounds.size.width, bounds.size.height);
 
-    UIView* overlayView = [[UIView alloc] initWithFrame:[self safeBounds]];
+    UIView* overlayView = [[UIView alloc] initWithFrame:bounds];
     overlayView.autoresizesSubviews = YES;
     overlayView.autoresizingMask    = UIViewAutoresizingFlexibleWidth | UIViewAutoresizingFlexibleHeight;
     overlayView.opaque              = NO;
@@ -1068,32 +1060,11 @@ parentViewController:(UIViewController*)parentViewController
       [items insertObject:torchButton atIndex:0];
     }
   }
-
     self.toolbar.items = items;
-
-    bounds = overlayView.bounds;
-
-    [self.toolbar sizeToFit];
-    CGFloat toolbarHeight  = [self.toolbar frame].size.height;
-    CGFloat rootViewHeight = CGRectGetHeight(bounds);
-    CGFloat rootViewWidth  = CGRectGetWidth(bounds);
-    CGRect  rectArea       = CGRectMake(0, rootViewHeight - toolbarHeight, rootViewWidth, toolbarHeight);
-    [self.toolbar setFrame:rectArea];
-
     [overlayView addSubview: self.toolbar];
 
     UIImage* reticleImage = [self buildReticleImage];
     self.reticleView = [[[UIImageView alloc] initWithImage:reticleImage] autorelease];
-    CGFloat minAxis = MIN(rootViewHeight, rootViewWidth);
-
-    rectArea = CGRectMake(
-        (CGFloat) (0.5 * (rootViewWidth  - minAxis)),
-        (CGFloat) (0.5 * (rootViewHeight - minAxis)),
-        minAxis,
-        minAxis
-    );
-
-    [self.reticleView setFrame:rectArea];
 
     self.reticleView.opaque           = NO;
     self.reticleView.contentMode      = UIViewContentModeScaleAspectFit;
@@ -1105,7 +1076,7 @@ parentViewController:(UIViewController*)parentViewController
     ;
 
     [overlayView addSubview: self.reticleView];
-
+    [self resizeElements];
     return overlayView;
 }
 
@@ -1184,7 +1155,7 @@ parentViewController:(UIViewController*)parentViewController
 {
     [UIView setAnimationsEnabled:NO];
     AVCaptureVideoPreviewLayer* previewLayer = self.processor.previewLayer;
-    previewLayer.frame = [self safeBounds];
+    previewLayer.frame = self.view.bounds;
 
     if (orientation == UIInterfaceOrientationLandscapeLeft) {
         [previewLayer setOrientation:AVCaptureVideoOrientationLandscapeLeft];
@@ -1197,13 +1168,35 @@ parentViewController:(UIViewController*)parentViewController
     }
 
     previewLayer.videoGravity = AVLayerVideoGravityResizeAspectFill;
-    int multiplier = 1;
-    if (UIInterfaceOrientationIsLandscape(orientation)) {
-        multiplier = 2;
-    }
-    self.toolbar.frame = CGRectMake([self safeBounds].origin.x, [self safeBounds].size.height-self.toolbar.frame.size.height*multiplier, [self safeBounds].size.width, self.toolbar.frame.size.height);
-    self.reticleView.center = CGPointMake(self.view.center.x, self.view.center.y-self.toolbar.frame.size.height*multiplier+10);
+
+    [self resizeElements];
     [UIView setAnimationsEnabled:YES];
+}
+
+-(void) resizeElements {
+    CGRect bounds = self.view.bounds;
+    if (@available(iOS 11.0, *)) {
+        bounds = CGRectMake(bounds.origin.x, bounds.origin.y, bounds.size.width, self.view.safeAreaLayoutGuide.layoutFrame.size.height+self.view.safeAreaLayoutGuide.layoutFrame.origin.y);
+    }
+
+    [self.toolbar sizeToFit];
+    CGFloat toolbarHeight  = [self.toolbar frame].size.height;
+    CGFloat rootViewHeight = CGRectGetHeight(bounds);
+    CGFloat rootViewWidth  = CGRectGetWidth(bounds);
+    CGRect  rectArea       = CGRectMake(0, rootViewHeight - toolbarHeight, rootViewWidth, toolbarHeight);
+    [self.toolbar setFrame:rectArea];
+
+    CGFloat minAxis = MIN(rootViewHeight, rootViewWidth);
+
+    rectArea = CGRectMake(
+                          (CGFloat) (0.5 * (rootViewWidth  - minAxis)),
+                          (CGFloat) (0.5 * (rootViewHeight - minAxis)),
+                          minAxis,
+                          minAxis
+                          );
+
+    [self.reticleView setFrame:rectArea];
+    self.reticleView.center = CGPointMake(self.view.center.x, self.view.center.y-self.toolbar.frame.size.height/2);
 }
 
 @end
