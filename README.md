@@ -42,19 +42,6 @@ Note: Windows 10 applications can not be build for `AnyCPU` architecture, which 
 cordova run windows -- --archs=x86
 ```
 
-Note: Since iOS 10 it's mandatory to add a `NSCameraUsageDescription` in the `Info.plist`.
-
-`NSCameraUsageDescription` describes the reason that the app accesses the user's camera.
-When the system prompts the user to allow access, this string is displayed as part of the dialog box. If you didn't provide the usage description, the app will crash before showing the dialog. Also, Apple will reject apps that access private data but don't provide an usage description.
-
-To add this entry you can use the `edit-config` tag in the `config.xml` like this:
-
-```
-<edit-config target="NSCameraUsageDescription" file="*-Info.plist" mode="merge">
-    <string>To scan barcodes</string>
-</edit-config>
-```
-
 ### PhoneGap Build Usage
 
 Add the following to your config.xml:
@@ -142,6 +129,21 @@ A full example could be:
             alert("encoding failed: " + fail);
           }
         );
+```
+
+## iOS quirks ##
+
+Since iOS 10 it's mandatory to add a `NSCameraUsageDescription` in the `Info.plist`.
+
+`NSCameraUsageDescription` describes the reason that the app accesses the user's camera.
+When the system prompts the user to allow access, this string is displayed as part of the dialog box. If you didn't provide the usage description, the app will crash before showing the dialog. Also, Apple will reject apps that access private data but don't provide an usage description.
+
+To add this entry you can use the `edit-config` tag in the `config.xml` like this:
+
+```
+<edit-config target="NSCameraUsageDescription" file="*-Info.plist" mode="merge">
+    <string>To scan barcodes</string>
+</edit-config>
 ```
 
 ## Windows quirks ##
