@@ -1,12 +1,12 @@
 <?xml version="1.0" encoding="UTF-8" standalone="yes"?>
-<plugin xmlns="http://www.phonegap.com/ns/plugins/1.0" xmlns:android="http://schemas.android.com/apk/res/android" xmlns:rim="http://www.blackberry.com/ns/widgets" id="phonegap-plugin-barcodescanner" version="7.0.4">
+<plugin xmlns="http://www.phonegap.com/ns/plugins/1.0" xmlns:android="http://schemas.android.com/apk/res/android" xmlns:rim="http://www.blackberry.com/ns/widgets" id="phonegap-plugin-barcodescanner" version="7.1.0">
   <name>BarcodeScanner</name>
   <description>You can use the BarcodeScanner plugin to scan different types of barcodes (using the device's camera) and get the metadata encoded in them for processing within your application.</description>
   <license>MIT</license>
   <repo>https://github.com/phonegap/phonegap-plugin-barcodescanner</repo>
   <issue>https://github.com/phonegap/phonegap-plugin-barcodescanner/issues</issue>
   <engines>
-    <engine name="cordova" version=">=3.0.0"/>
+    <engine name="cordova" version=">=7.1.0"/>
     <engine name="cordova-android" version=">=6.3.0"/>
   </engines>
   <js-module src="www/barcodescanner.js" name="BarcodeScanner">
