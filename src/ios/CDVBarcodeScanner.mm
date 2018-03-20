@@ -185,13 +185,24 @@
         return;
     }
 
+    UIViewController* vc = self.viewController;
+    if (vc.view.window != [UIApplication sharedApplication].keyWindow){
+        //for wkwebview, the privacy screen plugin is presented from a different window object
+        vc = [UIApplication sharedApplication].keyWindow.rootViewController;
+    }
+
+    while (vc.presentedViewController != nil && ![vc.presentedViewController isBeingDismissed]){
+        vc = vc.presentedViewController;
+    }
+
     processor = [[[CDVbcsProcessor alloc]
                 initWithPlugin:self
                       callback:callback
-          parentViewController:self.viewController
+          parentViewController:vc
             alterateOverlayXib:overlayXib
             ] autorelease];
     // queue [processor scanBarcode] to run on the event loop
+
 
     if (preferFrontCamera) {
       processor.isFrontCamera = true;
