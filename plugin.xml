@@ -20,17 +20,7 @@
     </config-file>
     <resource-file src="src/ios/scannerOverlay.xib"/>
     <resource-file src="src/ios/CDVBarcodeScanner.bundle"/>
-    <header-file src="src/ios/zxing-all-in-one.h"/>
-    <source-file src="src/ios/CDVBarcodeScanner.mm" compiler-flags="-fno-objc-arc"/>
-    <source-file src="src/ios/zxing-all-in-one.cpp"/>
-    <framework src="libiconv.dylib"/>
-    <framework src="AVFoundation.framework"/>
-    <framework src="AssetsLibrary.framework"/>
-    <framework src="CoreVideo.framework"/>
-    <framework src="QuartzCore.framework"/>
-    <framework src="CoreGraphics.framework"/>
-    <framework src="CoreImage.framework"/>
-    <framework src="AudioToolbox.framework"/>
+    <source-file src="src/ios/CDVBarcodeScanner.mm"/>
   </platform>
   <platform name="android">
     <source-file src="src/android/com/phonegap/plugins/barcodescanner/BarcodeScanner.java" target-dir="src/com/phonegap/plugins/barcodescanner"/>
