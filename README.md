@@ -10,13 +10,7 @@ Follows the [Cordova Plugin spec](https://cordova.apache.org/docs/en/latest/plug
 ## Installation
 
 
-This requires phonegap 5.0+ ( current stable v3.0.0 )
-
     phonegap plugin add phonegap-plugin-barcodescanner
-
-Older versions of phonegap can still install via the __deprecated__ id ( stale v2.0.1 )
-
-    phonegap plugin add com.phonegap.plugins.barcodescanner
 
 It is also possible to install via repo url directly ( unstable )
 
@@ -27,8 +21,6 @@ It is also possible to install via repo url directly ( unstable )
 - Android
 - iOS
 - Windows (Windows/Windows Phone 8.1 and Windows 10)
-- Windows Phone 8
-- BlackBerry 10
 - Browser
 
 Note: the Android source for this project includes an Android Library Project.
@@ -60,24 +52,24 @@ The plugin creates the object `cordova.plugins.barcodeScanner` with the method `
 
 The following barcode types are currently supported:
 
-|  Barcode Type | Android | iOS | Windows8 | Windows Phone 8 | BlackBerry 10 |
-|---------------|:-------:|:---:|:--------:|:---------------:|:-------------:|
-| QR_CODE       |    ✔    |  ✔  |     ✔    |        ✔        |       ✖       |
-| DATA_MATRIX   |    ✔    |  ✔  |     ✔    |        ✔        |       ✔       |
-| UPC_A         |    ✔    |  ✔  |     ✔    |        ✔        |       ✔       |
-| UPC_E         |    ✔    |  ✔  |     ✔    |        ✔        |       ✔       |
-| EAN_8         |    ✔    |  ✔  |     ✔    |        ✔        |       ✔       |
-| EAN_13        |    ✔    |  ✔  |     ✔    |        ✔        |       ✔       |
-| CODE_39       |    ✔    |  ✔  |     ✔    |        ✔        |       ✔       |
-| CODE_93       |    ✔    |  ✖  |     ✔    |        ✔        |       ✖       |
-| CODE_128      |    ✔    |  ✔  |     ✔    |        ✔        |       ✔       |
-| CODABAR       |    ✔    |  ✖  |     ✔    |        ✔        |       ✖       |
-| ITF           |    ✔    |  ✔  |     ✔    |        ✔        |       ✔       |
-| RSS14         |    ✔    |  ✖  |     ✔    |        ✔        |       ✖       |
-| PDF417        |    ✔    |  ✖  |     ✔    |        ✔        |       ✖       |
-| RSS_EXPANDED  |    ✔    |  ✖  |     ✖    |        ✖        |       ✖       |
-| MSI           |    ✖    |  ✖  |     ✔    |        ✔        |       ✖       |
-| AZTEC         |    ✖    |  ✖  |     ✔    |        ✔        |       ✔       |
+|  Barcode Type | Android | iOS | Windows  |
+|---------------|:-------:|:---:|:--------:|
+| QR_CODE       |    ✔    |  ✔  |     ✔    |
+| DATA_MATRIX   |    ✔    |  ✔  |     ✔    |
+| UPC_A         |    ✔    |  ✔  |     ✔    |
+| UPC_E         |    ✔    |  ✔  |     ✔    |
+| EAN_8         |    ✔    |  ✔  |     ✔    |
+| EAN_13        |    ✔    |  ✔  |     ✔    |
+| CODE_39       |    ✔    |  ✔  |     ✔    |
+| CODE_93       |    ✔    |  ✖  |     ✔    |
+| CODE_128      |    ✔    |  ✔  |     ✔    |
+| CODABAR       |    ✔    |  ✖  |     ✔    |
+| ITF           |    ✔    |  ✔  |     ✔    |
+| RSS14         |    ✔    |  ✖  |     ✔    |
+| PDF417        |    ✔    |  ✖  |     ✔    |
+| RSS_EXPANDED  |    ✔    |  ✖  |     ✖    |
+| MSI           |    ✖    |  ✖  |     ✔    |
+| AZTEC         |    ✖    |  ✖  |     ✔    |
 
 `success` and `fail` are callback functions. Success is passed an object with data, type and cancelled properties. Data is the text representation of the barcode data, type is the type of barcode detected and cancelled is whether or not the user cancelled the scan.
 
@@ -151,13 +143,6 @@ To add this entry you can use the `edit-config` tag in the `config.xml` like thi
 * Windows implementation currently doesn't support encode functionality.
 
 * On Windows 10 desktop ensure that you have Windows Media Player and Media Feature pack installed.
-
-## Windows Phone 8 quirks ##
-Windows Phone 8 implementation currently doesn't support encode functionality.
-
-## BlackBerry 10 quirks
-BlackBerry 10 implementation currently doesn't support encode functionality.
-Cancelling a scan on BlackBerry 10 is done by touching the screen.
 
 ## Thanks on Github ##
 
