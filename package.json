@@ -8,8 +8,6 @@
       "ios",
       "android",
       "windows",
-      "wp8",
-      "blackberry10",
       "browser"
     ]
   },
@@ -23,8 +21,6 @@
     "cordova-ios",
     "cordova-android",
     "cordova-windows",
-    "cordova-wp8",
-    "cordova-blackberry10",
     "cordova-browser",
     "cordova:plugin"
   ],
