@@ -139,6 +139,15 @@
             authStatus == AVAuthorizationStatusRestricted);
 }
 
+-(BOOL)isUsageDescriptionSet
+{
+  NSDictionary * plist = [[NSBundle mainBundle] infoDictionary];
+  if ([plist objectForKey:@"NSCameraUsageDescription" ]) {
+    return YES;
+  }
+  return NO;
+}
+
 
 
 //--------------------------------------------------------------------------
@@ -173,6 +182,10 @@
         NSString * error = NSLocalizedString(@"Access to the camera has been prohibited; please enable it in the Settings app to continue.",nil);
         [self returnError:error callback:callback];
         return;
+    } else if (![self isUsageDescriptionSet]) {
+      NSString * error = NSLocalizedString(@"NSCameraUsageDescription is not set in the info.plist", nil);
+      [self returnError:error callback:callback];
+      return;
     }
 
     processor = [[CDVbcsProcessor alloc]
