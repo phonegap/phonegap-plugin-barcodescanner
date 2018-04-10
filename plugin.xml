@@ -39,9 +39,9 @@
       <uses-feature android:name="android.hardware.camera" android:required="true"/>
     </config-file>
     <framework src="src/android/barcodescanner.gradle" custom="true" type="gradleReference"/>
-    <framework src="com.android.support:support-v4:$ANDROID_SUPPORT_V4_VERSION"/>
+    <framework src="com.android.support:support-v13:$ANDROID_SUPPORT_V4_VERSION"/>
     <lib-file src="src/android/barcodescanner-release-2.1.5.aar"/>
-    <preference name="ANDROID_SUPPORT_V4_VERSION" default="27.+"/>
+    <preference name="ANDROID_SUPPORT_V4_VERSION" default="26.+"/>
   </platform>
   <platform name="windows">
     <js-module src="src/windows/BarcodeScannerProxy.js" name="BarcodeScannerProxy">
