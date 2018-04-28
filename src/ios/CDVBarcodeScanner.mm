@@ -369,6 +369,14 @@ parentViewController:(UIViewController*)parentViewController
     [self.captureSession stopRunning];
     [self.parentViewController dismissViewControllerAnimated:self.isTransitionAnimated completion:callbackBlock];
 
+
+    AVCaptureDevice *device = [AVCaptureDevice defaultDeviceWithMediaType:AVMediaTypeVideo];
+    [device lockForConfiguration:nil];
+    if([device isAutoFocusRangeRestrictionSupported]) {
+        [device setAutoFocusRangeRestriction:AVCaptureAutoFocusRangeRestrictionNone];
+    }
+    [device unlockForConfiguration];
+
     // viewcontroller holding onto a reference to us, release them so they
     // will release us
     self.viewController = nil;
