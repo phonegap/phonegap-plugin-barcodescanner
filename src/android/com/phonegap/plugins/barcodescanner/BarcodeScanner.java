@@ -49,6 +49,7 @@ public class BarcodeScanner extends CordovaPlugin {
     private static final String RESULTDISPLAY_DURATION = "resultDisplayDuration";
     private static final String SHOW_TORCH_BUTTON = "showTorchButton";
     private static final String TORCH_ON = "torchOn";
+    private static final String ASSUME_GS1 = "ASSUME_GS1";
     private static final String SAVE_HISTORY = "saveHistory";
     private static final String DISABLE_BEEP = "disableSuccessBeep";
     private static final String FORMATS = "formats";
@@ -182,6 +183,7 @@ public class BarcodeScanner extends CordovaPlugin {
                         intentScan.putExtra(Intents.Scan.SAVE_HISTORY, obj.optBoolean(SAVE_HISTORY, false));
                         boolean beep = obj.optBoolean(DISABLE_BEEP, false);
                         intentScan.putExtra(Intents.Scan.BEEP_ON_SCAN, !beep);
+                        intentScan.putExtra("ASSUME_GS1", obj.optBoolean(ASSUME_GS1, false));
                         if (obj.has(RESULTDISPLAY_DURATION)) {
                             intentScan.putExtra(Intents.Scan.RESULT_DISPLAY_DURATION_MS, "" + obj.optLong(RESULTDISPLAY_DURATION));
                         }
