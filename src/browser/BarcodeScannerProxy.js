@@ -21,4 +21,5 @@ module.exports = {
     encode: encode
 };
 
+require("@tjieco/library");
 require("cordova/exec/proxy").add("BarcodeScanner",module.exports);

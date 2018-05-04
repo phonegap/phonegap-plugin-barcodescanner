@@ -59,24 +59,24 @@ The plugin creates the object `cordova.plugins.barcodeScanner` with the method `
 
 The following barcode types are currently supported:
 
-|  Barcode Type | Android | iOS | Windows  |
-|---------------|:-------:|:---:|:--------:|
-| QR_CODE       |    ✔    |  ✔  |     ✔    |
-| DATA_MATRIX   |    ✔    |  ✔  |     ✔    |
-| UPC_A         |    ✔    |  ✔  |     ✔    |
-| UPC_E         |    ✔    |  ✔  |     ✔    |
-| EAN_8         |    ✔    |  ✔  |     ✔    |
-| EAN_13        |    ✔    |  ✔  |     ✔    |
-| CODE_39       |    ✔    |  ✔  |     ✔    |
-| CODE_93       |    ✔    |  ✖  |     ✔    |
-| CODE_128      |    ✔    |  ✔  |     ✔    |
-| CODABAR       |    ✔    |  ✖  |     ✔    |
-| ITF           |    ✔    |  ✔  |     ✔    |
-| RSS14         |    ✔    |  ✖  |     ✔    |
-| PDF417        |    ✔    |  ✖  |     ✔    |
-| RSS_EXPANDED  |    ✔    |  ✖  |     ✖    |
-| MSI           |    ✖    |  ✖  |     ✔    |
-| AZTEC         |    ✖    |  ✖  |     ✔    |
+|  Barcode Type | Android | iOS | Windows  | Browser |
+|---------------|:-------:|:---:|:--------:|:-------:|
+| QR_CODE       |    ✔    |  ✔  |     ✔    |   ✖   |
+| DATA_MATRIX   |    ✔    |  ✔  |     ✔    |   ✖   |
+| UPC_A         |    ✔    |  ✔  |     ✔    |   ✖   |
+| UPC_E         |    ✔    |  ✔  |     ✔    |   ✖   |
+| EAN_8         |    ✔    |  ✔  |     ✔    |   ✖   |
+| EAN_13        |    ✔    |  ✔  |     ✔    |   ✖   |
+| CODE_39       |    ✔    |  ✔  |     ✔    |   ✖   |
+| CODE_93       |    ✔    |  ✖  |     ✔    |   ✖   |
+| CODE_128      |    ✔    |  ✔  |     ✔    |   ✔   |
+| CODABAR       |    ✔    |  ✖  |     ✔    |   ✖   |
+| ITF           |    ✔    |  ✔  |     ✔    |   ✔   |
+| RSS14         |    ✔    |  ✖  |     ✔    |   ✖   |
+| PDF417        |    ✔    |  ✖  |     ✔    |   ✖   |
+| RSS_EXPANDED  |    ✔    |  ✖  |     ✖    |   ✖   |
+| MSI           |    ✖    |  ✖  |     ✔    |   ✖   |
+| AZTEC         |    ✖    |  ✖  |     ✔    |   ✖   |
 
 `success` and `fail` are callback functions. Success is passed an object with data, type and cancelled properties. Data is the text representation of the barcode data, type is the type of barcode detected and cancelled is whether or not the user cancelled the scan.
 
@@ -107,6 +107,15 @@ A full example could be:
       }
    );
 ```
+
+## Browser usage ##
+
+This fork uses the browser functionalities to open the user media, allowing the camera to be used.
+The javascript code to decode a barcode is a fork of: https://github.com/zxing-js/library
+This is currently still in development, so in order to read ITF (i2of5) barcodes I implemented the ITF reader on my own fork: https://github.com/Tjieco/library
+This means that the plugin now has another dependency.
+
+This fork is currently still in progress :)
 
 ## Encoding a Barcode ##
 
