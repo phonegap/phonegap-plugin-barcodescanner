@@ -1,3 +1,31 @@
+function startScan(deviceId, videoOutputElementId, success, error) {
+    const library = new Library();
+    const codeReader = library.BrowserBarcodeReader();
+    console.log(codeReader);
+    const devices = codeReader.getVideoInputDevices();
+
+    codeReader.decodeFromInputVideoDevice(devices[deviceId], videoOutputElementId).then((res) => {
+        console.log(res);
+        let result = {
+            text: res.getText(),
+            format: res.getBarcodeFormat(),
+            cancelled: false
+        };
+        success(result);
+    }).catch((err) => {
+        console.error(err);
+        error("Barcode could not be decoded");
+    });
+    console.log('Started continous decode from camera with id' + deviceId)
+/*    document.getElementById('resetButton').addEventListener('click', () => {
+        document.getElementById('result').textContent = '';
+    codeReader.reset();
+    })
+    .catch((err) => {
+          error(err);
+    })*/
+}
+
 function scan(success, error) {
     var code = window.prompt("Enter barcode value (empty value will fire the error handler):");
     if(code) {
@@ -17,6 +45,7 @@ function encode(type, data, success, errorCallback) {
 }
 
 module.exports = {
+    startScan: startScan,
     scan: scan,
     encode: encode
 };

@@ -112,10 +112,14 @@ A full example could be:
 
 This fork uses the browser functionalities to open the user media, allowing the camera to be used.
 The javascript code to decode a barcode is a fork of: https://github.com/zxing-js/library
-This is currently still in development, so in order to read ITF (i2of5) barcodes I implemented the ITF reader on my own fork: https://github.com/Tjieco/library
+This is currently still in development, so in order to read ITF (i2of5) barcodes, this fork was created: https://github.com/Tjieco/library
 This means that the plugin now has another dependency.
 
 This fork is currently still in progress :)
+
+The "scan" functionality to enter the barcode manually still works.
+However, you can also call "starscan" to open a camera prompt. This will call "scan" with the found number.
+
 
 ## Encoding a Barcode ##
 
