@@ -44,11 +44,11 @@
   "scripts": {
     "test": "jasmine-node --color spec"
   },
+  "dependencies": {
+    "@tjieco/library": "^0.4.2"
+  },
   "devDependencies": {
     "jasmine-node": "1.14.5",
     "pluginpub": "^0.0.9"
-  },
-  "dependencies": {
-    "@tjieco/library": "github:Tjieco/library"
   }
 }

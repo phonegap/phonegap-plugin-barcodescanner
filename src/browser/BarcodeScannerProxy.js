@@ -1,5 +1,5 @@
 function startScan(deviceId, videoOutputElementId, success, error) {
-    const library = new Library();
+    const library = require("@tjieco/library");
     const codeReader = library.BrowserBarcodeReader();
     console.log(codeReader);
     const devices = codeReader.getVideoInputDevices();
@@ -50,5 +50,4 @@ module.exports = {
     encode: encode
 };
 
-require("@tjieco/library");
 require("cordova/exec/proxy").add("BarcodeScanner",module.exports);
