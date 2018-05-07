@@ -9,3 +9,4 @@ src/windows/lib/.vs
 src/windows/lib/bin
 src/windows/lib/obj
 node_modules
+example
