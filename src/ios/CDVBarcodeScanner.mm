@@ -168,7 +168,7 @@
     BOOL showTorchButton = [options[@"showTorchButton"] boolValue];
     BOOL disableAnimations = [options[@"disableAnimations"] boolValue];
     BOOL disableSuccessBeep = [options[@"disableSuccessBeep"] boolValue];
-    NSString *cancelButtonString = options[@"cancelButtonString"];
+    NSString* _cancelButtonString = options[@"cancelButtonString"];
 
     // We allow the user to define an alternate xib file for loading the overlay.
     NSString *overlayXib = options[@"overlayXib"];
@@ -205,8 +205,8 @@
       processor.isShowTorchButton = true;
     }
     
-    if (cancelButtonString) {
-        processor.cancelButtonString = cancelButtonString;
+    if (_cancelButtonString) {
+        processor.cancelButtonString = _cancelButtonString;
     }
 
     processor.isSuccessBeepEnabled = !disableSuccessBeep;
@@ -1047,7 +1047,12 @@ parentViewController:(UIViewController*)parentViewController
     CGFloat toolbarHeight  = [toolbar frame].size.height;
     CGFloat rootViewHeight = CGRectGetHeight(bounds);
     CGFloat rootViewWidth  = CGRectGetWidth(bounds);
-    CGRect  rectArea       = CGRectMake(0, rootViewHeight - toolbarHeight, rootViewWidth, toolbarHeight);
+    CGFloat bottomPadding = 0;
+    if (@available(iOS 11.0, *)) {
+        UIWindow *window = UIApplication.sharedApplication.keyWindow;
+        bottomPadding = window.safeAreaInsets.bottom;
+    }
+    CGRect  rectArea       = CGRectMake(0, rootViewHeight - toolbarHeight - bottomPadding, rootViewWidth, toolbarHeight);
     [toolbar setFrame:rectArea];
 
     [overlayView addSubview: toolbar];

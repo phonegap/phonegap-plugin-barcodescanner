@@ -190,6 +190,23 @@ A full example could be:
         );
 ```
 
+## Change cancel button text (ios) ##
+1. import { BarcodeScanner, BarcodeScannerOptions } from '@ionic-native/barcode-scanner';
+
+2. add `cancelButtonString?: string;` in BarcodeScannerOptions
+
+3. add cancelButtonString in options
+let scanner_options: BarcodeScannerOptions = {
+    cancelButtonString: 'Button Text'
+}
+this.scanner.scan(scanner_options)
+.then(success => {
+    // scan success
+}, error => {
+    // scan fail
+})
+
+
 ## Windows quirks ##
 
 * Windows implementation currently doesn't support encode functionality.
