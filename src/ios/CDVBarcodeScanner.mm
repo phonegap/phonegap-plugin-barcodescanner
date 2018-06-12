@@ -73,6 +73,7 @@
 - (void)barcodeScanSucceeded:(NSString*)text format:(NSString*)format;
 - (void)barcodeScanFailed:(NSString*)message;
 - (void)barcodeScanCancelled;
+- (void)barcodeScanTimedOut;
 - (void)openDialog;
 - (NSString*)setUpCaptureSession;
 - (void)captureOutput:(AVCaptureOutput*)captureOutput didOutputSampleBuffer:(CMSampleBufferRef)sampleBuffer fromConnection:(AVCaptureConnection*)connection;
@@ -170,6 +171,7 @@
     BOOL showTorchButton = [options[@"showTorchButton"] boolValue];
     BOOL disableAnimations = [options[@"disableAnimations"] boolValue];
     BOOL disableSuccessBeep = [options[@"disableSuccessBeep"] boolValue];
+    long scanTimeout = [ options[@"scanTimeout"] longValue];
 
     // We allow the user to define an alternate xib file for loading the overlay.
     NSString *overlayXib = options[@"overlayXib"];
@@ -215,6 +217,10 @@
     processor.formats = options[@"formats"];
 
     [processor performSelector:@selector(scanBarcode) withObject:nil afterDelay:0];
+
+    if (scanTimeout > 0) {
+     [processor performSelector:@selector(barcodeScanTimedOut) withObject:nil afterDelay:(scanTimeout/1000)];
+    }
 }
 
 //--------------------------------------------------------------------------
@@ -380,6 +386,7 @@ parentViewController:(UIViewController*)parentViewController
     // viewcontroller holding onto a reference to us, release them so they
     // will release us
     self.viewController = nil;
+    [NSObject cancelPreviousPerformRequestsWithTarget: self];
 }
 
 //--------------------------------------------------------------------------
@@ -438,6 +445,16 @@ parentViewController:(UIViewController*)parentViewController
 - (void)barcodeScanCancelled {
     [self barcodeScanDone:^{
         [self.plugin returnSuccess:@"" format:@"" cancelled:TRUE flipped:self.isFlipped callback:self.callback];
+    }];
+    if (self.isFlipped) {
+        self.isFlipped = NO;
+    }
+}
+
+- (void)barcodeScanTimedOut {
+    NSLog(@"do barcodeScanTimedOut");
+    [self barcodeScanDone:^{
+        [self.plugin returnSuccess:@"TimedOut" format:@"" cancelled:TRUE flipped:self.isFlipped callback:self.callback];
     }];
     if (self.isFlipped) {
         self.isFlipped = NO;

@@ -93,6 +93,7 @@ A full example could be:
           alert("Scanning failed: " + error);
       },
       {
+          scanTimeout : 60000, // iOS, auto exit scan screen after X ms
           preferFrontCamera : true, // iOS and Android
           showFlipCameraButton : true, // iOS and Android
           showTorchButton : true, // iOS and Android
