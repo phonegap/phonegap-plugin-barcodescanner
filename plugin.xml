@@ -67,5 +67,11 @@
     <js-module src="src/browser/BarcodeScannerProxy.js" name="BarcodeScannerProxy">
       <runs/>
     </js-module>
+    <js-module src="src/browser/jsqrcode.js" name="jsqrcode">
+      <clobbers target="qrcode"/>
+    </js-module>
+    <js-module src="src/browser/PwaScanner.js" name="pwascanner">
+      <clobbers target="PwaScanner"/>
+    </js-module>
   </platform>
 </plugin>
