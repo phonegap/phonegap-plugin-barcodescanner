@@ -50,7 +50,7 @@ public class BarcodeScanner extends CordovaPlugin {
     private static final String PREFER_FRONTCAMERA = "preferFrontCamera";
     private static final String ORIENTATION = "orientation";
     private static final String SHOW_FLIP_CAMERA_BUTTON = "showFlipCameraButton";
-    private static final String CONTINUOS_MODE = "continuosMode";
+    private static final String CONTINUOUS_MODE = "continuousMode";
     private static final String RESULTDISPLAY_DURATION = "resultDisplayDuration";
     private static final String SHOW_TORCH_BUTTON = "showTorchButton";
     private static final String TORCH_ON = "torchOn";
@@ -71,7 +71,7 @@ public class BarcodeScanner extends CordovaPlugin {
     private CallbackContext callbackContext;
 
     private LocalBroadcastManager broadcastManager;
-    private BroadcastReceiver continuosModeBroadcastReceiver;
+    private BroadcastReceiver continuousModeBroadcastReceiver;
 
     /**
      * Constructor.
