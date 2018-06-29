@@ -73,7 +73,7 @@ The following barcode types are currently supported:
 | CODABAR       |    ✔    |  ✖  |     ✔    |
 | ITF           |    ✔    |  ✔  |     ✔    |
 | RSS14         |    ✔    |  ✖  |     ✔    |
-| PDF417        |    ✔    |  ✖  |     ✔    |
+| PDF_417       |    ✔    |  ✖  |     ✔    |
 | RSS_EXPANDED  |    ✔    |  ✖  |     ✖    |
 | MSI           |    ✖    |  ✖  |     ✔    |
 | AZTEC         |    ✖    |  ✖  |     ✔    |
