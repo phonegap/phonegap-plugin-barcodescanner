@@ -142,7 +142,8 @@
 -(BOOL)isUsageDescriptionSet
 {
   NSDictionary * plist = [[NSBundle mainBundle] infoDictionary];
-  if ([plist objectForKey:@"NSCameraUsageDescription" ]) {
+  if ([plist objectForKey:@"NSCameraUsageDescription" ] ||
+      [[NSBundle mainBundle] localizedStringForKey: @"NSCameraUsageDescription" value: nil table: @"InfoPlist"]) {
     return YES;
   }
   return NO;
