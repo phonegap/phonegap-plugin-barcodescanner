@@ -16,9 +16,14 @@ function encode(type, data, success, errorCallback) {
     success();
 }
 
+function decode(base64, success, errorCallback) {
+    success();
+}
+
 module.exports = {
     scan: scan,
-    encode: encode
+    encode: encode,
+    decode: decode
 };
 
 require("cordova/exec/proxy").add("BarcodeScanner",module.exports);
