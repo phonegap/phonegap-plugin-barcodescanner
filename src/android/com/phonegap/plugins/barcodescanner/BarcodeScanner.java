@@ -203,10 +203,10 @@ public class BarcodeScanner extends CordovaPlugin {
                             intentScan.putExtra(Intents.Scan.ORIENTATION_LOCK, obj.optString(ORIENTATION));
                         }
 
-                        boolean isContinuous = obj.optBoolean(CONTINUOS_MODE, false);
+                        boolean isContinuous = obj.optBoolean(CONTINUOUS_MODE, false);
                         if (isContinuous) {
                             intentScan.putExtra(Intents.Scan.BULK_SCAN, true);
-                            BarcodeScanner.this.continuosModeBroadcastReceiver = new BroadcastReceiver() {
+                            BarcodeScanner.this.continuousModeBroadcastReceiver = new BroadcastReceiver() {
                                 @Override
                                 public void onReceive(Context context, Intent intent) {
                                     JSONObject obj = new JSONObject();
@@ -229,7 +229,7 @@ public class BarcodeScanner extends CordovaPlugin {
                                         .getInstance(that.cordova.getActivity());
                             }
                             BarcodeScanner.this.broadcastManager
-                                    .registerReceiver(BarcodeScanner.this.continuosModeBroadcastReceiver, filter);
+                                    .registerReceiver(BarcodeScanner.this.continuousModeBroadcastReceiver, filter);
                         }
                     }
 
@@ -281,8 +281,8 @@ public class BarcodeScanner extends CordovaPlugin {
                 this.callbackContext.error("Unexpected error");
             }
 
-            if (this.broadcastManager != null && this.continuosModeBroadcastReceiver != null) {
-                this.broadcastManager.unregisterReceiver(this.continuosModeBroadcastReceiver);
+            if (this.broadcastManager != null && this.continuousModeBroadcastReceiver != null) {
+                this.broadcastManager.unregisterReceiver(this.continuousModeBroadcastReceiver);
             }
         }
     }
