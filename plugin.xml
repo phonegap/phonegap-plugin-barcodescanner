@@ -21,6 +21,9 @@
     <resource-file src="src/ios/scannerOverlay.xib"/>
     <resource-file src="src/ios/CDVBarcodeScanner.bundle"/>
     <source-file src="src/ios/CDVBarcodeScanner.mm"/>
+    <!-- frameworks -->
+    <framework src="AVFoundation.framework" />
+    <framework src="AudioToolbox.framework" />
   </platform>
   <platform name="android">
     <source-file src="src/android/com/phonegap/plugins/barcodescanner/BarcodeScanner.java" target-dir="src/com/phonegap/plugins/barcodescanner"/>
