@@ -1,12 +1,13 @@
 <?xml version="1.0" encoding="UTF-8" standalone="yes"?>
-<plugin xmlns="http://www.phonegap.com/ns/plugins/1.0" xmlns:android="http://schemas.android.com/apk/res/android" xmlns:rim="http://www.blackberry.com/ns/widgets" id="phonegap-plugin-barcodescanner" version="6.0.6">
+<plugin xmlns="http://www.phonegap.com/ns/plugins/1.0" xmlns:android="http://schemas.android.com/apk/res/android" xmlns:rim="http://www.blackberry.com/ns/widgets" id="phonegap-plugin-barcodescanner" version="8.0.0">
   <name>BarcodeScanner</name>
   <description>You can use the BarcodeScanner plugin to scan different types of barcodes (using the device's camera) and get the metadata encoded in them for processing within your application.</description>
   <license>MIT</license>
   <repo>https://github.com/phonegap/phonegap-plugin-barcodescanner</repo>
   <issue>https://github.com/phonegap/phonegap-plugin-barcodescanner/issues</issue>
   <engines>
-    <engine name="cordova" version=">=3.0.0"/>
+    <engine name="cordova" version=">=7.1.0"/>
+    <engine name="cordova-android" version=">=6.3.0"/>
   </engines>
   <js-module src="www/barcodescanner.js" name="BarcodeScanner">
     <clobbers target="cordova.plugins.barcodeScanner"/>
@@ -17,23 +18,9 @@
         <param name="ios-package" value="CDVBarcodeScanner"/>
       </feature>
     </config-file>
-    <config-file target="*-Info.plist" parent="NSCameraUsageDescription">
-      <string>$CAMERA_USAGE_DESCRIPTION</string>
-    </config-file>
-    <preference name="CAMERA_USAGE_DESCRIPTION" default=" "/>
     <resource-file src="src/ios/scannerOverlay.xib"/>
     <resource-file src="src/ios/CDVBarcodeScanner.bundle"/>
-    <header-file src="src/ios/zxing-all-in-one.h"/>
-    <source-file src="src/ios/CDVBarcodeScanner.mm" compiler-flags="-fno-objc-arc"/>
-    <source-file src="src/ios/zxing-all-in-one.cpp"/>
-    <framework src="libiconv.dylib"/>
-    <framework src="AVFoundation.framework"/>
-    <framework src="AssetsLibrary.framework"/>
-    <framework src="CoreVideo.framework"/>
-    <framework src="QuartzCore.framework"/>
-    <framework src="CoreGraphics.framework"/>
-    <framework src="CoreImage.framework"/>
-    <framework src="AudioToolbox.framework"/>
+    <source-file src="src/ios/CDVBarcodeScanner.mm"/>
   </platform>
   <platform name="android">
     <source-file src="src/android/com/phonegap/plugins/barcodescanner/BarcodeScanner.java" target-dir="src/com/phonegap/plugins/barcodescanner"/>
@@ -52,8 +39,9 @@
       <uses-feature android:name="android.hardware.camera" android:required="true"/>
     </config-file>
     <framework src="src/android/barcodescanner.gradle" custom="true" type="gradleReference"/>
-    <resource-file src="src/android/barcodescanner-release-2.1.5.aar" target="libs/barcodescanner.aar"/>
-    <dependency id="cordova-plugin-compat" version="^1.0.0"/>
+    <framework src="com.android.support:support-v4:$ANDROID_SUPPORT_V4_VERSION"/>
+    <lib-file src="src/android/barcodescanner-release-2.1.5.aar"/>
+    <preference name="ANDROID_SUPPORT_V4_VERSION" default="27.+"/>
   </platform>
   <platform name="windows">
     <js-module src="src/windows/BarcodeScannerProxy.js" name="BarcodeScannerProxy">
@@ -70,22 +58,6 @@
     <hook src="hooks/windows/check-arch.js" type="before_compile"/>
     <hook src="hooks/windows/check-arch.js" type="before_run"/>
   </platform>
-  <platform name="wp8">
-    <config-file target="config.xml" parent="/*">
-      <feature name="BarcodeScanner">
-        <param name="wp-package" value="BarcodeScanner"/>
-      </feature>
-    </config-file>
-    <config-file target="Properties/WMAppManifest.xml" parent="/Deployment/App/Capabilities">
-      <Capability Name="ID_CAP_ISV_CAMERA"/>
-    </config-file>
-    <framework src="src/wp8/lib/zxing.wp8.0.dll" custom="true"/>
-    <asset src="src/wp8/assets/cancel.png" target="Images/appbar.cancel.png"/>
-    <source-file src="src/wp8/BarcodeScanner.cs"/>
-    <source-file src="src/wp8/BarcodeScannerTask.cs"/>
-    <source-file src="src/wp8/BarcodeScannerUI.xaml"/>
-    <source-file src="src/wp8/BarcodeScannerUI.xaml.cs"/>
-  </platform>
   <platform name="browser">
     <config-file target="config.xml" parent="/*">
       <feature name="BarcodeScanner">
@@ -95,20 +67,5 @@
     <js-module src="src/browser/BarcodeScannerProxy.js" name="BarcodeScannerProxy">
       <runs/>
     </js-module>
-  </platform>
-  <platform name="blackberry10">
-    <source-file src="src/blackberry10/index.js" target-dir="BarcodeScanner"/>
-    <source-file src="src/blackberry10/qrcode.js" target-dir="BarcodeScanner"/>
-    <lib-file src="src/blackberry10/native/device/libBarcodeScanner.so" arch="device"/>
-    <lib-file src="src/blackberry10/native/simulator/libBarcodeScanner.so" arch="simulator"/>
-    <config-file target="www/config.xml" parent="/widget">
-      <feature name="BarcodeScanner">
-        <param name="blackberry-package" value="phonegap-plugin-barcodescanner"/>
-      </feature>
-    </config-file>
-    <config-file target="www/config.xml" parent="/widget/rim:permissions">
-      <rim:permit>use_camera</rim:permit>
-    </config-file>
-    <dependency id="cordova-plugin-bb-app"/>
   </platform>
 </plugin>

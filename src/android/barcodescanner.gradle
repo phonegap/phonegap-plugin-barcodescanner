@@ -1,9 +1,3 @@
-def DEFAULT_MIN_SDK_VERSION = 15
-def minSdk = Math.max(DEFAULT_MIN_SDK_VERSION, cdvHelpers.getConfigPreference('android-minSdkVersion',0) as Integer);
-if (cdvMinSdkVersion == null || Integer.parseInt(cdvMinSdkVersion) < minSdk ) {
-    ext.cdvMinSdkVersion = minSdk;
-}
-
 repositories{
     jcenter()
     flatDir{
@@ -12,8 +6,7 @@ repositories{
 }
 
 dependencies {
-    compile 'com.android.support:support-v4:+'
-    compile(name:'barcodescanner', ext:'aar')
+    compile(name:'barcodescanner-release-2.1.5', ext:'aar')
 }
 
 android {
