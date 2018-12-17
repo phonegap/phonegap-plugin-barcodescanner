@@ -76,7 +76,7 @@ The following barcode types are currently supported:
 | PDF_417       |    ✔    |  ✔  |     ✔    |
 | RSS_EXPANDED  |    ✔    |  ✖  |     ✖    |
 | MSI           |    ✖    |  ✖  |     ✔    |
-| AZTEC         |    ✖    |  ✔  |     ✔    |
+| AZTEC         |    ✔    |  ✔  |     ✔    |
 
 `success` and `fail` are callback functions. Success is passed an object with data, type and cancelled properties. Data is the text representation of the barcode data, type is the type of barcode detected and cancelled is whether or not the user cancelled the scan.
 
