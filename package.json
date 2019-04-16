@@ -54,5 +54,9 @@
   "devDependencies": {
     "jasmine-node": "1.14.5",
     "pluginpub": "^0.0.9"
+  },
+  "dependencies": {
+    "nopt": "^4.0.1",
+    "shelljs": "^0.8.3"
   }
 }
