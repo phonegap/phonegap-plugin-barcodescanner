@@ -2,8 +2,8 @@ module.exports = function(ctx) {
     if (ctx.opts && ctx.opts.platforms && ctx.opts.platforms.indexOf('windows') > -1
         && ctx.opts.options) {
         var path = require('path');
-        var shell = ctx.requireCordovaModule('shelljs');
-        var nopt = ctx.requireCordovaModule('nopt');
+        var shell = require('shelljs');
+        var nopt = require('nopt');
 
         // parse and validate args
         var args = nopt({
@@ -18,7 +18,7 @@ module.exports = function(ctx) {
             'buildConfig': String
         }, {}, ctx.opts.options.argv, 0);
 
-        // Check if --appx flag is passed so that we have a project build version override:  
+        // Check if --appx flag is passed so that we have a project build version override:
         var isWin10 = args.appx && args.appx.toLowerCase() === 'uap';
 
         // Else check "windows-target-version" preference:
