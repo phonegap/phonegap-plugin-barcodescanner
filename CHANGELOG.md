@@ -1,5 +1,94 @@
 # Change Log
 
+## v8.0.1
+
+- Bump version ([#740](https://github.com/phonegap/phonegap-plugin-barcodescanner/pull/740)) [view commit](https://github.com/phonegap/phonegap-plugin-barcodescanner/commit/c5dbca2770d7c0f22ccb23473cd38c5fad8f8fa9)
+- Convert interface orientation to video orientation on iOS ([#71](https://github.com/phonegap/phonegap-plugin-barcodescanner/pull/71)) [view commit](https://github.com/phonegap/phonegap-plugin-barcodescanner/commit/26f07b01c41816dcba6becf2fefe69538ec73eda)
+- [FIX] Localized strings ignored [view commit](https://github.com/phonegap/phonegap-plugin-barcodescanner/commit/9c200e002e447e3b6d950f9fccccbf0538c44bc5)
+- lengthen stale window [view commit](https://github.com/phonegap/phonegap-plugin-barcodescanner/commit/2e4af7abf001b640e9ff225b559009dec0075929)
+- Update `README.md` ([#715](https://github.com/phonegap/phonegap-plugin-barcodescanner/pull/715)) [view commit](https://github.com/phonegap/phonegap-plugin-barcodescanner/commit/8f7a646cc79443b0f73ee5591d3426b81a2fc4a9)
+- Fixed `PDF_417` barcode format name in the `README.md` ([#692](https://github.com/phonegap/phonegap-plugin-barcodescanner/pull/692)) [view commit](https://github.com/phonegap/phonegap-plugin-barcodescanner/commit/a7c36291f02d7d3134f534b136a2e234911111cc)
+- Create `stale.yml` [view commit](https://github.com/phonegap/phonegap-plugin-barcodescanner/commit/334a0be548eae120a9c72eee8bec8973f9de46fa)
+- Create `lock.yml` [view commit](https://github.com/phonegap/phonegap-plugin-barcodescanner/commit/ad1ff522e523d80ebf0c774926fef9c5318db94a)
+
+## v8.0.0
+
+- Bump version and set engines [view commit](https://github.com/phonegap/phonegap-plugin-barcodescanner/commit/e2ba60ca6b7e36306b02a0f3c437fbee51bda2ed)
+- Remove deprecated platforms from plugin.xml ([#675](https://github.com/phonegap/phonegap-plugin-barcodescanner/pull/675)) [view commit](https://github.com/phonegap/phonegap-plugin-barcodescanner/commit/2a17b6b457c03ec56e8c8244079097596db8849c)
+- Also update `README.md` [view commit](https://github.com/phonegap/phonegap-plugin-barcodescanner/commit/41545281dfd9412b8b4ea0430d4fdc44921a78d2)
+- Remove deprecated platforms [view commit](https://github.com/phonegap/phonegap-plugin-barcodescanner/commit/39b729c4fe80faa92c2d22b765d79d20fea40db2)
+- Make request code smaller [view commit](https://github.com/phonegap/phonegap-plugin-barcodescanner/commit/db447e03e6677c5b6b1020d5f8244291c5c8ab45)
+- Bump version [view commit](https://github.com/phonegap/phonegap-plugin-barcodescanner/commit/1019fd5a70f1336682cd20556fdf7b8549e3f053)
+
+
+## v7.1.2
+
+- Bump version ([#657](https://github.com/phonegap/phonegap-plugin-barcodescanner/pull/657)) [view commit](https://github.com/phonegap/phonegap-plugin-barcodescanner/commit/5c915006d94f7efa43b9e621b21caa89eca5808e)
+- Bump version [view commit](https://github.com/phonegap/phonegap-plugin-barcodescanner/commit/1019fd5a70f1336682cd20556fdf7b8549e3f053)
+- Document `ANDROID_SUPPORT_V4_VERSION` ([#656](https://github.com/phonegap/phonegap-plugin-barcodescanner/pull/656)) [view commit](https://github.com/phonegap/phonegap-plugin-barcodescanner/commit/93650ddf9759bfb1b7d66a59b5363221ad36b52b)
+- Update `README.md` ([#557](https://github.com/phonegap/phonegap-plugin-barcodescanner/pull/557)) [view commit](https://github.com/phonegap/phonegap-plugin-barcodescanner/commit/b781f5d95322fdf2ab550c823cbc167f229c2844)
+- reset autoFocusRangeRestriction when bar code scan done ([#65](https://github.com/phonegap/phonegap-plugin-barcodescanner/pull/65)) [view commit](https://github.com/phonegap/phonegap-plugin-barcodescanner/commit/4a1aa56656c1a8db7342695ff28df2582fff62f8)
+
+## v7.1.1
+
+- Bump version [view commit](https://github.com/phonegap/phonegap-plugin-barcodescanner/commit/0474ec1347b88b7a5c12f230254febd9d75a2fc0)
+- Check if `NSCameraUsageDescription` is set and return error instead of crash ([#643](https://github.com/phonegap/phonegap-plugin-barcodescanner/pull/643)) [view commit](https://github.com/phonegap/phonegap-plugin-barcodescanner/commit/e516a87818c5a535376b705503e255bbb4e78d90)
+- add `ITF` (less than 14 digit) support ([#636](https://github.com/phonegap/phonegap-plugin-barcodescanner/pull/636)) [view commit](https://github.com/phonegap/phonegap-plugin-barcodescanner/commit/a78262b449056034130ffde1caa780853bec49d9)
+- Remove `ZXing` code and files [view commit](https://github.com/phonegap/phonegap-plugin-barcodescanner/commit/bc42890c99e7511f56001e5d2dbf0abf205cf2c5)
+
+
+## v7.1.0
+
+- Bump version and engines ([#627](https://github.com/phonegap/phonegap-plugin-barcodescanner/pull/627)) [view commit](https://github.com/phonegap/phonegap-plugin-barcodescanner/commit/aad4a91f858ae54f5c0b1b613b603ce87f910cda)
+- Redo usage descriptions ([#626](https://github.com/phonegap/phonegap-plugin-barcodescanner/pull/626)) [view commit](https://github.com/phonegap/phonegap-plugin-barcodescanner/commit/b9a32ba14e24aa28490d901d62a2cf1a4caff4ae)
+
+## v7.0.4
+
+- Merge pull request [#625](https://github.com/phonegap/phonegap-plugin-barcodescanner/pull/625) from jcesarmobile/bump-version [view commit](https://github.com/phonegap/phonegap-plugin-barcodescanner/commit/7cdfcb669785d174ee32bffdfb16995863b06415)
+- Bump version [view commit](https://github.com/phonegap/phonegap-plugin-barcodescanner/commit/a5b62fc3738a9db8816e9f3727f696b04125693e)
+- Merge pull request [#623](https://github.com/phonegap/phonegap-plugin-barcodescanner/pull/623) from jcesarmobile/revert-usage-description [view commit](https://github.com/phonegap/phonegap-plugin-barcodescanner/commit/1b2aa76453021c2a0e5ba7bfc6b4dca581755489)
+- Merge pull request [#624](https://github.com/phonegap/phonegap-plugin-barcodescanner/pull/624) from adebree/patch-1 [view commit](https://github.com/phonegap/phonegap-plugin-barcodescanner/commit/6e88cbbec9032513738d992dcd8cd22de4731b20)
+- Align `previewLayer` orientation with device [view commit](https://github.com/phonegap/phonegap-plugin-barcodescanner/commit/17de6c5451ad86edddf438760ec4b51b993be850)
+- Revert usage description changes [view commit](https://github.com/phonegap/phonegap-plugin-barcodescanner/commit/46b925cda5e53b7a56a3f0169a073bb6c07d0a08)
+
+
+## v7.0.3
+
+- 7.0.3 [view commit](https://github.com/phonegap/phonegap-plugin-barcodescanner/commit/b508cd36ca5e0e52ff3c23b09c64675f25eda084)
+- :bookmark: Bumping plugin version to 7.0.3 [view commit](https://github.com/phonegap/phonegap-plugin-barcodescanner/commit/2cb4d1cff345c0a590034429d2d320e940e466e2)
+- Move support from gradle to `plugin.xml` and make version configurable [view commit](https://github.com/phonegap/phonegap-plugin-barcodescanner/commit/16c97b7b6d0f845282d0633e65593ac263baaa58)
+- Use safe areas and reposition elements on rotation ([#585](https://github.com/phonegap/phonegap-plugin-barcodescanner/pull/585)) [view commit](https://github.com/phonegap/phonegap-plugin-barcodescanner/commit/85faa874620f8e0598a4c050393378fae4ff54c1)
+- Remove usage description from `plugin.xml` ([#598](https://github.com/phonegap/phonegap-plugin-barcodescanner/pull/598)) [view commit](https://github.com/phonegap/phonegap-plugin-barcodescanner/commit/add72c9014fe6b867c0dddb6caa3248df752a58e)
+
+## v7.0.2
+
+- 7.0.2 [view commit](https://github.com/phonegap/phonegap-plugin-barcodescanner/commit/97ea85db70c6aa0fea849b0664a32e2e7e39fc96)
+- :bookmark: Bumping plugin version to 7.0.2 [view commit](https://github.com/phonegap/phonegap-plugin-barcodescanner/commit/cf89947f159d28dd062be1a7eaa72b6506f203ca)
+- Change the `.aar` from `resource-file` to `lib-file` ([#592](https://github.com/phonegap/phonegap-plugin-barcodescanner/pull/592)) [view commit](https://github.com/phonegap/phonegap-plugin-barcodescanner/commit/4dcf4ea1a2f484081fa7bb680a51cf241df9a23c)
+
+## v7.0.1
+
+- 7.0.1 [view commit](https://github.com/phonegap/phonegap-plugin-barcodescanner/commit/54bfa7a2d2f6d035cbff91c3d6f78832889270e1)
+- :bookmark: Bumping plugin version to 7.0.1 [view commit](https://github.com/phonegap/phonegap-plugin-barcodescanner/commit/98f2929ca9d84cb591f4e69c3c630f0bfc8330e0)
+- Removed min sdk version from grandle ([#450](https://github.com/phonegap/phonegap-plugin-barcodescanner/pull/450)) [view commit](https://github.com/phonegap/phonegap-plugin-barcodescanner/commit/36284b161eb721fead059de7760adc022c3e5d9d)
+
+## v7.0.0
+
+- 7.0.0 [view commit](https://github.com/phonegap/phonegap-plugin-barcodescanner/commit/d33fcd0117524f6a0ce8cb06a978c7c71c347d10)
+- :bookmark: Bumping plugin version to 7.0.0 [view commit](https://github.com/phonegap/phonegap-plugin-barcodescanner/commit/1959622dc1a458d3907ebc35bcf1430699cadd72)
+- :arrow_up: update `pluginpub` to 0.0.9 [view commit](https://github.com/phonegap/phonegap-plugin-barcodescanner/commit/57c3f1387ccd22db8d5410841b15cbd5543d3f7f)
+- :heavy_minus_sign: remove `cordova-plugin-compat` dependency [view commit](https://github.com/phonegap/phonegap-plugin-barcodescanner/commit/f6fc30ac4b25e8a5d8ab306f4b6e574277fc2317)
+- [readme] updating PhoneGap Build instructions [view commit](https://github.com/phonegap/phonegap-plugin-barcodescanner/commit/9da5174cd6edd26fc022f081e1780f3f9a9b3d1c)
+- [WinJS][Win10] Fixes "formats" in options passed to `BarcodeReader.scan()` being ignored ([#524](https://github.com/phonegap/phonegap-plugin-barcodescanner/pull/524)) [view commit](https://github.com/phonegap/phonegap-plugin-barcodescanner/commit/1f016d9564a494cf0ecc86c41be89fabdfa9fa3f)
+- :penguin: Issue [#508](https://github.com/phonegap/phonegap-plugin-barcodescanner/issues/508): Is there any way to disable the beep in android? [view commit](https://github.com/phonegap/phonegap-plugin-barcodescanner/commit/f316c4e10cd01e83797d9f122666c85472bcbd67)
+- :penguin: Issue [#512](https://github.com/phonegap/phonegap-plugin-barcodescanner/issues/512): Generated `.gradle` file invalid, `parseInt` takes wrong argument [view commit](https://github.com/phonegap/phonegap-plugin-barcodescanner/commit/a0d8ac4e17cbcb695175915645a7fab7fcadf03c)
+- Convert the handler functions for the `torch`, `flipCamera`, and `shutter` buttons to `IBAction` ([#511](https://github.com/phonegap/phonegap-plugin-barcodescanner/pull/511)) [view commit](https://github.com/phonegap/phonegap-plugin-barcodescanner/commit/f0a8664182688eb5db78373832a114bc5e717379)
+- Merge pull request [#522](https://github.com/phonegap/phonegap-plugin-barcodescanner/issues/522) from josephma93/patch-2 [view commit](https://github.com/phonegap/phonegap-plugin-barcodescanner/commit/5f9461ebd9c23b22a4cea573ba8279b0b978243e)
+- Update `README.md` [view commit](https://github.com/phonegap/phonegap-plugin-barcodescanner/commit/fdf1fdaebfd713f53a7042a9ca74385a25cadca3)
+- Merge pull request [#520](https://github.com/phonegap/phonegap-plugin-barcodescanner/issues/520) from aruis/fix_readme [view commit](https://github.com/phonegap/phonegap-plugin-barcodescanner/commit/55e844003499bac956bbdd907c76e30ae89e509f)
+- Update `README.md` [view commit](https://github.com/phonegap/phonegap-plugin-barcodescanner/commit/682a7e54517691775c57b16086b9e27ea7720b27)
+- Updating `CHANGELOG.md` [view commit](https://github.com/phonegap/phonegap-plugin-barcodescanner/commit/af3494b5ff7be71f8159a35d98804ec3cc23a95d)
+
 ## [v6.0.8](https://github.com/* remote origin
   Fetch URL: https://github.com//tree/v6.0.8) (2017-07-18)
 [Full Changelog](https://github.com/* remote origin
