@@ -428,11 +428,16 @@ parentViewController:(UIViewController*)parentViewController
 
 //--------------------------------------------------------------------------
 - (void)barcodeScanFailed:(NSString*)message {
-    dispatch_sync(dispatch_get_main_queue(), ^{
+    dispatch_block_t block = ^{
         [self barcodeScanDone:^{
             [self.plugin returnError:message callback:self.callback];
         }];
-    });
+    };
+    if ([NSThread isMainThread]) {
+        block();
+    } else {
+        dispatch_sync(dispatch_get_main_queue(), block);
+    }
 }
 
 //--------------------------------------------------------------------------
