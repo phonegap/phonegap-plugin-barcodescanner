@@ -1,5 +1,15 @@
 # Change Log
 
+## v8.1.0
+
+- Don't use `dispatch_sync` if already in the main thread ([#797](https://github.com/phonegap/phonegap-plugin-barcodescanner/pull/797)) [view commit](https://github.com/phonegap/phonegap-plugin-barcodescanner/commit/d45ffc32c03e489b6bb3da8a29d950e7a89f4812)
+- Add missing versions to `CHANGELOG.md` ([#796](https://github.com/phonegap/phonegap-plugin-barcodescanner/pull/796)) [view commit](https://github.com/phonegap/phonegap-plugin-barcodescanner/commit/bb4e66c60ef0079277e2b9abda22d57679a02251)
+- Merge pull request [#780](https://github.com/phonegap/phonegap-plugin-barcodescanner/pull/780) from erisu/cordova9-require-fix [view commit](https://github.com/phonegap/phonegap-plugin-barcodescanner/commit/baa45a679fd6c7af418dabd0d99aca506768cae8)
+- Updated Travis CI: Test Node 6 to 10 [view commit](https://github.com/phonegap/phonegap-plugin-barcodescanner/commit/1903737253ee44b40777617dd9b98b4f8af756ba)
+- fix: replace `requireCordovaModule` with require for Cordova 9 [view commit](https://github.com/phonegap/phonegap-plugin-barcodescanner/commit/4c4127665fdfaab60ce73f97e7cb2acd92aa28f7)
+- Document `AZTEC` as supported ([#749](https://github.com/phonegap/phonegap-plugin-barcodescanner/pull/749)) [view commit](https://github.com/phonegap/phonegap-plugin-barcodescanner/commit/acfed444d5845e87b6ba85af7629cc70ef0810f0)
+- Update supported types for iOS ([#748](https://github.com/phonegap/phonegap-plugin-barcodescanner/pull/748)) [view commit](https://github.com/phonegap/phonegap-plugin-barcodescanner/commit/18312c1d1e2a94e4f95add450763b36c1b1f2c57)
+
 ## v8.0.1
 
 - Bump version ([#740](https://github.com/phonegap/phonegap-plugin-barcodescanner/pull/740)) [view commit](https://github.com/phonegap/phonegap-plugin-barcodescanner/commit/c5dbca2770d7c0f22ccb23473cd38c5fad8f8fa9)
