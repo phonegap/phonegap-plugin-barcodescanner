@@ -40,7 +40,7 @@
 - (void)scan:(CDVInvokedUrlCommand*)command;
 - (void)encode:(CDVInvokedUrlCommand*)command;
 - (void)returnImage:(NSString*)filePath format:(NSString*)format callback:(NSString*)callback;
-- (void)returnSuccess:(NSString*)scannedText format:(NSString*)format cancelled:(BOOL)cancelled flipped:(BOOL)flipped callback:(NSString*)callback;
+- (void)returnSuccess:(NSString*)scannedText format:(NSString*)format cancelled:(BOOL)cancelled flipped:(BOOL)flipped current:(NSString*)current total:(NSString*)total parity:(NSString*)parity  callback:(NSString*)callback;
 - (void)returnError:(NSString*)message callback:(NSString*)callback;
 @end
 
@@ -70,7 +70,7 @@
 
 - (id)initWithPlugin:(CDVBarcodeScanner*)plugin callback:(NSString*)callback parentViewController:(UIViewController*)parentViewController alterateOverlayXib:(NSString *)alternateXib;
 - (void)scanBarcode;
-- (void)barcodeScanSucceeded:(NSString*)text format:(NSString*)format;
+- (void)barcodeScanSucceeded:(NSString*)text format:(NSString*)format current:(NSString*)current total:(NSString*)total parity:(NSString*)parity;
 - (void)barcodeScanFailed:(NSString*)message;
 - (void)barcodeScanCancelled;
 - (void)openDialog;
@@ -250,13 +250,17 @@
 }
 
 //--------------------------------------------------------------------------
-- (void)returnSuccess:(NSString*)scannedText format:(NSString*)format cancelled:(BOOL)cancelled flipped:(BOOL)flipped callback:(NSString*)callback{
+- (void)returnSuccess:(NSString*)scannedText format:(NSString*)format cancelled:(BOOL)cancelled flipped:(BOOL)flipped
+              current:(NSString*)current total:(NSString*)total parity:(NSString*)parity callback:(NSString*)callback{
     NSNumber* cancelledNumber = @(cancelled ? 1 : 0);
 
     NSMutableDictionary* resultDict = [NSMutableDictionary new];
     resultDict[@"text"] = scannedText;
     resultDict[@"format"] = format;
     resultDict[@"cancelled"] = cancelledNumber;
+    resultDict[@"current"] = current;
+    resultDict[@"total"] = total;
+    resultDict[@"parity"] = parity;
 
     CDVPluginResult* result = [CDVPluginResult
                                resultWithStatus: CDVCommandStatus_OK
@@ -415,13 +419,13 @@ parentViewController:(UIViewController*)parentViewController
 }
 
 //--------------------------------------------------------------------------
-- (void)barcodeScanSucceeded:(NSString*)text format:(NSString*)format {
+- (void)barcodeScanSucceeded:(NSString*)text format:(NSString*)format current:(NSString*)current total:(NSString*)total parity:(NSString*)parity {
     dispatch_sync(dispatch_get_main_queue(), ^{
         if (self.isSuccessBeepEnabled) {
             AudioServicesPlaySystemSound(_soundFileObject);
         }
         [self barcodeScanDone:^{
-            [self.plugin returnSuccess:text format:format cancelled:FALSE flipped:FALSE callback:self.callback];
+            [self.plugin returnSuccess:text format:format cancelled:FALSE flipped:FALSE current:current total:total parity:parity callback:self.callback];
         }];
     });
 }
@@ -443,7 +447,7 @@ parentViewController:(UIViewController*)parentViewController
 //--------------------------------------------------------------------------
 - (void)barcodeScanCancelled {
     [self barcodeScanDone:^{
-        [self.plugin returnSuccess:@"" format:@"" cancelled:TRUE flipped:self.isFlipped callback:self.callback];
+        [self.plugin returnSuccess:@"" format:@"" cancelled:TRUE flipped:self.isFlipped current:@"" total:@"" parity:@"" callback:self.callback];
     }];
     if (self.isFlipped) {
         self.isFlipped = NO;
@@ -582,8 +586,28 @@ parentViewController:(UIViewController*)parentViewController
         for (AVMetadataObject *metaData in metadataObjects) {
             AVMetadataMachineReadableCodeObject* code = (AVMetadataMachineReadableCodeObject*)[self.previewLayer transformedMetadataObjectForMetadataObject:(AVMetadataMachineReadableCodeObject*)metaData];
 
+            // separated QRCode meta
+            NSString *strCurrent = @"";
+            NSString *strTotal = @"";
+            NSString *strParity = @"";
+            if (@available(iOS 11.0, *)) {
+                if (code.type == AVMetadataObjectTypeQRCode){
+                    CIQRCodeDescriptor *descriptor = (CIQRCodeDescriptor *)code.descriptor;
+                    Byte bytes[3];
+                    [descriptor.errorCorrectedPayload getBytes:bytes length:3];
+                    int current = bytes[0] & 0x0f;
+                    int total = ((bytes[1] & 0xf0) >> 4) + 1;
+                    int parity = ((bytes[1] & 0x0f) << 4) | ((bytes[2] & 0xf0) >>4);
+                    strCurrent = [NSString stringWithFormat:@"%d", current];
+                    strTotal = [NSString stringWithFormat:@"%d", total];
+                    strParity = [NSString stringWithFormat:@"%d", parity];
+                }
+            } else {
+                // Fallback on earlier versions
+            }
+
             if ([self checkResult:code.stringValue]) {
-                [self barcodeScanSucceeded:code.stringValue format:[self formatStringFromMetadata:code]];
+                [self barcodeScanSucceeded:code.stringValue format:[self formatStringFromMetadata:code] current:strCurrent total:strTotal parity:strParity];
             }
         }
     }
