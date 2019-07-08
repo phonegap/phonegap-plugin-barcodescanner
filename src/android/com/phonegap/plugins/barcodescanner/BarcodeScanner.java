@@ -58,8 +58,8 @@ public class BarcodeScanner extends CordovaPlugin {
     private static final String PHONE_TYPE = "PHONE_TYPE";
     private static final String SMS_TYPE = "SMS_TYPE";
     // divided QR Code meta data.
-    private static final String TOTAL = "total";
     private static final String META = "meta";
+    private static final String TOTAL = "total";
     private static final String CURRENT = "current";
     private static final String QR_MODE = "mode";
     private static final String PARITY = "parity";
