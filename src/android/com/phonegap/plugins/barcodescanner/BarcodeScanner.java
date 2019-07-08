@@ -43,9 +43,6 @@ public class BarcodeScanner extends CordovaPlugin {
     private static final String TEXT = "text";
     private static final String DATA = "data";
     private static final String TYPE = "type";
-    private static final String TOTAL = "total";
-    private static final String CURRENT = "current";
-    private static final String PARITY = "parity";
     private static final String PREFER_FRONTCAMERA = "preferFrontCamera";
     private static final String ORIENTATION = "orientation";
     private static final String SHOW_FLIP_CAMERA_BUTTON = "showFlipCameraButton";
@@ -60,6 +57,12 @@ public class BarcodeScanner extends CordovaPlugin {
     private static final String EMAIL_TYPE = "EMAIL_TYPE";
     private static final String PHONE_TYPE = "PHONE_TYPE";
     private static final String SMS_TYPE = "SMS_TYPE";
+    // divided QR Code meta data.
+    private static final String TOTAL = "total";
+    private static final String META = "meta";
+    private static final String CURRENT = "current";
+    private static final String QR_MODE = "mode";
+    private static final String PARITY = "parity";
 
     private static final String LOG_TAG = "BarcodeScanner";
 
@@ -227,15 +230,12 @@ public class BarcodeScanner extends CordovaPlugin {
                     obj.put(FORMAT, intent.getStringExtra("SCAN_RESULT_FORMAT"));
                     obj.put(CANCELLED, false);
 
-                    // Separated QRCode meta
+                    // divided QRCode meta data.
                     if (intent.getStringExtra("SCAN_RESULT_FORMAT").equals("QR_CODE")) {
                         byte[] rawBytes = intent.getByteArrayExtra("SCAN_RESULT_BYTES");
-                        if ((rawBytes[0] & 0xf0) == 0x30) {
-                            obj.put(CURRENT, (rawBytes[0] & 0x0f));
-                            obj.put(TOTAL, ((rawBytes[1] & 0xf0) >> 4) + 1);
-                            obj.put(PARITY, ((rawBytes[1] & 0x0f) << 4) | ((rawBytes[2] & 0xf0) >> 4));
-
-                            Log.d(LOG_TAG, obj.toString());
+                        JSONObject metaObj = this.extractQrMetaData(rawBytes);
+                        if(metaObj != null){
+                            obj.put(META, metaObj);
                         }
                     }
                 } catch (JSONException e) {
@@ -281,16 +281,16 @@ public class BarcodeScanner extends CordovaPlugin {
     /**
      * check application's permissions
      */
-   public boolean hasPermisssion() {
-       for(String p : permissions)
-       {
-           if(!PermissionHelper.hasPermission(this, p))
-           {
-               return false;
-           }
-       }
-       return true;
-   }
+    public boolean hasPermisssion() {
+        for(String p : permissions)
+        {
+            if(!PermissionHelper.hasPermission(this, p))
+            {
+                return false;
+            }
+        }
+        return true;
+    }
 
     /**
      * We override this so that we can access the permissions variable, which no longer exists in
@@ -298,38 +298,38 @@ public class BarcodeScanner extends CordovaPlugin {
      *
      * @param requestCode The code to get request action
      */
-   public void requestPermissions(int requestCode)
-   {
-       PermissionHelper.requestPermissions(this, requestCode, permissions);
-   }
+    public void requestPermissions(int requestCode)
+    {
+        PermissionHelper.requestPermissions(this, requestCode, permissions);
+    }
 
-   /**
-   * processes the result of permission request
-   *
-   * @param requestCode The code to get request action
-   * @param permissions The collection of permissions
-   * @param grantResults The result of grant
-   */
-  public void onRequestPermissionResult(int requestCode, String[] permissions,
-                                         int[] grantResults) throws JSONException
-   {
-       PluginResult result;
-       for (int r : grantResults) {
-           if (r == PackageManager.PERMISSION_DENIED) {
-               Log.d(LOG_TAG, "Permission Denied!");
-               result = new PluginResult(PluginResult.Status.ILLEGAL_ACCESS_EXCEPTION);
-               this.callbackContext.sendPluginResult(result);
-               return;
-           }
-       }
+    /**
+     * processes the result of permission request
+     *
+     * @param requestCode The code to get request action
+     * @param permissions The collection of permissions
+     * @param grantResults The result of grant
+     */
+    public void onRequestPermissionResult(int requestCode, String[] permissions,
+                                          int[] grantResults) throws JSONException
+    {
+        PluginResult result;
+        for (int r : grantResults) {
+            if (r == PackageManager.PERMISSION_DENIED) {
+                Log.d(LOG_TAG, "Permission Denied!");
+                result = new PluginResult(PluginResult.Status.ILLEGAL_ACCESS_EXCEPTION);
+                this.callbackContext.sendPluginResult(result);
+                return;
+            }
+        }
 
-       switch(requestCode)
-       {
-           case 0:
-               scan(this.requestArgs);
-               break;
-       }
-   }
+        switch(requestCode)
+        {
+            case 0:
+                scan(this.requestArgs);
+                break;
+        }
+    }
 
     /**
      * This plugin launches an external Activity when the camera is opened, so we
@@ -340,4 +340,30 @@ public class BarcodeScanner extends CordovaPlugin {
         this.callbackContext = callbackContext;
     }
 
+    /**
+     * QR Code can be One data symbol can be divided into up to 16 symbols.
+     * It can be reconstructed as a single data symbol using
+     * the same payload and the current No. / total Count.
+     * @param rawBytes The QRCode decoded raw byte data.
+     */
+    private JSONObject extractQrMetaData(byte[] rawBytes) {
+        if ((rawBytes[0] & 0xf0) == 0x30) {
+            try{
+                JSONObject obj = new JSONObject();
+                // QRCode Mode (divided mode = 3)
+                obj.put(QR_MODE, (rawBytes[0] & 0xf0) >> 4);
+                // QRCode Current No.
+                obj.put(CURRENT, (rawBytes[0] & 0x0f));
+                // divited QRCode total count.
+                obj.put(TOTAL, ((rawBytes[1] & 0xf0) >> 4) + 1);
+                // parity bit.
+                obj.put(PARITY, ((rawBytes[1] & 0x0f) << 4) | ((rawBytes[2] & 0xf0) >> 4));
+
+                return obj;
+            }catch(JSONException e){
+                Log.d(LOG_TAG, "This should never happen");
+            }
+        }
+        return null;
+    }
 }
