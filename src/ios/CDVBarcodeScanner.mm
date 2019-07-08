@@ -662,13 +662,13 @@ parentViewController:(UIViewController*)parentViewController
             CIQRCodeDescriptor *descriptor = (CIQRCodeDescriptor *)code.descriptor;
             Byte bytes[3];
             [descriptor.errorCorrectedPayload getBytes:bytes length:3];
-            // 構造的連接モード指示子(構造的連接 = 3）
+            // QRCode Mode (divided mode = 3)
             int qrmode = (bytes[0] & 0xf0) >> 4;
-            // 位置（0..15）
+            // QRCode Current No.(ex. 0..15)
             int current = bytes[0] & 0x0f;
-            // 全シンボル数
+            // divited QRCode total count.(ex. 1..16)
             int total = ((bytes[1] & 0xf0) >> 4) + 1;
-            // パリティデータ
+            // parity.
             int parity = ((bytes[1] & 0x0f) << 4) | ((bytes[2] & 0xf0) >>4);
 
             NSMutableDictionary* dict = [NSMutableDictionary new];

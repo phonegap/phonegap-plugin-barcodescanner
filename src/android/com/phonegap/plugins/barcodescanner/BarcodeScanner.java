@@ -352,11 +352,11 @@ public class BarcodeScanner extends CordovaPlugin {
                 JSONObject obj = new JSONObject();
                 // QRCode Mode (divided mode = 3)
                 obj.put(QR_MODE, (rawBytes[0] & 0xf0) >> 4);
-                // QRCode Current No.
+                // QRCode Current No.(ex. 0..15)
                 obj.put(CURRENT, (rawBytes[0] & 0x0f));
-                // divited QRCode total count.
+                // divited QRCode total count.(ex. 1..16)
                 obj.put(TOTAL, ((rawBytes[1] & 0xf0) >> 4) + 1);
-                // parity bit.
+                // parity.
                 obj.put(PARITY, ((rawBytes[1] & 0x0f) << 4) | ((rawBytes[2] & 0xf0) >> 4));
 
                 return obj;
