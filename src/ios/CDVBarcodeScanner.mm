@@ -652,9 +652,8 @@ parentViewController:(UIViewController*)parentViewController
 }
 
 //--------------------------------------------------------------------------
-// QR Code can be One data symbol can be divided into up to 16 symbols.
-// It can be reconstructed as a single data symbol using
-// the same payload and the position No. / total Count.
+// A single data symbol can be divided into up to 16 symbols in QR Code specification.
+// Divided symbols can be reconstructed as a single data symbol using the same payload , the position number and total count.
 //--------------------------------------------------------------------------
 - (NSDictionary*) extractQrMetaData:(AVMetadataMachineReadableCodeObject*)code {
     if (@available(iOS 11.0, *)) {
@@ -884,14 +883,14 @@ parentViewController:(UIViewController*)parentViewController
         return nil;
     }
 
-	self.overlayView.autoresizesSubviews = YES;
+    self.overlayView.autoresizesSubviews = YES;
     self.overlayView.autoresizingMask    = UIViewAutoresizingFlexibleWidth | UIViewAutoresizingFlexibleHeight;
     self.overlayView.opaque              = NO;
 
-	CGRect bounds = self.view.bounds;
+    CGRect bounds = self.view.bounds;
     bounds = CGRectMake(0, 0, bounds.size.width, bounds.size.height);
 
-	[self.overlayView setFrame:bounds];
+    [self.overlayView setFrame:bounds];
 
     return self.overlayView;
 }
