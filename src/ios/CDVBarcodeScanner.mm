@@ -420,7 +420,7 @@ parentViewController:(UIViewController*)parentViewController
 }
 
 //--------------------------------------------------------------------------
-- (void)barcodeScanSucceeded:(NSString*)text format:(NSString*)format meta:(NSMutableDictionary*)metaData {
+- (void)barcodeScanSucceeded:(NSString*)text format:(NSString*)format meta:(NSDictionary*)metaData {
     dispatch_sync(dispatch_get_main_queue(), ^{
         if (self.isSuccessBeepEnabled) {
             AudioServicesPlaySystemSound(_soundFileObject);

@@ -301,19 +301,19 @@ public class BarcodeScanner extends CordovaPlugin {
      *
      * @param requestCode The code to get request action
      */
-    public void requestPermissions(int requestCode)
-    {
-        PermissionHelper.requestPermissions(this, requestCode, permissions);
-    }
+   public void requestPermissions(int requestCode)
+   {
+       PermissionHelper.requestPermissions(this, requestCode, permissions);
+   }
 
    /**
-    * processes the result of permission request
-    *
-    * @param requestCode The code to get request action
-    * @param permissions The collection of permissions
-    * @param grantResults The result of grant
-    */
-   public void onRequestPermissionResult(int requestCode, String[] permissions,
+   * processes the result of permission request
+   *
+   * @param requestCode The code to get request action
+   * @param permissions The collection of permissions
+   * @param grantResults The result of grant
+   */
+  public void onRequestPermissionResult(int requestCode, String[] permissions,
                                          int[] grantResults) throws JSONException
    {
        PluginResult result;
