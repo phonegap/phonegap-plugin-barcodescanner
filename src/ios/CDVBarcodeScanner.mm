@@ -66,6 +66,7 @@
 @property (nonatomic)         BOOL                        isFlipped;
 @property (nonatomic)         BOOL                        isTransitionAnimated;
 @property (nonatomic)         BOOL                        isSuccessBeepEnabled;
+@property (nonatomic)         BOOL                        isShouldAutorotate;
 
 
 - (id)initWithPlugin:(CDVBarcodeScanner*)plugin callback:(NSString*)callback parentViewController:(UIViewController*)parentViewController alterateOverlayXib:(NSString *)alternateXib;
@@ -171,6 +172,7 @@
     BOOL showTorchButton = [options[@"showTorchButton"] boolValue];
     BOOL disableAnimations = [options[@"disableAnimations"] boolValue];
     BOOL disableSuccessBeep = [options[@"disableSuccessBeep"] boolValue];
+    BOOL shouldAutorotate = [options[@"shouldAutorotate"] boolValue];
 
     // We allow the user to define an alternate xib file for loading the overlay.
     NSString *overlayXib = options[@"overlayXib"];
@@ -207,6 +209,10 @@
 
     if (showTorchButton) {
       processor.isShowTorchButton = true;
+    }
+
+    if (shouldAutorotate) {
+      processor.isShouldAutorotate = true;
     }
 
     processor.isSuccessBeepEnabled = !disableSuccessBeep;
@@ -999,7 +1005,9 @@ parentViewController:(UIViewController*)parentViewController
 
 - (BOOL)shouldAutorotate
 {
-    return YES;
+    if (_processor.isShouldAutorotate)
+        return YES;
+    return NO;
 }
 
 - (UIInterfaceOrientation)preferredInterfaceOrientationForPresentation
@@ -1018,7 +1026,9 @@ parentViewController:(UIViewController*)parentViewController
         return [self.orientationDelegate shouldAutorotateToInterfaceOrientation:interfaceOrientation];
     }
 
-    return YES;
+    if (_processor.isShouldAutorotate)
+        return YES;
+    return NO;
 }
 
 - (void) willAnimateRotationToInterfaceOrientation:(UIInterfaceOrientation)orientation duration:(NSTimeInterval)duration
