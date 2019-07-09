@@ -40,7 +40,7 @@
 - (void)scan:(CDVInvokedUrlCommand*)command;
 - (void)encode:(CDVInvokedUrlCommand*)command;
 - (void)returnImage:(NSString*)filePath format:(NSString*)format callback:(NSString*)callback;
-- (void)returnSuccess:(NSString*)scannedText format:(NSString*)format cancelled:(BOOL)cancelled flipped:(BOOL)flipped meta:(NSMutableDictionary*)metaData callback:(NSString*)callback;
+- (void)returnSuccess:(NSString*)scannedText format:(NSString*)format cancelled:(BOOL)cancelled flipped:(BOOL)flipped meta:(NSDictionary*)metaData callback:(NSString*)callback;
 - (void)returnError:(NSString*)message callback:(NSString*)callback;
 @end
 
@@ -70,7 +70,7 @@
 
 - (id)initWithPlugin:(CDVBarcodeScanner*)plugin callback:(NSString*)callback parentViewController:(UIViewController*)parentViewController alterateOverlayXib:(NSString *)alternateXib;
 - (void)scanBarcode;
-- (void)barcodeScanSucceeded:(NSString*)text format:(NSString*)format meta:(NSMutableDictionary*)metaData;
+- (void)barcodeScanSucceeded:(NSString*)text format:(NSString*)format meta:(NSDictionary*)metaData;
 - (void)barcodeScanFailed:(NSString*)message;
 - (void)barcodeScanCancelled;
 - (void)openDialog;
@@ -251,7 +251,7 @@
 
 //--------------------------------------------------------------------------
 - (void)returnSuccess:(NSString*)scannedText format:(NSString*)format cancelled:(BOOL)cancelled flipped:(BOOL)flipped
-                 meta:(NSMutableDictionary*)metaData callback:(NSString*)callback{
+                 meta:(NSDictionary*)metaData callback:(NSString*)callback{
     NSNumber* cancelledNumber = @(cancelled ? 1 : 0);
 
     NSMutableDictionary* resultDict = [NSMutableDictionary new];
@@ -656,29 +656,32 @@ parentViewController:(UIViewController*)parentViewController
 // It can be reconstructed as a single data symbol using
 // the same payload and the position No. / total Count.
 //--------------------------------------------------------------------------
-- (NSMutableDictionary*) extractQrMetaData:(AVMetadataMachineReadableCodeObject*)code {
+- (NSDictionary*) extractQrMetaData:(AVMetadataMachineReadableCodeObject*)code {
     if (@available(iOS 11.0, *)) {
         if (code.type == AVMetadataObjectTypeQRCode){
             CIQRCodeDescriptor *descriptor = (CIQRCodeDescriptor *)code.descriptor;
             Byte bytes[3];
             [descriptor.errorCorrectedPayload getBytes:bytes length:3];
+            // nibble masking
+            unsigned char nibbleMaskHigher = 0x0f;
+            unsigned char nibbleMaskLower = 0xf0;
             // QRCode Mode
-            int qrmode = (bytes[0] & 0xf0) >> 4;
+            int qrmode = (bytes[0] & nibbleMaskLower) >> 4;
             // mode=3: divided QRCode
             if( qrmode == 3) {
                 // QRCode Position No.(ex. 0..15)
-                int position = bytes[0] & 0x0f;
+                int position = bytes[0] & nibbleMaskHigher;
                 // divited QRCode total count.(up to 16)
-                int total = ((bytes[1] & 0xf0) >> 4) + 1;
+                int total = ((bytes[1] & nibbleMaskLower) >> 4) + 1;
                 // parity.
-                int parity = ((bytes[1] & 0x0f) << 4) | ((bytes[2] & 0xf0) >>4);
+                int parity = ((bytes[1] & nibbleMaskHigher) << 4) | ((bytes[2] & nibbleMaskHigher) >>4);
 
-                NSMutableDictionary* dict = [NSMutableDictionary new];
-                dict[@"mode"] = [NSNumber numberWithInt:qrmode];
-                dict[@"position"] = [NSNumber numberWithInt:position];
-                dict[@"total"] = [NSNumber numberWithInt:total];
-                dict[@"parity"] = [NSNumber numberWithInt:parity];
-
+                NSDictionary *dict = @{
+                                       @"mode":[NSNumber numberWithInt:qrmode],
+                                       @"position":[NSNumber numberWithInt:position],
+                                       @"total":[NSNumber numberWithInt:total],
+                                       @"parity":[NSNumber numberWithInt:parity]
+                };
                 return dict;
             }
         }

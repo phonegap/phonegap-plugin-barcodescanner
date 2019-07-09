@@ -63,6 +63,9 @@ public class BarcodeScanner extends CordovaPlugin {
     private static final String POSITION = "position";
     private static final String QR_MODE = "mode";
     private static final String PARITY = "parity";
+    // Divided QRCode Header Masking Nibble
+    private static final char NIBBLE_MASK_HIGHER = 0x0f;
+    private static final char NIBBLE_MASK_LOWER = 0xf0;
 
     private static final String LOG_TAG = "BarcodeScanner";
 
@@ -123,9 +126,9 @@ public class BarcodeScanner extends CordovaPlugin {
 
             //android permission auto add
             if(!hasPermisssion()) {
-                requestPermissions(0);
+              requestPermissions(0);
             } else {
-                scan(args);
+              scan(args);
             }
         } else {
             return false;
@@ -233,7 +236,7 @@ public class BarcodeScanner extends CordovaPlugin {
                     // divided QRCode meta data.
                     if (intent.getStringExtra("SCAN_RESULT_FORMAT").equals("QR_CODE")) {
                         byte[] rawBytes = intent.getByteArrayExtra("SCAN_RESULT_BYTES");
-                        JSONObject metaObj = this.extractQrMetaData(rawBytes);
+                        JSONObject metaObj = this.extractDividedQrMetaData(rawBytes);
                         if(metaObj != null){
                             obj.put(META, metaObj);
                         }
@@ -281,16 +284,16 @@ public class BarcodeScanner extends CordovaPlugin {
     /**
      * check application's permissions
      */
-    public boolean hasPermisssion() {
-        for(String p : permissions)
-        {
-            if(!PermissionHelper.hasPermission(this, p))
-            {
-                return false;
-            }
-        }
-        return true;
-    }
+   public boolean hasPermisssion() {
+       for(String p : permissions)
+       {
+           if(!PermissionHelper.hasPermission(this, p))
+           {
+               return false;
+           }
+       }
+       return true;
+   }
 
     /**
      * We override this so that we can access the permissions variable, which no longer exists in
@@ -303,33 +306,33 @@ public class BarcodeScanner extends CordovaPlugin {
         PermissionHelper.requestPermissions(this, requestCode, permissions);
     }
 
-    /**
-     * processes the result of permission request
-     *
-     * @param requestCode The code to get request action
-     * @param permissions The collection of permissions
-     * @param grantResults The result of grant
-     */
-    public void onRequestPermissionResult(int requestCode, String[] permissions,
-                                          int[] grantResults) throws JSONException
-    {
-        PluginResult result;
-        for (int r : grantResults) {
-            if (r == PackageManager.PERMISSION_DENIED) {
-                Log.d(LOG_TAG, "Permission Denied!");
-                result = new PluginResult(PluginResult.Status.ILLEGAL_ACCESS_EXCEPTION);
-                this.callbackContext.sendPluginResult(result);
-                return;
-            }
-        }
+   /**
+    * processes the result of permission request
+    *
+    * @param requestCode The code to get request action
+    * @param permissions The collection of permissions
+    * @param grantResults The result of grant
+    */
+   public void onRequestPermissionResult(int requestCode, String[] permissions,
+                                         int[] grantResults) throws JSONException
+   {
+       PluginResult result;
+       for (int r : grantResults) {
+           if (r == PackageManager.PERMISSION_DENIED) {
+               Log.d(LOG_TAG, "Permission Denied!");
+               result = new PluginResult(PluginResult.Status.ILLEGAL_ACCESS_EXCEPTION);
+               this.callbackContext.sendPluginResult(result);
+               return;
+           }
+       }
 
-        switch(requestCode)
-        {
-            case 0:
-                scan(this.requestArgs);
-                break;
-        }
-    }
+       switch(requestCode)
+       {
+           case 0:
+               scan(this.requestArgs);
+               break;
+       }
+   }
 
     /**
      * This plugin launches an external Activity when the camera is opened, so we
@@ -341,31 +344,30 @@ public class BarcodeScanner extends CordovaPlugin {
     }
 
     /**
-     * QR Code can be One data symbol can be divided into up to 16 symbols.
-     * It can be reconstructed as a single data symbol using
-     * the same payload and the current No. / total Count.
+     * A single data symbol can be divided into up to 16 symbols in QR Code specification.
+     * Divided symbols can be reconstructed as a single data symbol using the same payload , the position number and total count.
+     * @param rawBytes
      */
-    private JSONObject extractQrMetaData(byte[] rawBytes) {
-        if ((rawBytes[0] & 0xf0) == 0x30) {
-            try{
-                JSONObject obj = new JSONObject();
-                // QRCode Mode
-                int mode = (rawBytes[0] & 0xf0) >> 4;
-                // mode=3: divided mode
-                if(mode == 3){
-                    obj.put(QR_MODE, mode);
-                    // QRCode Current No.(ex. 0..15)
-                    obj.put(POSITION, (rawBytes[0] & 0x0f));
-                    // divited QRCode total count.(up to 16)
-                    obj.put(TOTAL, ((rawBytes[1] & 0xf0) >> 4) + 1);
-                    // parity.
-                    obj.put(PARITY, ((rawBytes[1] & 0x0f) << 4) | ((rawBytes[2] & 0xf0) >> 4));
+    private JSONObject extractDividedQrMetaData(byte[] rawBytes) {
+        JSONObject obj = new JSONObject();
+        // QRCode Mode
+        int mode = (rawBytes[0] & NIBBLE_MASK_LOWER) >> 4;
+        // mode=3: divided mode
+        if(mode != 3){
+          return null;
+        }
+        try{
+            obj.put(QR_MODE, mode);
+            // QRCode Current No.(ex. 0..15)
+            obj.put(POSITION, (rawBytes[0] & NIBBLE_MASK_HIGHER));
+            // divited QRCode total count.(up to 16)
+            obj.put(TOTAL, ((rawBytes[1] & NIBBLE_MASK_LOWER) >> 4) + 1);
+            // parity.
+            obj.put(PARITY, ((rawBytes[1] & NIBBLE_MASK_HIGHER) << 4) | ((rawBytes[2] & NIBBLE_MASK_LOWER) >> 4));
 
-                    return obj;
-                }
-            }catch(JSONException e){
-                Log.d(LOG_TAG, "This should never happen");
-            }
+            return obj;
+        }catch(JSONException e){
+            Log.d(LOG_TAG, "This should never happen");
         }
         return null;
     }
