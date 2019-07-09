@@ -654,7 +654,7 @@ parentViewController:(UIViewController*)parentViewController
 //--------------------------------------------------------------------------
 // QR Code can be One data symbol can be divided into up to 16 symbols.
 // It can be reconstructed as a single data symbol using
-// the same payload and the current No. / total Count.
+// the same payload and the position No. / total Count.
 //--------------------------------------------------------------------------
 - (NSMutableDictionary*) extractQrMetaData:(AVMetadataMachineReadableCodeObject*)code {
     if (@available(iOS 11.0, *)) {
@@ -662,22 +662,25 @@ parentViewController:(UIViewController*)parentViewController
             CIQRCodeDescriptor *descriptor = (CIQRCodeDescriptor *)code.descriptor;
             Byte bytes[3];
             [descriptor.errorCorrectedPayload getBytes:bytes length:3];
-            // QRCode Mode (divided mode = 3)
+            // QRCode Mode
             int qrmode = (bytes[0] & 0xf0) >> 4;
-            // QRCode Current No.(ex. 0..15)
-            int current = bytes[0] & 0x0f;
-            // divited QRCode total count.(ex. 1..16)
-            int total = ((bytes[1] & 0xf0) >> 4) + 1;
-            // parity.
-            int parity = ((bytes[1] & 0x0f) << 4) | ((bytes[2] & 0xf0) >>4);
+            // mode=3: divided QRCode
+            if( qrmode == 3) {
+                // QRCode Position No.(ex. 0..15)
+                int position = bytes[0] & 0x0f;
+                // divited QRCode total count.(up to 16)
+                int total = ((bytes[1] & 0xf0) >> 4) + 1;
+                // parity.
+                int parity = ((bytes[1] & 0x0f) << 4) | ((bytes[2] & 0xf0) >>4);
 
-            NSMutableDictionary* dict = [NSMutableDictionary new];
-            dict[@"mode"] = [NSNumber numberWithInt:qrmode];
-            dict[@"current"] = [NSNumber numberWithInt:current];
-            dict[@"total"] = [NSNumber numberWithInt:total];
-            dict[@"parity"] = [NSNumber numberWithInt:parity];
+                NSMutableDictionary* dict = [NSMutableDictionary new];
+                dict[@"mode"] = [NSNumber numberWithInt:qrmode];
+                dict[@"position"] = [NSNumber numberWithInt:position];
+                dict[@"total"] = [NSNumber numberWithInt:total];
+                dict[@"parity"] = [NSNumber numberWithInt:parity];
 
-            return dict;
+                return dict;
+            }
         }
     }
     return nil;

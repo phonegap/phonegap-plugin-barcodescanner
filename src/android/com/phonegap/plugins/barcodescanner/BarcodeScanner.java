@@ -60,7 +60,7 @@ public class BarcodeScanner extends CordovaPlugin {
     // divided QR Code meta data.
     private static final String META = "meta";
     private static final String TOTAL = "total";
-    private static final String CURRENT = "current";
+    private static final String POSITION = "position";
     private static final String QR_MODE = "mode";
     private static final String PARITY = "parity";
 
@@ -123,9 +123,9 @@ public class BarcodeScanner extends CordovaPlugin {
 
             //android permission auto add
             if(!hasPermisssion()) {
-              requestPermissions(0);
+                requestPermissions(0);
             } else {
-              scan(args);
+                scan(args);
             }
         } else {
             return false;
@@ -344,22 +344,25 @@ public class BarcodeScanner extends CordovaPlugin {
      * QR Code can be One data symbol can be divided into up to 16 symbols.
      * It can be reconstructed as a single data symbol using
      * the same payload and the current No. / total Count.
-     * @param rawBytes The QRCode decoded raw byte data.
      */
     private JSONObject extractQrMetaData(byte[] rawBytes) {
         if ((rawBytes[0] & 0xf0) == 0x30) {
             try{
                 JSONObject obj = new JSONObject();
-                // QRCode Mode (divided mode = 3)
-                obj.put(QR_MODE, (rawBytes[0] & 0xf0) >> 4);
-                // QRCode Current No.(ex. 0..15)
-                obj.put(CURRENT, (rawBytes[0] & 0x0f));
-                // divited QRCode total count.(ex. 1..16)
-                obj.put(TOTAL, ((rawBytes[1] & 0xf0) >> 4) + 1);
-                // parity.
-                obj.put(PARITY, ((rawBytes[1] & 0x0f) << 4) | ((rawBytes[2] & 0xf0) >> 4));
+                // QRCode Mode
+                int mode = (rawBytes[0] & 0xf0) >> 4;
+                // mode=3: divided mode
+                if(mode == 3){
+                    obj.put(QR_MODE, mode);
+                    // QRCode Current No.(ex. 0..15)
+                    obj.put(POSITION, (rawBytes[0] & 0x0f));
+                    // divited QRCode total count.(up to 16)
+                    obj.put(TOTAL, ((rawBytes[1] & 0xf0) >> 4) + 1);
+                    // parity.
+                    obj.put(PARITY, ((rawBytes[1] & 0x0f) << 4) | ((rawBytes[2] & 0xf0) >> 4));
 
-                return obj;
+                    return obj;
+                }
             }catch(JSONException e){
                 Log.d(LOG_TAG, "This should never happen");
             }
