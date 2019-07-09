@@ -588,7 +588,7 @@ parentViewController:(UIViewController*)parentViewController
             AVMetadataMachineReadableCodeObject* code = (AVMetadataMachineReadableCodeObject*)[self.previewLayer transformedMetadataObjectForMetadataObject:(AVMetadataMachineReadableCodeObject*)metaData];
 
             if ([self checkResult:code.stringValue]) {
-                [self barcodeScanSucceeded:code.stringValue format:[self formatStringFromMetadata:code] meta:[self extractQrMetaData:code]];
+                [self barcodeScanSucceeded:code.stringValue format:[self formatStringFromMetadata:code] meta:[self extractDividedQrMetaData:code]];
             }
         }
     }
@@ -655,7 +655,7 @@ parentViewController:(UIViewController*)parentViewController
 // A single data symbol can be divided into up to 16 symbols in QR Code specification.
 // Divided symbols can be reconstructed as a single data symbol using the same payload , the position number and total count.
 //--------------------------------------------------------------------------
-- (NSDictionary*) extractQrMetaData:(AVMetadataMachineReadableCodeObject*)code {
+- (NSDictionary*) extractDividedQrMetaData:(AVMetadataMachineReadableCodeObject*)code {
     if (@available(iOS 11.0, *)) {
         if (code.type == AVMetadataObjectTypeQRCode){
             CIQRCodeDescriptor *descriptor = (CIQRCodeDescriptor *)code.descriptor;
@@ -883,14 +883,14 @@ parentViewController:(UIViewController*)parentViewController
         return nil;
     }
 
-    self.overlayView.autoresizesSubviews = YES;
+	self.overlayView.autoresizesSubviews = YES;
     self.overlayView.autoresizingMask    = UIViewAutoresizingFlexibleWidth | UIViewAutoresizingFlexibleHeight;
     self.overlayView.opaque              = NO;
 
-    CGRect bounds = self.view.bounds;
+	CGRect bounds = self.view.bounds;
     bounds = CGRectMake(0, 0, bounds.size.width, bounds.size.height);
 
-    [self.overlayView setFrame:bounds];
+	[self.overlayView setFrame:bounds];
 
     return self.overlayView;
 }
