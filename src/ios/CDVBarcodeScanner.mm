@@ -57,6 +57,7 @@
 @property (nonatomic, retain) NSString*                   alternateXib;
 @property (nonatomic, retain) NSMutableArray*             results;
 @property (nonatomic, retain) NSString*                   formats;
+@property (nonatomic, retain) NSString*                   cancelText;
 @property (nonatomic)         BOOL                        is1D;
 @property (nonatomic)         BOOL                        is2D;
 @property (nonatomic)         BOOL                        capturing;
@@ -208,6 +209,8 @@
     if (showTorchButton) {
       processor.isShowTorchButton = true;
     }
+    
+    processor.cancelText = options[@"cancelText"];
 
     processor.isSuccessBeepEnabled = !disableSuccessBeep;
 
@@ -871,12 +874,25 @@ parentViewController:(UIViewController*)parentViewController
     self.toolbar = [[UIToolbar alloc] init];
     self.toolbar.autoresizingMask = UIViewAutoresizingFlexibleWidth;
 
-    id cancelButton = [[UIBarButtonItem alloc]
+    id cancelButton;
+    
+    if (_processor.cancelText != nil) {
+        cancelButton = [[UIBarButtonItem alloc]
+                        initWithTitle:(_processor.cancelText)
+                        style:UIBarButtonItemStylePlain
+                        target:(id)self
+                        
+                        action:@selector(cancelButtonPressed:)
+                        ];
+    }
+    else {
+        cancelButton =[[UIBarButtonItem alloc]
                        initWithBarButtonSystemItem:UIBarButtonSystemItemCancel
                        target:(id)self
+                       
                        action:@selector(cancelButtonPressed:)
                        ];
-
+    }
 
     id flexSpace = [[UIBarButtonItem alloc]
                     initWithBarButtonSystemItem:UIBarButtonSystemItemFlexibleSpace
