@@ -251,12 +251,10 @@
 
 //--------------------------------------------------------------------------
 - (void)returnSuccess:(NSString*)scannedText format:(NSString*)format cancelled:(BOOL)cancelled flipped:(BOOL)flipped callback:(NSString*)callback{
-    NSNumber* cancelledNumber = @(cancelled ? 1 : 0);
-
     NSMutableDictionary* resultDict = [NSMutableDictionary new];
     resultDict[@"text"] = scannedText;
     resultDict[@"format"] = format;
-    resultDict[@"cancelled"] = cancelledNumber;
+    resultDict[@"cancelled"] = cancelled ? @YES : @NO;
 
     CDVPluginResult* result = [CDVPluginResult
                                resultWithStatus: CDVCommandStatus_OK
