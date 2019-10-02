@@ -58,11 +58,16 @@ public class BarcodeScanner extends CordovaPlugin {
     private static final String PHONE_TYPE = "PHONE_TYPE";
     private static final String SMS_TYPE = "SMS_TYPE";
     // divided QR Code meta data.
+    private static final int STRUCTURED_APPEND = 3;
     private static final String META = "meta";
     private static final String TOTAL = "total";
     private static final String POSITION = "position";
     private static final String QR_MODE = "mode";
     private static final String PARITY = "parity";
+    private static final int QR_META_DEFAULT_VALUE_TOTAL = 1;
+    private static final int QR_META_DEFAULT_VALUE_POSITION = 1;
+    private static final int QR_META_DEFAULT_VALUE_PARITY = 0;
+
     // Divided QRCode Header Masking Nibble
     private static final char NIBBLE_MASK_HIGHER = 0x0f;
     private static final char NIBBLE_MASK_LOWER = 0xf0;
@@ -227,25 +232,25 @@ public class BarcodeScanner extends CordovaPlugin {
     public void onActivityResult(int requestCode, int resultCode, Intent intent) {
         if (requestCode == REQUEST_CODE && this.callbackContext != null) {
             if (resultCode == Activity.RESULT_OK) {
-                JSONObject obj = new JSONObject();
                 try {
+                    JSONObject obj = new JSONObject();
                     obj.put(TEXT, intent.getStringExtra("SCAN_RESULT"));
                     obj.put(FORMAT, intent.getStringExtra("SCAN_RESULT_FORMAT"));
                     obj.put(CANCELLED, false);
 
                     // divided QRCode meta data.
-                    if (intent.getStringExtra("SCAN_RESULT_FORMAT").equals("QR_CODE")) {
+                    if (obj.get(FORMAT).equals("QR_CODE")) {
                         byte[] rawBytes = intent.getByteArrayExtra("SCAN_RESULT_BYTES");
                         JSONObject metaObj = this.extractDividedQrMetaData(rawBytes);
-                        if(metaObj != null){
-                            obj.put(META, metaObj);
-                        }
+                        // if (metaObj != null) {
+                        obj.put(META, metaObj);
+                        // }
                     }
+                    this.callbackContext.success(obj);
                 } catch (JSONException e) {
                     Log.d(LOG_TAG, "This should never happen");
                 }
                 //this.success(new PluginResult(PluginResult.Status.OK, obj), this.callback);
-                this.callbackContext.success(obj);
             } else if (resultCode == Activity.RESULT_CANCELED) {
                 JSONObject obj = new JSONObject();
                 try {
@@ -349,15 +354,21 @@ public class BarcodeScanner extends CordovaPlugin {
      * @param rawBytes
      */
     private JSONObject extractDividedQrMetaData(byte[] rawBytes) {
-        JSONObject obj = new JSONObject();
-        // QRCode Mode
-        int mode = (rawBytes[0] & NIBBLE_MASK_LOWER) >> 4;
-        // mode=3: divided mode
-        if(mode != 3){
-          return null;
-        }
-        try{
+        try {
+            JSONObject obj = new JSONObject();
+            // QRCode Mode
+            int mode = (rawBytes[0] & NIBBLE_MASK_LOWER) >> 4;
             obj.put(QR_MODE, mode);
+            // If mode is not "structured append"(3), return meta is default value
+            if (mode != STRUCTURED_APPEND) {
+                // not divided QRCode position default value.
+                obj.put(POSITION, QR_META_DEFAULT_VALUE_POSITION);
+                // not divided QRCode total default value.
+                obj.put(TOTAL, QR_META_DEFAULT_VALUE_TOTAL);
+                // not divided QRCode parity default value.
+                obj.put(PARITY, QR_META_DEFAULT_VALUE_PARITY);
+                return obj;
+            }
             // QRCode Current No.(ex. 0..15)
             obj.put(POSITION, (rawBytes[0] & NIBBLE_MASK_HIGHER));
             // divited QRCode total count.(up to 16)
@@ -366,7 +377,7 @@ public class BarcodeScanner extends CordovaPlugin {
             obj.put(PARITY, ((rawBytes[1] & NIBBLE_MASK_HIGHER) << 4) | ((rawBytes[2] & NIBBLE_MASK_LOWER) >> 4));
 
             return obj;
-        }catch(JSONException e){
+        } catch (JSONException e) {
             Log.d(LOG_TAG, "This should never happen");
         }
         return null;
