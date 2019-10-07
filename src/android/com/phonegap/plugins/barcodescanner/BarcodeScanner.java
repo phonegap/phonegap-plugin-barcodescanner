@@ -65,7 +65,7 @@ public class BarcodeScanner extends CordovaPlugin {
     private static final String QR_MODE = "mode";
     private static final String PARITY = "parity";
     private static final int QR_META_DEFAULT_VALUE_TOTAL = 1;
-    private static final int QR_META_DEFAULT_VALUE_POSITION = 1;
+    private static final int QR_META_DEFAULT_VALUE_POSITION = 0;
     private static final int QR_META_DEFAULT_VALUE_PARITY = 0;
 
     // Divided QRCode Header Masking Nibble
@@ -354,27 +354,27 @@ public class BarcodeScanner extends CordovaPlugin {
      * @param rawBytes
      */
     private JSONObject extractDividedQrMetaData(byte[] rawBytes) {
+        int qrMetaMode = 0;
+        int qrMetaPosition = QR_META_DEFAULT_VALUE_POSITION;
+        int qrMetaTotal = QR_META_DEFAULT_VALUE_TOTAL;
+        int qrMetaParity = QR_META_DEFAULT_VALUE_PARITY;
         try {
             JSONObject obj = new JSONObject();
-            // QRCode Mode
-            int mode = (rawBytes[0] & NIBBLE_MASK_LOWER) >> 4;
-            obj.put(QR_MODE, mode);
-            // If mode is not "structured append"(3), return meta is default value
-            if (mode != STRUCTURED_APPEND) {
-                // not divided QRCode position default value.
-                obj.put(POSITION, QR_META_DEFAULT_VALUE_POSITION);
-                // not divided QRCode total default value.
-                obj.put(TOTAL, QR_META_DEFAULT_VALUE_TOTAL);
-                // not divided QRCode parity default value.
-                obj.put(PARITY, QR_META_DEFAULT_VALUE_PARITY);
-                return obj;
+            qrMetaMode = (rawBytes[0] & NIBBLE_MASK_LOWER) >> 4;
+            // If mode is "structured append"(3)
+            if (qrMetaMode == STRUCTURED_APPEND) {
+                qrMetaPosition = (rawBytes[0] & NIBBLE_MASK_HIGHER);
+                qrMetaTotal = ((rawBytes[1] & NIBBLE_MASK_LOWER) >> 4) + 1;
+                qrMetaParity = ((rawBytes[1] & NIBBLE_MASK_HIGHER) << 4) | ((rawBytes[2] & NIBBLE_MASK_LOWER) >> 4);
             }
+            // QRCode Mode
+            obj.put(QR_MODE, qrMetaMode);
             // QRCode Current No.(ex. 0..15)
-            obj.put(POSITION, (rawBytes[0] & NIBBLE_MASK_HIGHER));
+            obj.put(POSITION, qrMetaPosition);
             // divited QRCode total count.(up to 16)
-            obj.put(TOTAL, ((rawBytes[1] & NIBBLE_MASK_LOWER) >> 4) + 1);
+            obj.put(TOTAL, qrMetaTotal);
             // parity.
-            obj.put(PARITY, ((rawBytes[1] & NIBBLE_MASK_HIGHER) << 4) | ((rawBytes[2] & NIBBLE_MASK_LOWER) >> 4));
+            obj.put(PARITY, qrMetaParity);
 
             return obj;
         } catch (JSONException e) {
