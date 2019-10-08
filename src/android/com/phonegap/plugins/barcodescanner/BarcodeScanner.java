@@ -232,8 +232,8 @@ public class BarcodeScanner extends CordovaPlugin {
     public void onActivityResult(int requestCode, int resultCode, Intent intent) {
         if (requestCode == REQUEST_CODE && this.callbackContext != null) {
             if (resultCode == Activity.RESULT_OK) {
+                JSONObject obj = new JSONObject();
                 try {
-                    JSONObject obj = new JSONObject();
                     obj.put(TEXT, intent.getStringExtra("SCAN_RESULT"));
                     obj.put(FORMAT, intent.getStringExtra("SCAN_RESULT_FORMAT"));
                     obj.put(CANCELLED, false);
@@ -242,15 +242,13 @@ public class BarcodeScanner extends CordovaPlugin {
                     if (obj.get(FORMAT).equals("QR_CODE")) {
                         byte[] rawBytes = intent.getByteArrayExtra("SCAN_RESULT_BYTES");
                         JSONObject metaObj = this.extractDividedQrMetaData(rawBytes);
-                        // if (metaObj != null) {
                         obj.put(META, metaObj);
-                        // }
                     }
-                    this.callbackContext.success(obj);
                 } catch (JSONException e) {
                     Log.d(LOG_TAG, "This should never happen");
                 }
                 //this.success(new PluginResult(PluginResult.Status.OK, obj), this.callback);
+                this.callbackContext.success(obj);
             } else if (resultCode == Activity.RESULT_CANCELED) {
                 JSONObject obj = new JSONObject();
                 try {
@@ -354,12 +352,13 @@ public class BarcodeScanner extends CordovaPlugin {
      * @param rawBytes
      */
     private JSONObject extractDividedQrMetaData(byte[] rawBytes) {
+        // QR Code meta default value.
         int qrMetaMode = 0;
         int qrMetaPosition = QR_META_DEFAULT_VALUE_POSITION;
         int qrMetaTotal = QR_META_DEFAULT_VALUE_TOTAL;
         int qrMetaParity = QR_META_DEFAULT_VALUE_PARITY;
+        JSONObject obj = new JSONObject();
         try {
-            JSONObject obj = new JSONObject();
             qrMetaMode = (rawBytes[0] & NIBBLE_MASK_LOWER) >> 4;
             // If mode is "structured append"(3)
             if (qrMetaMode == STRUCTURED_APPEND) {
@@ -367,19 +366,14 @@ public class BarcodeScanner extends CordovaPlugin {
                 qrMetaTotal = ((rawBytes[1] & NIBBLE_MASK_LOWER) >> 4) + 1;
                 qrMetaParity = ((rawBytes[1] & NIBBLE_MASK_HIGHER) << 4) | ((rawBytes[2] & NIBBLE_MASK_LOWER) >> 4);
             }
-            // QRCode Mode
             obj.put(QR_MODE, qrMetaMode);
-            // QRCode Current No.(ex. 0..15)
             obj.put(POSITION, qrMetaPosition);
-            // divited QRCode total count.(up to 16)
             obj.put(TOTAL, qrMetaTotal);
-            // parity.
             obj.put(PARITY, qrMetaParity);
 
-            return obj;
         } catch (JSONException e) {
             Log.d(LOG_TAG, "This should never happen");
         }
-        return null;
+        return obj;
     }
 }
