@@ -1,5 +1,9 @@
-function scan(success, error) {
-    var code = window.prompt("Enter barcode value (empty value will fire the error handler):");
+function scan(success, error, options) {
+    var text_prompt = "Enter barcode value (empty value will fire the error handler):";
+    if(options["browser_prompt"] !== null || options["browser_prompt"] !== "") {
+         text_prompt = options["browser_prompt"];
+    }
+    var code = window.prompt(text_prompt);
     if(code) {
         var result = {
             text:code,
