@@ -52,7 +52,7 @@
     "test": "jasmine-node --color spec"
   },
   "devDependencies": {
-    "jasmine-node": "1.14.5",
+    "jasmine-node": "^3.0.0",
     "pluginpub": "^0.0.9"
   },
   "dependencies": {
