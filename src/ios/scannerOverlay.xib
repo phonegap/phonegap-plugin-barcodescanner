@@ -50,13 +50,7 @@
 						<array class="NSMutableArray" key="IBUIItems">
 							<object class="IBUINavigationItem" id="240626599">
 								<reference key="IBUINavigationBar" ref="1064216609"/>
-								<string key="IBUITitle">Barcode Scanner</string>
-								<object class="IBUIBarButtonItem" key="IBUILeftBarButtonItem" id="1053701234">
-									<string key="IBUITitle">Cancel</string>
-									<string key="targetRuntimeIdentifier">IBCocoaTouchFramework</string>
-									<int key="IBUIStyle">1</int>
-									<reference key="IBUINavigationItem" ref="240626599"/>
-								</object>
+								<string key="IBUITitle">Barcode Scanner</string>							
 								<string key="targetRuntimeIdentifier">IBCocoaTouchFramework</string>
 							</object>
 						</array>
