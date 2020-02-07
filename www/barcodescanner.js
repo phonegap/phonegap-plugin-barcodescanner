@@ -109,7 +109,7 @@ BarcodeScanner.prototype.scan = function (successCallback, errorCallback, config
                 //return;
             }
 
-            scanInProgress = true;
+            //scanInProgress = true;
 
             exec(
                 function(result) {
