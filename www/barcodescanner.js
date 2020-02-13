@@ -106,10 +106,11 @@ BarcodeScanner.prototype.scan = function (successCallback, errorCallback, config
 
             if (scanInProgress) {
                 errorCallback('Scan is already in progress');
+				Scaninprogress = false;				
                 return;
             }
 
-            scanInProgress = true;
+            Scaninprogress = true;
 
             exec(
                 function(result) {
