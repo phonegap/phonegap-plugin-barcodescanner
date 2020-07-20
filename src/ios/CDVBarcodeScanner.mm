@@ -66,6 +66,9 @@
 @property (nonatomic)         BOOL                        isFlipped;
 @property (nonatomic)         BOOL                        isTransitionAnimated;
 @property (nonatomic)         BOOL                        isSuccessBeepEnabled;
+@property (nonatomic)         BOOL                        isSuccess;
+@property (nonatomic)         BOOL                        isCancelled;
+
 
 
 - (id)initWithPlugin:(CDVBarcodeScanner*)plugin callback:(NSString*)callback parentViewController:(UIViewController*)parentViewController alterateOverlayXib:(NSString *)alternateXib;
@@ -417,6 +420,9 @@ parentViewController:(UIViewController*)parentViewController
 //--------------------------------------------------------------------------
 - (void)barcodeScanSucceeded:(NSString*)text format:(NSString*)format {
     dispatch_sync(dispatch_get_main_queue(), ^{
+        
+        self.isSuccess = true;
+        
         if (self.isSuccessBeepEnabled) {
             AudioServicesPlaySystemSound(_soundFileObject);
         }
@@ -771,6 +777,14 @@ parentViewController:(UIViewController*)parentViewController
     self.processor.previewLayer.frame = self.view.bounds;
 }
 
+- (void)viewWillDisappear:(BOOL)animated{
+    if ( !(self.processor.isCancelled) && !(self.processor.isSuccess) )
+    {
+        [self.processor performSelector:@selector(barcodeScanCancelled) withObject:nil afterDelay:0];
+    }
+}
+
+
 //--------------------------------------------------------------------------
 - (void)viewDidAppear:(BOOL)animated {
     // setup capture preview layer
@@ -817,6 +831,7 @@ parentViewController:(UIViewController*)parentViewController
 
 //--------------------------------------------------------------------------
 - (IBAction)cancelButtonPressed:(id)sender {
+    self.processor.isCancelled = true;
     [self.processor performSelector:@selector(barcodeScanCancelled) withObject:nil afterDelay:0];
 }
 
